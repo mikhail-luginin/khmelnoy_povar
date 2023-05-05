@@ -1,0 +1,112 @@
+{% extends 'bar_base.html' %}
+
+{% block page_title %}
+    <center><big><b>{{ data.employee.fio }}<br>Выбранный месяц: {{ data.month_name }}</b></big></center>{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3 mb-3">
+            <div class="card-body">
+                Сумма к получению (с 1 по 15): <b>{{ data.first_period }}</b><br>
+                Сумма к получению (с 16 по 31): <b>{{ data.second_period }}</b><br><br>
+
+                <center>
+                    Выбор месяца:<br>
+                    <a href="{% url 'Bar:employee' %}?employee_code={{ data.employee.code }}&previous=1"
+                   class="btn btn-{% if data.previous %}primary{% else %}secondary{% endif %}">Предыдущий</a>
+                <a href="{% url 'Bar:employee' %}?employee_code={{ data.employee.code }}"
+                   class="btn btn-{% if data.previous is False %}primary{% else %}secondary{% endif %}">Текущий</a>
+                </center>
+            </div>
+        </div>
+        <div class="card rounded-3 mb-2">
+            <div class="card-header rounded-top-3">
+                <center>Смены (зарплата начислено)</center>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped table-bordered nowrap w-100">
+                    <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Оклад</th>
+                        <th>Процент</th>
+                        <th>Премия</th>
+                        <th>Штраф</th>
+                        <th>Итого</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in data.session_data %}
+                        <tr>
+                            <td>{{ row.date_at|date:'m.d' }}</td>
+                            <td>{{ row.oklad }}</td>
+                            <td>{{ row.percent }}</td>
+                            <td>{{ row.premium }}</td>
+                            <td>{{ row.fine }}</td>
+                            <td>{{ row.total }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card rounded-3 mb-2">
+            <div class="card-header rounded-top-3">
+                <center>Полученные авансы</center>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped table-bordered nowrap w-100">
+                    <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Оклад</th>
+                        <th>Процент</th>
+                        <th>Премия</th>
+                        <th>Итого</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in data.accrued_prepayed_data %}
+                        <tr>
+                            <td>{{ row.salary.date_at|date:'m.d' }}</td>
+                            <td>{{ row.salary.oklad }}</td>
+                            <td>{{ row.salary.percent }}</td>
+                            <td>{{ row.salary.premium }}</td>
+                            <td>{{ row.total }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card rounded-3 mb-2">
+            <div class="card-header rounded-top-3">
+                <center>Полученные месячные зарплаты</center>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped table-bordered nowrap w-100">
+                    <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Сумма</th>
+                        <th>Месяц</th>
+                        <th>Период</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in data.accrued_month_data %}
+                        <tr>
+                            <td>{{ row.salary.date_at|date:'m.d' }}</td>
+                            <td>{{ row.salary.oklad }}</td>
+                            <td>{{ row.month_name }}</td>
+                            <td>{{ row.period_name }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block bottom_menu %}{% endblock %}

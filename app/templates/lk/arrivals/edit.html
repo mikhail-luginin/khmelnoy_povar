@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">
+                Редактирование
+            </div>
+            <div class="card-body">
+                <form action="{% url 'LK:tovar_arrival_edit' %}?id={{ row.id }}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label">Дата</label>
+                        <input class="form-control date-at" name="date_at" placeholder="Выберите дату" value="{{ row.date_at|date:'Y-m-d' }}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Заведение</label>
+                        <select class="form-select" name="storage_id" placeholder="Выберите заведение">
+                            <option></option>
+                            {% for storage in storages %}
+                                <option value="{{ storage.id }}" {% if storage.id == row.storage_id %}selected{% endif %}>{{ storage.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Номер накладной</label>
+                        <input class="form-control" name="num" placeholder="Введите номер накладной" value="{{ row.num }}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Продукт</label>
+                        <select class="form-select" name="product_id" placeholder="Выберите продукт">
+                            <option></option>
+                            {% for product in products %}
+                                <option value="{{ product.id }}" {% if product.id == row.product_id %}selected{% endif %}>{{ product.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Поставщик</label>
+                        <select class="form-select" name="supplier_id" placeholder="Выберите поставщика">
+                            <option></option>
+                            {% for supplier in suppliers %}
+                                <option value="{{ supplier.id }}" {% if supplier.id == row.supplier_id %}selected{% endif %}>{{ supplier.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Количество</label>
+                        <input class="form-control" type="tel" inputmode="numeric" name="amount" placeholder="Введите количество" value="{{ row.amount }}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Сумма</label>
+                        <input class="form-control" type="tel" inputmode="numeric" name="sum" placeholder="Введите сумму" value="{{ row.sum }}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Источник оплаты</label>
+                        <select class="form-select" name="payment_type" placeholder="Выберите источник оплаты">
+                            <option></option>
+                            {% for type in payment_types %}
+                                <option value="{{ type.id }}" {% if type.id == row.payment_type_id %}selected{% endif %}>{{ type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Дата оплаты</label>
+                        <input class="form-control date-at" name="payment_date" placeholder="Выберите дату оплаты" value="{{ row.payment_date|date:'Y-m-d' }}">
+                    </div>
+                    <div class="mb-2"><button type="submit" class="btn btn-success w-100">Сохранить</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

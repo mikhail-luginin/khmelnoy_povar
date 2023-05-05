@@ -1,0 +1,29 @@
+{% extends 'bar_base.html' %}
+
+{% block title %}Инвентаризация.Бар{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">
+                <b>Инвентаризация.Напитки</b>
+            </div>
+            <div class="card-body">
+                <form action="{{ request.path }}?code={{ code }}" method="post">
+                    {% csrf_token %}
+                    <table>
+                        {% for product in products %}
+                            <tr>
+                                <td>{{ product.name }}</td>
+                                <td><input type="tel" name="{{ product.num }}" id="{{ product.num }}"
+                                           class="form-control" value="0" size="2"></td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    <div class="dropdown-divider"></div>
+                    <button type="submit" class="btn btn-success w-100">Отправить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

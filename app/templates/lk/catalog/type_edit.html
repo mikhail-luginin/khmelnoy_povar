@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Редактирование
+{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">Редактирование</div>
+            <div class="card-body">
+                <form action="{% url 'LK:catalog_type_edit' %}?id={{ row.id }}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <input class="form-control" name="name" placeholder="Введите наименование справочника"
+                               value="{{ row.name }}">
+                    </div>
+                    <div class="mb-1">
+                        <button type="submit" class="btn btn-success w-100">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

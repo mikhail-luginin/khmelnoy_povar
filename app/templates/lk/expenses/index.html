@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Расходы{% endblock %}
+{% block page_title %}Расходы{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">
+                <h3 class="card-title">Расходы</h3>
+                <div class="card-actions">
+                    <a href="{% url 'LK:create_expense' %}" class="btn btn-tabler">Создать запись</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered table-striped table-hover nowrap w-100"
+                           id="expenses-table">
+                        <thead>
+                        <tr class="column-filter dt-column-filter">
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Отправитель</th>
+                            <th>Заведение</th>
+                            <th>Тип</th>
+                            <th>Источник</th>
+                            <th>Получатель</th>
+                            <th>Сумма</th>
+                            <th>Комментарий</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        run_datatable('expenses-table', '/api/expenses', '/lk/expenses', [
+            {data: 'date_at'},
+            {data: 'writer'},
+            {data: 'storage_name'},
+            {data: 'expense_type_name'},
+            {data: 'expense_source_name'},
+            {data: 'payment_receiver'},
+            {data: 'sum'},
+            {data: 'comment'}
+        ])
+    </script>
+{% endblock %}

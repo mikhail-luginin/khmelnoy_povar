@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Cоздание записи{% endblock %}
+{% block page_title %}Cоздание записи в графике{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-body">
+                <form action="{% url 'LK:create_timetable' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="created_at">
+                    <div class="mb-4">
+                        <label class="form-label">Дата</label>
+                        <input class="form-control date-at" name="date_at" id="date_at" placeholder="Выберите дату" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Сотрудник</label>
+                        <select type="text" placeholder="Выберите сотрудника" class="form-select" name="employee_id" required>
+                            <option></option>
+                            {% for employee in employees %}
+                                <option value="{{ employee.id }}">{{ employee.fio }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Заведение</label>
+                        <select type="text" class="form-select" name="storage_id" placeholder="Выберите заведение" required>
+                            <option></option>
+                            {% for storage in storages %}
+                                <option value="{{ storage.id }}">{{ storage.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Оклад</label>
+                        <input type="tel" inputmode="numeric" class="form-control" name="oklad" id="oklad" placeholder="Введите оклад" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Позиция</label>
+                        <select type="text" class="form-select" name="position_id" placeholder="Выберите позицию" required>
+                            <option></option>
+                            {% for position in positions %}
+                                <option value="{{ position.id }}">{{ position.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-1">
+                        <button type="submit" class="btn btn-success w-100">Создать</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

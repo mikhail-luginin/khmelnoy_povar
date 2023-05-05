@@ -1,0 +1,52 @@
+{% extends 'bar_base.html' %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3 mb-2">
+            <table class="table card-table table-hover table-vcenter table-striped">
+                <thead>
+                    <tr>
+                        <th>Сотрудник</th>
+                        <th>Сумма</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                        <tr onclick="delete_confirm({{ record.id }}, 'Вы действительно хотите удалить полученную зарплату?')">
+                            <td>{{ record.employee.fio }}</td>
+                            <td>{{ record.oklad }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">
+                Зарплата расчет ({{ data_for_calculate_month_salary.month_name }} / {% if data_for_calculate_month_salary.period == 1 %}С 1 по 15 число{% elif data_for_calculate_month_salary.period == 2 %}С 16 по 31 число{% endif %})
+            </div>
+            <div class="card-body">
+                {% for row in rows %}
+                    <form action="{% url 'Bar:salary_calculation' %}?code={{ code }}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="employee_id" value="{{ row.employee.id }}">
+                        <div class="row mb-2">
+                            <div class="col-4" style="position: relative; top: 5px;">
+                                <p><b><a href="{% url 'Bar:employee' %}?employee_code={{ row.employee.code }}">{{ row.employee.fio }}</a></b></p>
+                            </div>
+                            <div class="col-4">
+                                <input class="form-control" name="employee[{{ row.employee.id }}]" value="{{ row.sum }}" disabled>
+                            </div>
+                            <div class="col-4">
+                                {% if row.is_accrued is True %}
+                                    <button class="btn btn-danger w-100" type="button">Получено</button>
+                                {% else %}
+                                    <button class="btn btn-success w-100" type="submit">Получить</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </form>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% load names %}
+
+{% block title %}Редактирование сотрудника{% endblock %}
+{% block page_title %}Редактирование сотрудника {{ row.fio }}{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-body">
+                <form action="{% url 'LK:edit_employee' %}?id={{ row.id }}" method="post" type="multipart/from_data">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label">Фамилия</label>
+                        <input class="form-control" name="last-name" placeholder="Введите фамилию" value="{{ row.fio|last_name }}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Имя</label>
+                        <input class="form-control" name="first-name" placeholder="Введите имя" value="{{ row.fio|first_name }}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Дата рождения</label>
+                        <input class="form-control date-at" name="birth_date" placeholder="Выберите дату рождения" value="{{ row.birth_date|date:'Y-m-d' }}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Адрес проживания</label>
+                        <input class="form-control" name="address" placeholder="Введите адрес проживания" value="{{ row.address }}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Должность</label>
+                        <select class="form-select" name="job_place_id" placeholder="Выберите должность">
+                            <option></option>
+                            {% for job in jobs %}
+                                <option value="{{ job.id }}" {% if row.job_place.id == job.id %}selected{% endif %}>{{ job.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Заведение</label>
+                        <select class="form-select" name="storage_id" placeholder="Выберите заведение">
+                            <option></option>
+                            {% for storage in storages %}
+                                <option value="{{ storage.id }}" {% if storage.id == row.storage.id %}selected{% endif %}>{{ storage.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Номер телефона</label>
+                        <input type="tel" inputmode="numeric" name="phone" class="form-control" placeholder="Введите номер телефона" autocomplete="off" value="{{ row.phone }}"/>
+                    </div>
+                    <div class="mb-1">
+                        <button type="submit" class="btn btn-success w-100">Добавить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

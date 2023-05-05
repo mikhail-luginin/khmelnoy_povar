@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование расхода{% endblock %}
+{% block page_title %}Редактирование расхода{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-body">
+                <form action="{% url 'LK:edit_expense' %}?id={{ row.id }}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="writer" value="Сайт">
+                    <input type="hidden" name="created_at">
+                    <div class="mb-4">
+                        <label class="form-label">Дата</label>
+                        <input class="form-control date-at" name="date_at" placeholder="Выберите дату" value="{{ row.date_at|date:'Y-m-d' }}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Получатель платежа</label>
+                        <input class="form-control" name="payment_receiver" placeholder="Введите получателя платежа" value="{% if row.payment_receiver %}{{ row.payment_receiver }}{% endif %}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Тип расхода</label>
+                        <select class="form-select" name="expense_type_id" placeholder="Выберите тип расхода" required>
+                            <option></option>
+                            {% for type in types %}
+                                <option value="{{ type.id }}" {% if type.id == row.expense_type_id %}selected{% endif %}>{{ type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Источник расхода</label>
+                        <select class="form-select" name="expense_source_id" placeholder="Выберите источник расхода" required>
+                            <option></option>
+                            {% for source in sources %}
+                                <option value="{{ source.id }}" {% if source.id == row.expense_source_id %}selected{% endif %}>{{ source.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Заведение</label>
+                        <select class="form-select" name="storage_id" placeholder="Выберите заведение" required>
+                            <option></option>
+                            {% for storage in storages %}
+                                <option value="{{ storage.id }}" {% if storage.id == row.storage_id %}selected{% endif %}>{{ storage.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Сумма расхода</label>
+                        <input type="tel" inputmode="numeric" name="sum" class="form-control" placeholder="Введите сумму расхода" value="{{ row.sum }}"/>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Комментарий</label>
+                        <input class="form-control" name="comment" placeholder="Введите комментарий" value="{{ row.comment }}">
+                    </div>
+                    <div class="mb-1">
+                        <button type="submit" class="btn btn-success w-100">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

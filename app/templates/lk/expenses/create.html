@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Создание расхода{% endblock %}
+{% block page_title %}Создание расхода{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-body">
+                <form action="{% url 'LK:create_expense' %}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label">Дата</label>
+                        <input class="form-control date-at" name="date_at" placeholder="Выберите дату" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Получатель платежа</label>
+                        <input class="form-control" name="payment_receiver" placeholder="Введите получателя платежа" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Тип расхода</label>
+                        <select class="form-select" name="type_id" placeholder="Выберите тип расхода" required>
+                            <option></option>
+                            {% for type in types %}
+                                <option value="{{ type.id }}">{{ type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Источник расхода</label>
+                        <select class="form-select" name="source_id" placeholder="Выберите источник расхода" required>
+                            <option></option>
+                            {% for source in sources %}
+                                <option value="{{ source.id }}">{{ source.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Заведение</label>
+                        <select class="form-select" name="storage_id" placeholder="Выберите заведение" required>
+                            <option></option>
+                            {% for storage in storages %}
+                                <option value="{{ storage.id }}">{{ storage.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Сумма расхода</label>
+                        <input type="tel" inputmode="numeric" name="sum" class="form-control" placeholder="Введите сумму расхода" required/>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Комментарий</label>
+                        <input class="form-control" name="comment" placeholder="Введите комментарий" required>
+                    </div>
+                    <div class="mb-1">
+                        <button type="submit" class="btn btn-success w-100">Создать</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Создание штрафа{% endblock %}
+{% block page_title %}Создание штрафа{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-body">
+                <form action="{% url 'LK:create_fine' %}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label">Дата</label>
+                        <input class="form-control date-at" name="date_at" placeholder="Выберите дату" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Сотрудник</label>
+                        <select class="form-select" name="employee_id" placeholder="Выберите сотрудника" required>
+                            <option></option>
+                            {% for employee in employees %}
+                                <option value="{{ employee.id }}">{{ employee.fio }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Сумма</label>
+                        <input type="tel" inputmode="numeric" class="form-control" name="sum"
+                               placeholder="Введите сумму штрафа" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Причина</label>
+                        <select class="form-select" name="reason_id" placeholder="Выберите причину" required>
+                            <option></option>
+                            {% for reason in reasons %}
+                                <option value="{{ reason.id }}">{{ reason.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-1">
+                        <button type="submit" class="btn btn-success w-100">Создать</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

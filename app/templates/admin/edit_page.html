@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование страницы{% endblock %}
+{% block page_title %}Редактирование страницы{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3"><h3 class="card-title">Редактирование страницы {{ row.text }}</h3></div>
+            <div class="card-body">
+                <form action="{% url 'Admin:edit_page' %}?id={{ row.id }}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Ссылка на страницу (etc. /lk/money)</label>
+                        <input class="form-control" name="page-link"
+                               placeholder="Введите ссылку на страницу" value="{{ row.link }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Наименование</label>
+                        <input class="form-control" name="page-text"
+                               placeholder="Введите наименование ссылки" value="{{ row.text }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Приложение</label>
+                        <select class="form-select" name="page-app-name" required>
+                            <option selected>Выберите..</option>
+                            <option value="lk" {% if row.app_name == 'lk' %}selected{% endif %}>Личный кабинет</option>
+                            <option value="iiko"{% if row.app_name == 'iiko' %}selected{% endif %}>IIKO</option>
+                        </select>
+                    </div>
+                    <div class="mb-1">
+                        <button type="submit" class="btn btn-success w-100">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Cоздание записи{% endblock %}
+{% block page_title %}Cоздание записи в зарплате{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-body">
+                <form action="{% url 'LK:create_salary' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="created_at">
+                    <div class="mb-4">
+                        <label class="form-label">Дата</label>
+                        <input class="form-control date-at" name="date_at" id="date_at" placeholder="Выберите дату"
+                               required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Тип</label>
+                        <select class="form-select" type="text" placeholder="Выберите тип зарплаты" name="type"
+                                id="type" onchange="typeChange()" required>
+                            <option></option>
+                            <option value="Аванс">Аванс</option>
+                            <option value="Расчет">Расчет</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Сотрудник</label>
+                        <select type="text" placeholder="Выберите сотрудника" class="form-select" name="employee_id"
+                                required>
+                            <option></option>
+                            {% for employee in employees %}
+                                <option value="{{ employee.id }}">{{ employee.fio }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Заведение</label>
+                        <select type="text" class="form-select" name="storage_id" placeholder="Выберите заведение"
+                                required>
+                            <option></option>
+                            {% for storage in storages %}
+                                <option value="{{ storage.id }}">{{ storage.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Оклад</label>
+                        <input type="tel" inputmode="numeric" class="form-control" name="oklad"
+                               placeholder="Введите оклад" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Процент</label>
+                        <input type="tel" inputmode="numeric" class="form-control" name="percent"
+                               placeholder="Введите процент" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Премия</label>
+                        <input type="tel" inputmode="numeric" class="form-control" name="premium"
+                               placeholder="Введите премию" required>
+                    </div>
+                    <div id="raschet-block" style="display: none;">
+                        <div class="mb-4">
+                            <label class="form-label">Месяц</label>
+                            <select type="text" class="form-select" name="month" id="month" placeholder="Выберите месяц">
+                                <option></option>
+                                {% for k, v in months.items %}
+                                    <option value="{{ k }}">{{ v }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Период</label>
+                            <select type="text" class="form-select" name="period" id="period"
+                                    placeholder="Выберите период">
+                                <option></option>
+                                <option value="1">С 1 по 15 числа</option>
+                                <option value="2">С 16 по 31 числа</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        <button type="submit" class="btn btn-success w-100">Создать</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        function typeChange() {
+            let value = document.getElementById('type').value
+            if (value === 'Расчет') {
+                document.getElementById('raschet-block').removeAttribute('style')
+            }
+        }
+    </script>
+{% endblock %}

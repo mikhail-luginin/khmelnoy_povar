@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block title %}Должности{% endblock %}
+{% block page_title %}Должности{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">
+                <h3 class="card-title">Список позиций</h3>
+                <div class="card-actions">
+                    <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#position-add-modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="24"
+                             height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M12 5l0 14"></path>
+                            <path d="M5 12l14 0"></path>
+                        </svg>
+                        Добавить позицию
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <table id="table" class="table table-sm table-striped table-hover table-bordered nowrap w-100">
+                    <thead>
+                    <tr>
+                        <th>Позиция</th>
+                        <th>Оклад</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">
+                <h3 class="card-title">Список должностей</h3>
+                <div class="card-actions">
+                    <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#job-add-modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="24"
+                             height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M12 5l0 14"></path>
+                            <path d="M5 12l14 0"></path>
+                        </svg>
+                        Добавить должность
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <table id="table2" class="table table-sm table-striped table-hover table-bordered nowrap w-100">
+                    <thead>
+                    <tr>
+                        <th>Должность</th>
+                        <th>Оклад</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="modal modal-blur fade" id="position-add-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавление новой позиции</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{% url 'LK:positions' %}" name="form1" method="post">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="alert alert-primary" role="alert" style="display: none;"
+                             id="position-add-ctrl-alert">
+                            <p class="mb-1">Приоритетный ID (чем больше, тем выше):</p>
+                            <p class="mb-1">20-29 - бармены</p>
+                            <p class="mb-1">10-19 - повара</p>
+                            <p class="mb-0">0-9 - тех. служащие</p>
+                        </div>
+                        <div class="mb-2">
+                            <div class="row">
+                                <div class="col">
+                                    <label class="form-label">Наименование</label>
+                                    <input type="text" class="form-control" name="position-name"
+                                           placeholder="Введите наименование позиции" required>
+                                </div>
+                                <div class="col">
+                                    <label class="form-label">Привязать к</label>
+                                    <select placeholder="Выберите должность" name="job_id" id="job_id" class="form-select" multiple required>
+                                        <option></option>
+                                        {% for job in jobs %}
+                                            <option value="{{ job.id }}">{{ job.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <div class="row">
+                                <div class="col">
+                                    <input class="form-control" name="position-oklad" type="tel" inputmode="numeric"
+                                           placeholder="Оклад позиции" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-1">
+                            <div class="row">
+                                <div class="col-auto">
+                                    <label class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="position-all-storages">
+                                        <span class="form-check-label"><b>Все заведения</b></span>
+                                    </label>
+                                </div>
+                                <div class="col-auto">
+                                    <label class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="position-is-usil">
+                                        <span class="form-check-label"><b>Усиление</b></span>
+                                    </label>
+                                </div>
+                                <div class="col-auto">
+                                    <label class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="position-is-calling">
+                                        <span class="form-check-label"><b>Вызывной</b></span>
+                                    </label>
+                                </div>
+                                <div class="col-auto">
+                                    <label class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="position-has-percent">
+                                        <span class="form-check-label"><b>Процент</b></span>
+                                    </label>
+                                </div>
+                                <div class="col-auto">
+                                    <label class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="position-has-premium">
+                                        <span class="form-check-label"><b>Премия</b></span>
+                                    </label>
+                                </div>
+                                <div class="col-auto">
+                                    <label class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="position-is-trainee">
+                                        <span class="form-check-label"><b>Стажер</b></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <input class="form-control" name="priority-id" type="tel" inputmode="numeric" min="1" max="99" placeholder="Расположение должности в списке от меньшего к большему" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn me-auto" data-bs-dismiss="modal">Закрыть</button>
+                        <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Добавить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal modal-blur fade" id="job-add-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавление новой должности</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{% url 'LK:job_add' %}" method="post">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="alert alert-danger" role="alert">
+                            <p class="mb-1">При добавлении должности оставляйте оклад пустым в случае использования
+                                стандартного расчета, если же иначе:
+                                <br><b>Основная смена: введенный оклад; Усиление: введенный оклад / 2</b></p>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <label class="form-label">Наименование</label>
+                                <input type="text" class="form-control" name="job-name"
+                                       placeholder="Введите наименование должности" required>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Оклад</label>
+                                <input type="tel" inputmode="numeric" class="form-control" name="job-oklad">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn me-auto" data-bs-dismiss="modal">Закрыть</button>
+                        <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Добавить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(document).ready(function () {
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i
+                .test(navigator.userAgent)) {
+                return false;
+            } else document.getElementById('position-add-ctrl-alert').setAttribute('style', '')
+            var table = run_datatable('table', '/api/positions', '/lk/positions', [{data: 'name'}, {data: 'oklad'}])
+            var table2 = run_datatable('table2', '/api/jobplaces', '/lk/jobs', [{data: 'name'}, {data: 'oklad'}])
+        });
+    </script>
+{% endblock %}

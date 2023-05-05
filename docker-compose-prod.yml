@@ -1,0 +1,75 @@
+services:
+  app:
+    build:
+      context: .
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./app:/app
+      - ./app/assets:/app/static
+    env_file:
+      - ./app/.env
+    command: >
+      sh -c "python manage.py migrate
+             gunicorn --bind 0.0.0.0:8080 config.wsgi"
+    depends_on:
+      - database
+
+  nginx:
+    image: nginx:1.19.8-alpine
+    restart: always
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+    env_file:
+      - ./app/.env
+    volumes:
+      - ./app/assets:/static
+
+  database:
+    image: postgres:15-alpine
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./app/.env
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7.0.5-alpine
+    restart: always
+    hostname: redis
+
+  worker:
+    build:
+      context: .
+    restart: always
+    hostname: worker
+    entrypoint: celery
+    command: -A config.celery.app worker --loglevel=info
+    volumes:
+      - ./app:/app
+    links:
+      - redis
+    depends_on:
+      - redis
+
+  beat_worker:
+    build:
+      context: .
+    restart: always
+    hostname: beat_worker
+    entrypoint: celery
+    command: -A config.celery.app beat -s /tmp/celerybeat-schedule --loglevel=info
+    volumes:
+      - ./app:/app
+    links:
+      - redis
+    depends_on:
+      - redis
+
+volumes:
+  postgres_data:

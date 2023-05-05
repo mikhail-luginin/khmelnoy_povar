@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+
+{% block title %}Админ-панель{% endblock %}
+{% block page_title %}Админ-панель{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="mb-2">
+            <div class="card rounded-3">
+                <div class="card-header card-header-light rounded-top-3"><h3 class="card-title">Список ролей</h3></div>
+                <div class="card-body">
+                    <table class="table table-sm table-striped table-hover table-bordered nowrap w-100"
+                           id="roles-table">
+                        <thead>
+                        <tr>
+                            <th>Наименование</th>
+                            <th>Все права</th>
+                            <th>Создавать</th>
+                            <th>Редактировать</th>
+                            <th>Удалять</th>
+                            <th>Страницы</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% for role in roles %}
+                                <tr>
+                                    <td>{{ role.name }}</td>
+                                    <td>{{ role.can_all }}</td>
+                                    <td>{{ role.can_create }}</td>
+                                    <td>{{ role.can_edit }}</td>
+                                    <td>{{ role.can_delete }}</td>
+                                    <td>{% for page in role.can_view.all %}{{ page }}, {% endfor %}</td>
+                                    <td>{{ role.actions|safe }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="mb-2">
+            <div class="card rounded-3">
+                <div class="card-header card-header-light rounded-top-3"><h3 class="card-title">Список пользователей</h3>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-striped table-hover table-bordered nowrap w-100"
+                           id="users-table">
+                        <thead>
+                        <tr>
+                            <th>Имя пользователя</th>
+                            <th>ФИ</th>
+                            <th>Почта</th>
+                            <th>Роли</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                                <tr>
+                                    <td>{{ user.username }}</td>
+                                    <td>{{ user.flnames }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td></td>
+                                    <td>{{ user.actions|safe }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="mb-2">
+            <div class="card rounded-3">
+                <div class="card-header card-header-light rounded-top-3"><h3 class="card-title">Список страниц</h3></div>
+                <div class="card-body">
+                    <table class="table table-sm table-striped table-hover table-bordered nowrap w-100"
+                           id="pages-table">
+                        <thead>
+                        <tr>
+                            <th>Наименование</th>
+                            <th>Ссылка</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% for page in navbar_all %}
+                                <tr>
+                                    <td>{{ page.text }}</td>
+                                    <td>{{ page.link }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row row-cards">
+            <div class="col-6">
+                <div class="mb-2">
+                    <div class="card rounded-3">
+                        <div class="card-header card-header-light rounded-top-3"><h3 class="card-title">Создание роли</h3></div>
+                        <div class="card-body">
+                            <form action="{% url 'Admin:create_role' %}" method="post">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label class="form-label">Наименование</label>
+                                    <input class="form-control" name="role-name"
+                                           placeholder="Введите наименование роли" required>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-label">Возможности</div>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <label class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="can-all">
+                                                <span class="form-check-label">Все (доступ ко всему)</span>
+                                            </label>
+                                            <label class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="can-create">
+                                                <span class="form-check-label">Создавать</span>
+                                            </label>
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="can-edit">
+                                                <span class="form-check-label">Редактировать</span>
+                                            </label>
+                                            <label class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="can-delete">
+                                                <span class="form-check-label">Удалять</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Страницы</label>
+                                    <select class="form-select" name="can-view" multiple>
+                                        {% for page in navbar_all %}
+                                            <option value="{{ page.id }}">{{ page.text }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-1">
+                                    <button type="submit" class="btn btn-success w-100">Создать</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="card rounded-3">
+                        <div class="card-header card-header-light rounded-top-3"><h3 class="card-title">Создать страницу</h3></div>
+                        <div class="card-body">
+                            <form id="create-page-form" method="post">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label class="form-label">Ссылка на страницу (etc. /lk/money)</label>
+                                    <input class="form-control" name="page-link"
+                                           placeholder="Введите ссылку на страницу"
+                                           required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Наименование</label>
+                                    <input class="form-control" name="page-text"
+                                           placeholder="Введите наименование ссылки"
+                                           required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Приложение</label>
+                                    <select class="form-select" name="page-app-name" required>
+                                        <option selected>Выберите..</option>
+                                        <option value="lk">Личный кабинет</option>
+                                        <option value="iiko">IIKO</option>
+                                    </select>
+                                </div>
+                                <div class="mb-1">
+                                    <button type="submit" class="btn btn-success w-100">Сохранить</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card rounded-3">
+                    <div class="card-header card-header-light rounded-top-3"><h3 class="card-title">Создание пользователя</h3></div>
+                    <div class="card-body">
+                        <form id="create-user-form" method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label">Имя пользователя</label>
+                                <input class="form-control" name="username" placeholder="Введите имя пользователя">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Имя</label>
+                                <input class="form-control" name="first-name" placeholder="Введите имя">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Фамилия</label>
+                                <input class="form-control" name="last-name" placeholder="Введите фамилию">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Почта</label>
+                                <input type="email" class="form-control" name="email" placeholder="Введите почту">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Пароль</label>
+                                <input type="password" class="form-control" name="password"
+                                       placeholder="Введите пароль">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Подтвердите пароль</label>
+                                <input type="password" class="form-control" name="confirm-password"
+                                       placeholder="Подтвердите пароль">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Роль</label>
+                                <select class="form-select" name="roles" multiple>
+                                    {% for role in roles %}
+                                        <option value="{{ role.id }}">{{ role.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-1">
+                                <button type="submit" class="btn btn-success w-100">Создать</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

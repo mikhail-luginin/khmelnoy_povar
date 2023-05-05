@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование{% endblock %}
+{% block page_title %}Редактирование записи{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-body">
+                <form action="{% url 'LK:edit_money' %}?id={{ row.id }}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label">Касса утро</label>
+                        <input class="form-control" name="sum_cash_morning" placeholder="Введите сумму кассы на утро" value="{{ row.sum_cash_morning }}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Касса вечер</label>
+                        <input class="form-control" name="sum_cash_end_day" placeholder="Введите сумму кассы на вечер" value="{{ row.sum_cash_end_day }}">
+                    </div>
+                    <div class="mb-1">
+                        <button type="submit" class="btn btn-success w-100">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

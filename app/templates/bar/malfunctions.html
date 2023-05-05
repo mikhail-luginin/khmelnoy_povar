@@ -1,0 +1,77 @@
+{% extends 'bar_base.html' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="/assets/css/magnific-popup.css">
+{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3 mb-2">
+            <div class="card-header card-header-light rounded-top-3">
+                Неисправности
+            </div>
+            <div class="card-body">
+                <form action="{% url 'Bar:malfunctions' %}?code={{ code }}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label for="malfunction-photo" class="form-label">Фото</label>
+                        <input class="form-control" type="file" name="malfunction-photo" id="malfunction-photo"
+                               required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="fault-object" class="form-label">Объект неисправности</label>
+                        <input class="form-control" name="fault-object" id="fault-object"
+                               placeholder="Укажите объект неисправности" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="malfunction-description" class="form-label">Описание неисправности</label>
+                        <textarea
+                                name="malfunction-description" id="malfunction-description"
+                                class="form-control" placeholder="Введите описание неисправности" required></textarea>
+                    </div>
+                    <div class="mb-1">
+                        <button type="submit" class="btn btn-success w-100">Добавить неисправность</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">
+                Список неисправностей
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                    <tr>
+                        <th>Фото</th>
+                        <th>Дата</th>
+                        <th>Объект</th>
+                        <th>Описание</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in rows %}
+                        <tr class="table-{% if row.status == 0 %}danger{% else %}success{% endif %}">
+                            <td><a class="image-popup" title="Фото" href="{{ row.photo.url }}">
+                                <i class="fa fa-camera"></i>
+                            </a></td>
+                            <td>{{ row.date_at|date:'Y-m-d h:i' }}</td>
+                            <td>{{ row.fault_object }}</td>
+                            <td>{{ row.description }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="/assets/js/jquery.magnific-popup.min.js"></script>
+    <script>
+        $('.image-popup').magnificPopup({
+            type: 'image'
+        });
+    </script>
+{% endblock %}

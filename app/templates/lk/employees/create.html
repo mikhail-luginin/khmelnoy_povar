@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавление сотрудника{% endblock %}
+{% block page_title %}Добавление сотрудника в базу{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-body">
+                <form action="{% url 'LK:create_employee' %}" method="post" type="multipart/from_data">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label">Фамилия</label>
+                        <input class="form-control" name="last-name" placeholder="Введите фамилию" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Имя</label>
+                        <input class="form-control" name="first-name" placeholder="Введите имя" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Дата рождения</label>
+                        <input class="form-control date-at" name="birth-date" placeholder="Выберите дату рождения" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Адрес проживания</label>
+                        <input class="form-control" name="address" placeholder="Введите адрес проживания" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Должность</label>
+                        <select class="form-select" name="job-id" placeholder="Выберите должность" required>
+                            <option></option>
+                            {% for job in jobs %}
+                                <option value="{{ job.id }}">{{ job.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Заведение</label>
+                        <select class="form-select" name="storage-id" placeholder="Выберите заведение" required>
+                            <option></option>
+                            {% for storage in storages %}
+                                <option value="{{ storage.id }}">{{ storage.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Номер телефона</label>
+                        <div class="input-group mb-2">
+                            <span class="input-group-text">+7</span>
+                            <input type="tel" inputmode="numeric" name="phone" class="form-control" data-mask="0000000000" data-mask-visible="true" placeholder="Введите номер телефона" autocomplete="off" required/>
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        <button type="submit" class="btn btn-success w-100">Добавить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

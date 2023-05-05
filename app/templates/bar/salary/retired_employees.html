@@ -1,0 +1,28 @@
+{% extends 'bar_base.html' %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-table">
+                <table class="table table-vcenter mb-0">
+                    <thead>
+                    <tr>
+                        <th>Сотрудник</th>
+                        <th>Сумма</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            <td>{{ row.employee.fio }}</td>
+                            <td>{{ row.sum }}</td>
+                            <td><a class="btn" href="{% url 'Bar:salary_for_retired_employee_accrue' %}?code={{ code }}&employee_code={{ row.employee.code }}">Получить</a></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

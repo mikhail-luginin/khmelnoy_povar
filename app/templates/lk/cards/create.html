@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Создание карты{% endblock %}
+{% block page_title %}Создание карты для привязки к банковской выписке{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3"><h3 class="card-title">Создание карты</h3></div>
+            <div class="card-body">
+                <form action="{% url 'LK:create_bank_card' %}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label">Наименование карты/мерчанта</label>
+                        <input class="form-control" name="name" placeholder="Введите наименование карты или мерчанта">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Номер карты/мерчанта</label>
+                        <input class="form-control" type="tel" inputmode="numeric" name="num" placeholder="Введите 4 последние цифры карты либо номер мерчанта без знаков" value="{{ current_card }}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Заведение</label>
+                        <select class="form-select" name="storage_id">
+                            <option value="-1">Выберите или оставьте пустым</option>
+                            {% for storage in storages %}
+                                <option value="{{ storage.id }}">{{ storage.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-1">
+                        <button type="submit" class="btn btn-success w-100">Создать</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

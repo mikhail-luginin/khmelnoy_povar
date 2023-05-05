@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Внесения/изъятия{% endblock %}
+{% block page_title %}Список внесений и изъятий{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">
+                Внесения/изъятия
+                <div class="card-actions">
+                    <a href="{% url 'LK:create_pays' %}" class="btn btn-tabler">Добавить запись</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="pays-table" class="table table-sm table-striped table-hover table-bordered nowrap w-100">
+                        <thead>
+                            <tr class="column-filter dt-column-filter">
+                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                                <th></th>
+                            </tr>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Заведение</th>
+                                <th>Тип</th>
+                                <th>Сумма</th>
+                                <th>Комментарий</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        run_datatable('pays-table', '/api/pays', '/lk/pays', [
+            {data: 'date_at'},
+            {data: 'storage_name'},
+            {data: 'type_name'},
+            {data: 'sum'},
+            {data: 'comment'}
+        ])
+    </script>
+{% endblock %}

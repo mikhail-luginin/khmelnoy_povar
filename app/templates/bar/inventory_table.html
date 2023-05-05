@@ -1,0 +1,53 @@
+{% extends 'bar_base.html' %}
+
+{% block title %}Инвентаризация{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">
+                <b>Инвентаризация {{ category }}</b>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped table-bordered table-sm dt-responsive nowrap w-100">
+                    <thead>
+                    <th>Название</th>
+                    <th>IIKO</th>
+                    <th>Факт</th>
+                    <th>Разница</th>
+                    </thead>
+                    <tbody>
+                    {% for key, value in rows.items %}
+                        <tr>
+                            <td>
+                                {{ key }}
+                            </td>
+                            <td>
+                                {% for k, v in value.items %}
+                                    {% if k == 'iiko' %}
+                                        {{ v }}
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for k, v in value.items %}
+                                    {% if k == 'fact' %}
+                                        {{ v }}
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for k, v in value.items %}
+                                    {% if k == 'difference' %}
+                                        {{ v }}
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'bar_base.html' %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="mb-2">
+            <div class="card rounded-3">
+                <div class="list-group list-group-flush">
+                    {#                    <a href="{% url 'Bar:add_employee' %}?code={{ code }}" class="list-group-item list-group-item-action">Добавить сотрудника</a>#}
+                    <a href="{% url 'Bar:malfunctions' %}?code={{ code }}"
+                       class="list-group-item list-group-item-action">Неисправности</a>
+                </div>
+            </div>
+        </div>
+        <div class="mb-2">
+            <div class="card rounded-3">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-header sticky-top"><b>Поступления</b></div>
+                    <a href="{% url 'Bar:arrival_beer' %}?code={{ code }}"
+                       class="list-group-item list-group-item-action">Пиво</a>
+                    <a href="{% url 'Bar:arrival_drink' %}?code={{ code }}"
+                       class="list-group-item list-group-item-action">Напитки</a>
+                </div>
+            </div>
+        </div>
+        <div class="mb-2">
+            <div class="card rounded-3">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-header sticky-top"><b>Заявки</b></div>
+                    <a href="{% url 'Bar:tovar_request_beer' %}?code={{ code }}"
+                       class="list-group-item list-group-item-action">Пиво</a>
+                    <a href="{% url 'Bar:tovar_request_bar' %}?code={{ code }}"
+                       class="list-group-item list-group-item-action">Напитки</a>
+                    {#                    <a href="{% url 'Bar:tovar_request_products' %}?code={{ code }}" class="list-group-item list-group-item-action">Продукты</a>#}
+                    <a href="{% url 'Bar:tovar_request_hoz' %}?code={{ code }}"
+                       class="list-group-item list-group-item-action">Хоз. товары</a>
+                    <a href="{% url 'Bar:tovar_request_box' %}?code={{ code }}"
+                       class="list-group-item list-group-item-action">Упаковка</a>
+                </div>
+            </div>
+        </div>
+        <div class="mb-2">
+            <div class="card rounded-3">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-header sticky-top"><b>Инвентаризация</b></div>
+                    <a href="{% url 'Bar:inventory_bar' %}?code={{ code }}"
+                       class="list-group-item list-group-item-action">Напитки</a>
+                    <a href="{% url 'Bar:inventory_ware' %}?code={{ code }}"
+                       class="list-group-item list-group-item-action">Посуда</a>
+                </div>
+            </div>
+        </div>
+        <div class="mb-2">
+            <div class="card rounded-3">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-header sticky-top"><b>Зарплата</b></div>
+                    <a href="{% url 'Bar:salary_calculation' %}?code={{ code }}"
+                       class="list-group-item list-group-item-action">Расчет</a>
+                    <a href="?code={{ code }}" class="list-group-item list-group-item-action">Офис</a>
+                    <a href="?code={{ code }}" class="list-group-item list-group-item-action">Штрафы</a>
+                    <a href="{% url 'Bar:salary_for_retired_employees' %}?code={{ code }}"
+                       class="list-group-item list-group-item-action">Уволенные сотрудники</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

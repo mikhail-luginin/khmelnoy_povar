@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Сотрудники{% endblock %}
+{% block page_title %}Список сотрудников{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">
+                Сотрудники
+                <div class="card-actions">
+                    <a href="{% url 'LK:create_employee' %}" class="btn btn-tabler">Добавить сотрудника</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="employees-table" class="table table-sm table-striped table-hover table-bordered nowrap w-100">
+                        <thead>
+                            <tr class="column-filter dt-column-filter">
+                                <th></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                                <th></th>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <th>ФИО</th>
+                                <th>Дата рождения</th>
+                                <th>Адрес проживания</th>
+                                <th>Должность</th>
+                                <th>Заведение</th>
+                                <th>Телефон</th>
+                                <th>Статус</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        run_datatable('employees-table', '/api/employees', '/lk/employees', [
+            {data: 'photo'},
+            {data: 'fio'},
+            {data: 'birth_date'},
+            {data: 'address'},
+            {data: 'job'},
+            {data: 'storage_name'},
+            {data: 'phone'},
+            {data: 'status'}
+        ])
+    </script>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование пользователя{% endblock %}
+{% block page_title %}Редактирование пользователя{% endblock %}
+
+{% load data_converting %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3"><h3 class="card-title">Редактирование пользователя {{ row.username }}</h3></div>
+            <div class="card-body">
+                <form action="{% url 'Admin:edit_user' %}?id={{ row.id }}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Роли</label>
+                        <select class="form-select" name="roles" multiple>
+                            {% for role in roles %}
+                                <option value="{{ role.id }}" {% for user_role in row.roles %}{% if role.id == user_role|convert_int %}selected{% endif %}{% endfor %}>{{ role.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-1">
+                        <button type="submit" class="btn btn-success w-100">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

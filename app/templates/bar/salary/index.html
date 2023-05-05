@@ -1,0 +1,70 @@
+{% extends 'bar_base.html' %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3 mb-2">
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Сотрудник</th>
+                            <th>Оклад</th>
+                            <th>Процент</th>
+                            <th>Премия</th>
+                            <th>Итого</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for salary in salaries %}
+                            <tr>
+                                <td>{{salary.employee.fio}}</td>
+                                <td>{{salary.oklad}}</td>
+                                <td>{{salary.percent}}</td>
+                                <td>{{salary.premium}}</td>
+                                <td>{{salary.total_sum}}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% for row in rows %}
+            <form action="{% url 'Bar:salary' %}?code={{ code }}&employee_code={{ row.employee.code }}" method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <div class="card rounded-3">
+                        <div class="card-body">
+                            <div class="mb-1">
+                                <center><b>{{ row.employee.fio }} ({{ row.employee.job_place.name }})</b></center>
+                            </div>
+                            <div class="mb-1">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <input class="form-control" name="salary[{{ row.employee.code }}][oklad]"
+                                               placeholder="Введите оклад" value="{{ row.oklad }}"
+                                               readonly>
+                                    </div>
+                                    <div class="col-4">
+                                        <input class="form-control" name="salary[{{ row.employee.code }}][percent]"
+                                               placeholder="Введите процент" value="{{ row.percent }}"
+                                               readonly>
+                                    </div>
+                                    <div class="col-4">
+                                        <input class="form-control" name="salary[{{ row.employee.code }}][premium]"
+                                               placeholder="Введите премию" value="{{ row.premium }}"
+                                               readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if row.is_accrued is True %}
+                                <button type="button" class="btn btn-danger w-100">Получено</button>
+                            {% else %}
+                                <button type="submit" class="btn btn-success w-100">Получить</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </form>
+        {% endfor %}
+    </div>
+{% endblock %}

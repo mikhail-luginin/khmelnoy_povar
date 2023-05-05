@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Поступления{% endblock %}
+
+{% block page_title %}Поступления товара{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">
+                Поступления товара
+                <div class="card-actions">
+                    <a href="{% url 'LK:tovar_arrival_create' %}" class="btn btn-tabler">Создать запись</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <table id="arrivals-table" class="table table-sm table-hover table-striped table-bordered nowrap w-100">
+                    <thead>
+                    <tr class="column-filter dt-column-filter">
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Заведение</th>
+                        <th>Номер накладной</th>
+                        <th>Продукт</th>
+                        <th>Поставщик</th>
+                        <th>Кол-во</th>
+                        <th>Сумма</th>
+                        <th>Тип оплаты</th>
+                        <th>Источник оплаты</th>
+                        <th>Дата платежа</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        run_datatable('arrivals-table', '/api/arrivals', '/lk/tovar/arrivals', [
+            {data: 'date_at'},
+            {data: 'storage_name'},
+            {data: 'num'},
+            {data: 'product_name'},
+            {data: 'supplier_name'},
+            {data: 'amount'},
+            {data: 'sum'},
+            {data: 'pay_type_name'},
+            {data: 'payment_type_name'},
+            {data: 'payment_date'}
+        ])
+    </script>
+{% endblock %}

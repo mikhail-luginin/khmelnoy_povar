@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование{% endblock %}
+{% block page_title %}Редактирование поставщика {{ row.name }}{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">Редактирование</div>
+            <div class="card-body">
+                <form action="{% url 'IIKO:supplier_edit' %}?id={{ row.id }}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label" for="friendly_name">Дружеское название</label>
+                        <input class="form-control" id="friendly_name" name="friendly_name" placeholder="Введите дружеское название" value="{{ row.friendly_name }}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label" for="category_id">Категория</label>
+                        <select class="form-select" id="category_id" name="category_id">
+                            <option value="-1">Выберите..</option>
+                            {% for category in categories %}
+                                <option value="{{ category.id }}" {% if row.category == category.id %}selected{% endif %}>{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-check">
+                            <input class="form-check-input" type="radio" name="is_revise" value="1" {% if row.is_revise == 1 %}checked{% endif %}>
+                            <span class="form-check-label">Участвует в сверке</span>
+                        </label>
+                        <label class="form-check">
+                            <input class="form-check-input" type="radio" name="is_revise" value="0" {% if row.is_revise == 0 %}checked{% endif %}>
+                            <span class="form-check-label">Не участвует в сверке</span>
+                        </label>
+                    </div>
+                    <div class="mb-2">
+                        <button type="submit" class="btn btn-success w-100">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

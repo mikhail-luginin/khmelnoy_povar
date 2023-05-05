@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование записи{% endblock %}
+{% block page_title %}Редактирование записи в зарплате{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-body">
+                <form action="{% url 'LK:edit_salary' %}?id={{ row.id }}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label">Дата</label>
+                        <input class="form-control date-at" name="date_at" id="date_at" placeholder="Выберите дату" value="{{ row.date_at|date:'Y-m-d' }}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Тип</label>
+                        <select class="form-select" type="text" placeholder="Выберите тип зарплаты" name="type"
+                                id="type" onchange="typeChange()">
+                            <option></option>
+                            <option value="1" {% if row.type == 1 %}selected{% endif %}>Аванс</option>
+                            <option value="2" {% if row.type == 2 %}selected{% endif %}>Расчет</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Сотрудник</label>
+                        <select placeholder="Выберите сотрудника" class="form-select" name="employee_id">
+                            <option></option>
+                            {% for employee in employees %}
+                                <option value="{{ employee.id }}" {% if employee.id == row.employee.id %}selected{% endif %}>{{ employee.fio }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Заведение</label>
+                        <select class="form-select" name="storage_id" placeholder="Выберите заведение">
+                            <option></option>
+                            {% for storage in storages %}
+                                <option value="{{ storage.id }}" {% if storage.id == row.storage_id %}selected{% endif %}>{{ storage.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Оклад</label>
+                        <input type="tel" inputmode="numeric" class="form-control" name="oklad"
+                               placeholder="Введите оклад" value="{{ row.oklad }}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Процент</label>
+                        <input type="tel" inputmode="numeric" class="form-control" name="percent"
+                               placeholder="Введите процент" value="{{ row.percent }}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Премия</label>
+                        <input type="tel" inputmode="numeric" class="form-control" name="premium"
+                               placeholder="Введите премию" value="{{ row.premium }}">
+                    </div>
+                    <div id="raschet-block" style="display: none;">
+                        <div class="mb-4">
+                            <label class="form-label">Месяц</label>
+                            <select type="text" class="form-select" name="month" id="month" placeholder="Выберите месяц">
+                                <option></option>
+                                {% for k, v in months.items %}
+                                    <option value="{{ k }}" {% if row.month == k %}selected{% endif %}>{{ v }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Период</label>
+                            <select type="text" class="form-select" name="period" id="period"
+                                    placeholder="Выберите период">
+                                <option></option>
+                                <option value="1" {% if row.period == 1 %}selected{% endif %}>С 1 по 15 числа</option>
+                                <option value="2" {% if row.period == 2 %}selected{% endif %}>С 16 по 31 числа</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        <button type="submit" class="btn btn-success w-100">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        function typeChange() {
+            let value = document.getElementById('type').value
+            if (value === '2') {
+                document.getElementById('raschet-block').removeAttribute('style')
+            }
+        }
+    </script>
+{% endblock %}

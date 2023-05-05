@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <div class="container-xl">
+        {% for row in rows %}
+            <div class="card rounded-3 mb-2">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-header sticky-top"><b>{{ row.storage }}</b></div>
+                    {% for item in row.stoplist %}
+                        <span class="list-group-item">{{ item }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

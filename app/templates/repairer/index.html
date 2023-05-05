@@ -1,0 +1,58 @@
+{% extends 'repairer/base.html' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="/assets/css/magnific-popup.css">
+{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">
+                Текущие неисправности
+            </div>
+            <form action="{% url 'Repairer:index' %}" method="post">
+                {% csrf_token %}
+                <div class="table-responsive">
+                    <table class="table card-table table-sm table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>Фото</th>
+                            <th>Дата</th>
+                            <th>Заведение</th>
+                            <th>Объект</th>
+                            <th>Описание</th>
+                        </tr>
+                        </thead>
+                        {% for row in rows %}
+                            <tr class="table-{% if row.status == 0 %}danger{% else %}success{% endif %}">
+                                <td><a class="image-popup" title="Фото" href="{{ row.photo.url }}">
+                                    <i class="fa fa-camera"></i>
+                                </a></td>
+                                <td>{{ row.date_at|date:'Y-m-d h:i' }}</td>
+                                <td>
+                                    <a href="{% url 'Repairer:index' %}?storage={{ row.storage.id }}">{{ row.storage.name }}</a>
+                                </td>
+                                <td>{{ row.fault_object }}</td>
+                                <td>{{ row.description }}</td>
+                                <td>{% if row.status == 0 %}
+                                    <a href="{% url 'Repairer:malfunction_complete' %}?id={{ row.id }}"
+                                       class="btn btn-success">Завершить</a>
+                                {% else %}
+                                    <button class="btn btn-danger" disabled>Завершено</button>{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="/assets/js/jquery.magnific-popup.min.js"></script>
+    <script>
+        $('.image-popup').magnificPopup({
+            type: 'image'
+        });
+    </script>
+{% endblock %}

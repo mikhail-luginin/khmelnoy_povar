@@ -1,0 +1,47 @@
+#footer-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 12390;
+    background-color: rgba(249, 249, 249, .98);
+    box-shadow: 0 -5px 10px 0 rgba(0, 0, 0, .06);
+    min-height: 60px;
+    display: flex;
+    text-align: center
+}
+
+#footer-bar a {
+    color: #1f1f1f;
+    padding-top: 12px;
+    position: relative;
+    flex: 1 1 auto
+}
+
+#footer-bar a span {
+    position: relative;
+    z-index: 2;
+    display: block;
+    font-size: 10px;
+    font-weight: 500;
+    margin-top: 1px;
+    opacity: .7;
+    font-family: Inter, sans-serif !important
+}
+
+#footer-bar a i {
+    font-size: 18px;
+    position: relative;
+    z-index: 2
+}
+
+.footer-bar-5 .active-nav strong {
+    position: absolute;
+    width: 50px;
+    height: 2px;
+    border-radius: 60px;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    color: dodgerblue;
+}

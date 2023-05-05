@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Справочники
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" type="text/css" href="/assets/libs/DataTables/datatables.min.css"/>
+{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">
+                <h3 class="card-title">Содержимое справочников</h3>
+                <div class="card-actions">
+                    <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#catalog-add-modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="24"
+                             height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M12 5l0 14"></path>
+                            <path d="M5 12l14 0"></path>
+                        </svg>
+                        Добавить запись в справочник
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered table-striped table-hover nowrap w-100" id="table">
+                        <thead>
+                        <tr class="column-filter dt-column-filter">
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <th>Наименование</th>
+                            <th>Привязан к</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">
+                <h3 class="card-title">Типы справочников</h3>
+                <div class="card-actions">
+                    <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#catalog-type-add-modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="24"
+                             height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M12 5l0 14"></path>
+                            <path d="M5 12l14 0"></path>
+                        </svg>
+                        Добавить справочник
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered table-striped table-hover nowrap w-100" id="table2">
+                        <thead>
+                        <tr class="column-filter dt-column-filter">
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <th>Наименование</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal modal-blur fade" id="catalog-add-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавление новой записи в справочник</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{% url 'LK:catalog_add' %}" method="post">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col">
+                                <label class="form-label">Наименование</label>
+                                <input type="text" class="form-control" name="catalog-name"
+                                       placeholder="Введите наименование записи в каталоге" required>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Привязать к</label>
+                                <select name="linked" id="linked" class="form-select" multiple required>
+                                    {% for row in catalog_types %}
+                                        <option value="{{ row.id }}">{{ row.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn me-auto" data-bs-dismiss="modal">Закрыть</button>
+                        <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Добавить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal modal-blur fade" id="catalog-type-add-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавление нового типа справочника</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{% url 'LK:catalog_type_add' %}" method="post">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <label class="form-label">Наименование</label>
+                        <input type="text" class="form-control" name="name"
+                               placeholder="Введите наименование записи в каталоге">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn me-auto" data-bs-dismiss="modal">Закрыть</button>
+                        <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Добавить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" src="/assets/libs/DataTables/datatables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            let table = run_datatable('table', '/api/catalog', '/lk/catalog', [
+                {data: 'name'},
+                {data: 'catalog_types'}])
+            let table2 = run_datatable('table2', '/api/catalog-types', '/lk/catalog/types', [
+                {data: 'name'}])
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Банк.Карты{% endblock %}
+{% block page_title %}Банк.Карты{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="mb-2">
+            <div class="card rounded-3">
+                <div class="card-header card-header-light rounded-top-3"><h3 class="card-title">Карты</h3></div>
+                <div class="card-body">
+                    <table class="table table-sm table-striped table-bordered table-hover nowrap w-100" id="cards-table">
+                        <thead>
+                        <tr>
+                            <th>Наименование</th>
+                            <th>Номер</th>
+                            <th>Заведение</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3"><h3 class="card-title">Отсутствующие в справочнике
+                карты</h3></div>
+            <div class="card-body">
+                <div class="row">
+                    {% for card in undefined_cards %}
+                        <div class="col-4 mb-2">
+                            <a href="{% url 'LK:create_bank_card' %}?card={{ card }}" class="btn btn-azure w-100">
+                                {% if card|length == 4 %}Создать
+                                    карту **{{ card }}{% else %}Создать мерчант №{{ card }}{% endif %}</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        run_datatable('cards-table', '/api/cards', '/lk/cards', [
+            {data: 'name'},
+            {data: 'num'},
+            {data: 'storage'}
+        ])
+    </script>
+{% endblock %}

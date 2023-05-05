@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Поступления{% endblock %}
+
+{% block page_title %}Поступления товара{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-body">
+                <table id="tovar-requests-table" class="table table-sm table-hover table-striped table-bordered nowrap w-100">
+                    <thead>
+                    <tr class="column-filter dt-column-filter">
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Заведение</th>
+                        <th>Продукт</th>
+                        <th>Поставщик</th>
+                        <th>Кол-во</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        run_datatable('tovar-requests-table', '/api/tovar-requests', '/lk/tovar/requests', [
+            {data: 'date_at'},
+            {data: 'storage_name'},
+            {data: 'product_name'},
+            {data: 'supplier_name'},
+            {data: 'amount'}
+        ])
+    </script>
+{% endblock %}

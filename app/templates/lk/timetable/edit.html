@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование записи{% endblock %}
+{% block page_title %}Редактирование записи в графике{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-body">
+                <form action="{% url 'LK:edit_timetable' %}?id={{ row.id }}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label">Дата</label>
+                        <input class="form-control date-at" name="date_at" id="date_at" placeholder="Выберите дату" value="{{ row.date_at|date:'Y-m-d' }}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Сотрудник</label>
+                        <select type="text" placeholder="Выберите сотрудника" class="form-select" name="employee_id">
+                            {% for employee in employees %}
+                                <option value="{{ employee.id }}" {% if row.employee.id == employee.id %}selected{% endif %}>{{ employee.fio }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Заведение</label>
+                        <select type="text" class="form-select" name="storage_id" placeholder="Выберите заведение" required>
+                            <option></option>
+                            {% for storage in storages %}
+                                <option value="{{ storage.id }}" {% if row.storage.id == storage.id %}selected{% endif %}>{{ storage.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Оклад</label>
+                        <input type="tel" inputmode="numeric" class="form-control" name="oklad" placeholder="Введите оклад" value="{{ row.oklad }}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Позиция</label>
+                        <select type="text" class="form-select" name="position_id" placeholder="Выберите позицию">
+                            <option></option>
+                            {% for position in positions %}
+                                <option value="{{ position.id }}" {% if row.position == position %}selected{% endif %}>{{ position.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-1">
+                        <button type="submit" class="btn btn-success w-100">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

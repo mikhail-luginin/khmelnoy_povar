@@ -1,0 +1,7 @@
+<br> <br><div id="footer-bar" class="footer-bar-5 rounded-3">
+    <a href="{% url 'Bar:index' %}?code={{ code }}" {% if request.path == '/bar/' %}class="active-nav"{% endif %}class="active-nav"><i class="fa fa-home"></i><span>Главная</span><strong></strong></a>
+    <a href="{% url 'Bar:expenses' %}?code={{ code }}" {% if request.path == '/bar/expenses' %}class="active-nav"{% endif %}><i class="fa fa-credit-card"></i><span>Расходы</span><strong></strong></a>
+    <a href="{% url 'Bar:other' %}?code={{ code }}" {% if request.path == '/bar/other' or 'arrivals' in request.path or 'requests' in request.path or 'employee/add' in request.path or 'inventory' in request.path or 'fines' in request.path or 'salary/calculated' in request.path or 'salary/office' in request.path or 'salary/retired_employees' in request.path %}class="active-nav"{% endif %}><i class="fa-solid fa-layer-group"></i><span>Разное</span><strong></strong></a>
+    <a href="{% url 'Bar:salary' %}?code={{ code }}" {% if request.path == '/bar/salary' %}class="active-nav"{% endif %}><i class="fa fa-wallet"></i><span>Зарплата</span><strong></strong></a>
+    <a href="{% url 'Bar:end_day' %}?code={{ code }}" {% if request.path == '/bar/end_day' %}class="active-nav"{% endif %}><i class="fa fa-calendar-alt"></i><span>Конец дня</span><strong></strong></a>
+</div>

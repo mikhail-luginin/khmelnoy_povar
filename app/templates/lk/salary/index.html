@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Зарплата{% endblock %}
+{% block page_title %}Полученная зарплата сотрудников{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">
+                <h3 class="card-title">Зарплата</h3>
+                <div class="card-actions">
+                    <a href="{% url 'LK:create_salary' %}" class="btn btn-tabler">Создать запись</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered table-striped table-hover nowrap w-100" id="salary-table">
+                        <thead>
+                            <tr class="column-filter dt-column-filter">
+                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                                <th></th>
+                            </tr>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Тип</th>
+                                <th>Заведение</th>
+                                <th>Сотрудник</th>
+                                <th>Оклад</th>
+                                <th>Процент</th>
+                                <th>Премия</th>
+                                <th>Итого</th>
+                                <th>Месяц</th>
+                                <th>Период</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        run_datatable('salary-table', '/api/salary', '/lk/salary', [
+            {data: 'date_at'},
+            {data: 'type'},
+            {data: 'storage_name'},
+            {data: 'employee_fio'},
+            {data: 'oklad'},
+            {data: 'percent'},
+            {data: 'premium'},
+            {data: 'total_sum'},
+            {data: 'month_name'},
+            {data: 'period_name'}
+        ])
+    </script>
+{% endblock %}

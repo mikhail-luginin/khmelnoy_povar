@@ -1,0 +1,41 @@
+{% extends 'bar_base.html' %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3 overflow-hidden mb-2">
+            <div class="card-header card-header-light">Заявка на сегодня</div>
+            <table id="table" class="table card-table table-mobile-sm table-hover">
+                <tbody>
+                {% for row in rows %}
+                    <tr onclick="delete_confirm({{ row.id }}, 'asd', '/bar/requests/delete')">
+                        <td>
+                            {{ row.product.name }}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3"><b>Заявка на {{ category }}</b></div>
+            <div class="card-body">
+                <form action="{{ request.path }}?code={{ code }}" method="post">
+                    {% csrf_token %}
+                    {% for product in products %}
+                        <div class="mb-2">
+                            <div class="form-selectgroup">
+                                <label class="form-selectgroup-item">
+                                    <input type="checkbox" name="{{ product.id }}" value="{{ product.name }}"
+                                           class="form-selectgroup-input w-100">
+                                    <span class="form-selectgroup-label">{{ product.name }}</span>
+                                </label>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="mb-3"> </div>
+                    <div class="mb-2"><button type="submit" class="btn btn-success w-100">Отправить</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

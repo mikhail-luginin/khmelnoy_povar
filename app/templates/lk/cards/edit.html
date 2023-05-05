@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование{% endblock %}
+{% block page_title %}Редактирование{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">Редактирование {{ row.name }}</div>
+            <div class="card-body">
+                <form action="{% url 'LK:edit_bank_card' %}?id={{ row.id }}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label">Наименование</label>
+                        <input class="form-control" name="name" placeholder="Введите наименование карты или мерчанта" value="{{ row.name }}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Номер карты/мерчанта</label>
+                        <input class="form-control" type="tel" inputmode="numeric" name="num" placeholder="Введите 4 последние цифры карты либо номер мерчанта без знаков" value="{{ row.num }}" disabled>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Заведение</label>
+                        <select class="form-select" name="storage_id">
+                            <option value="-1">Выберите или оставьте пустым</option>
+                            {% for storage in storages %}
+                                <option value="{{ storage.id }}" {% if storage.id == row.storage_id %}selected{% endif %}>{{ storage.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-1">
+                        <button type="submit" class="btn btn-success w-100">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

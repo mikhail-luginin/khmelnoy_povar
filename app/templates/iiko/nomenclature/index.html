@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Номенклатура{% endblock %}
+{% block page_title %}Номенклатура{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">
+                <h3 class="card-title">Номенклатура</h3>
+                <div class="card-actions">
+                    <a class="btn btn-primary" id="update_nomenclature">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-cloud-upload"
+                             width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                             fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M7 18a4.6 4.4 0 0 1 0 -9a5 4.5 0 0 1 11 2h1a3.5 3.5 0 0 1 0 7h-1"></path>
+                            <path d="M9 15l3 -3l3 3"></path>
+                            <path d="M12 12l0 9"></path>
+                        </svg>
+                        Обновить номенклатуру
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-striped table-hover table-bordered nowrap w-100" id="table">
+                        <thead>
+                        <tr class="column-filter dt-column-filter">
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <th>Наименование</th>
+                            <th>Тип</th>
+                            <th>Единица</th>
+                            <th>Категория</th>
+                            <th>Поставщик</th>
+                            <th>Мин. кол-во</th>
+                            <th>Для заказа</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(document).ready(function () {
+            let table = run_datatable('table', '/api/products', [
+                {data: 'name'},
+                {data: 'type'},
+                {data: 'main_unit'},
+                {data: 'category'},
+                {data: 'supplier'},
+                {data: 'minimal'},
+                {data: 'for_order'}])
+            $('#update_nomenclature').click(function () {
+                $.ajax({
+                    data: $(this).serialize(),
+                    type: $(this).attr('method'),
+                    url: "{% url 'IIKO:nomenclature_update' %}",
+                    success: function (response) {
+                        if (response.status === true) {
+                            table.destroy()
+                            table = run_datatable('table', '/iiko/api/nomenclature', [
+                                {data: 'name'},
+                                {data: 'type'},
+                                {data: 'main_unit'},
+                                {data: 'category'},
+                                {data: 'supplier'},
+                                {data: 'minimal'},
+                                {data: 'for_order'},
+                                {data: 'actions'}])
+                            notification(true, 'Номенклатура успешно обновлена :)')
+                        } else {
+                            notification(false)
+                        }
+                    },
+                    error: function (response) {
+                        notification(false)
+                    }
+                });
+                return false;
+
+            });
+        })
+    </script>
+{% endblock %}

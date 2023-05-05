@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование записи внесения/изъятия{% endblock %}
+{% block page_title %}Редактирование внесения или изъятия{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-body">
+                <form action="{% url 'LK:edit_pays' %}?id={{ row.id }}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label">Дата</label>
+                        <input class="form-control date-at" name="date_at" placeholder="Выберите дату" value="{{ row.date_at|date:'Y-m-d' }}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Заведение</label>
+                        <select class="form-select" name="storage_id" placeholder="Выберите заведение">
+                            <option></option>
+                            {% for storage in storages %}
+                                <option value="{{ storage.id }}" {% if row.storage_id == storage.id %}selected{% endif %}>{{ storage.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Тип</label>
+                        <select class="form-select" name="type" placeholder="Выберите тип">
+                            <option></option>
+                            <option value="1" {% if row.type == 1 %}selected{% endif %}>Внесение</option>
+                            <option value="2" {% if row.type == 2 %}selected{% endif %}>Изъятие</option>
+                            <option value="4" {% if row.type == 4 %}selected{% endif %}>Закупщик</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Сумма</label>
+                        <input type="tel" inputmode="numeric" class="form-control" name="sum"
+                               placeholder="Введите сумму" value="{{ row.sum }}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Комментарий</label>
+                        <select class="form-select" name="comment" placeholder="Выберите комментарий">
+                            <option></option>
+                            {% for comment in pays %}
+                                <option value="{{ comment.name }}" {% if comment.name == row.comment %}selected{% endif %}>{{ comment.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-1">
+                        <button type="submit" class="btn btn-success w-100">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

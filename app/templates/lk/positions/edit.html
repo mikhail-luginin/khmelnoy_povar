@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">
+                Редактирование позиции {{ row.name }}
+            </div>
+            <div class="card-body">
+                <form action="{% url 'LK:position_edit' %}?id={{ row.id }}" method="post">
+                    {% csrf_token %}
+                    <div class="alert alert-primary" role="alert" style="display: none;"
+                         id="position-add-ctrl-alert">
+                        <p class="mb-1">Приоритетный ID (чем больше, тем выше):</p>
+                        <p class="mb-1">20-29 - бармены</p>
+                        <p class="mb-1">10-19 - повара</p>
+                        <p class="mb-0">0-9 - тех. служащие</p>
+                    </div>
+                    <div class="mb-2">
+                        <div class="row">
+                            <div class="col">
+                                <label class="form-label">Наименование</label>
+                                <input type="text" class="form-control" name="position-name"
+                                       placeholder="Введите наименование позиции" value="{{ row.name }}">
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Привязать к</label>
+                                <select placeholder="Выберите должность" name="job_id" id="job_id" class="form-select"
+                                        multiple>
+                                    <option></option>
+                                    {% for job in jobs %}
+                                        <option value="{{ job.id }}"
+                                                {% for l_j in row.linked_jobs.all %}{% if l_j.id == job.id %}selected
+                                                {% endif %}{% endfor %}>{{ job.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="row">
+                            <div class="col">
+                                <input class="form-control" name="position-oklad" type="tel" inputmode="numeric"
+                                       placeholder="Оклад позиции" value="{{ row.args.oklad }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        <div class="row">
+                            <div class="col-auto">
+                                <label class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="position-all-storages"
+                                           {% if row.args.all_storages %}checked{% endif %}>
+                                    <span class="form-check-label"><b>Все заведения</b></span>
+                                </label>
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="position-is-usil"
+                                           {% if row.args.is_usil %}checked{% endif %}>
+                                    <span class="form-check-label"><b>Усиление</b></span>
+                                </label>
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="position-is-calling"
+                                           {% if row.args.is_calling %}checked{% endif %}>
+                                    <span class="form-check-label"><b>Вызывной</b></span>
+                                </label>
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="position-has-percent"
+                                           {% if row.args.has_percent %}checked{% endif %}>
+                                    <span class="form-check-label"><b>Процент</b></span>
+                                </label>
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="position-has-premium"
+                                           {% if row.args.has_premium %}checked{% endif %}>
+                                    <span class="form-check-label"><b>Премия</b></span>
+                                </label>
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="position-is-trainee"
+                                           {% if row.args.is_trainee %}checked{% endif %}>
+                                    <span class="form-check-label"><b>Стажер</b></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col">
+                            <input class="form-control" name="priority-id" type="tel" inputmode="numeric" min="1"
+                                   max="99"
+                                   placeholder="Расположение должности в списке от меньшего к большему"
+                                   value="{{ row.priority_id }}">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Обновить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
