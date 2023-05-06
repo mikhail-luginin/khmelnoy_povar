@@ -46,7 +46,6 @@ REST_FRAMEWORK = {
     ]
 }
 
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -77,14 +76,22 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+DATABASE_DEV = {
+    'ENGINE': 'django.db.backends.sqlite3',
+    'NAME': BASE_DIR / 'db.sqlite3',
+}
+
+DATABASE_PROD = {
+    'ENGINE': 'django.db.backends.mysql',
+    'HOST': os.environ.get('DB_HOST'),
+    'NAME': os.environ.get('DB_NAME'),
+    'USER': os.environ.get('DB_USER'),
+    'PASSWORD': os.environ.get('DB_PASSWORD'),
+    'PORT': os.environ.get('DB_PORT'),
+}
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'HOST': os.environ.get('DB_HOST'),
-        'NAME': os.environ.get('POSTGRES_DB'),
-        'USER': os.environ.get('POSTGRES_USER'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD')
-    }
+    'default': DATABASE_DEV if DEBUG else DATABASE_PROD
 }
 
 AUTH_PASSWORD_VALIDATORS = [

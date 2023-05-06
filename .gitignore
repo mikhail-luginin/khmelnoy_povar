@@ -3,3 +3,4 @@
 .idea
 media
 celerybeat-schedule
+db.sqlite3

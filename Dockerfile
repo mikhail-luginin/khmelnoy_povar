@@ -11,7 +11,7 @@ COPY nginx/conf.d /etc/nginx/conf.d
 WORKDIR /app
 EXPOSE 8000
 
-RUN apk add postgresql-client build-base postgresql-dev
+RUN apk add mariadb-dev
 RUN apk add --update --no-cache --virtual .tmp-build-deps gcc libc-dev linux-headers
 
 RUN pip install --no-cache-dir -r /temp/requirements.txt
