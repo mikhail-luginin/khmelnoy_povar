@@ -83,6 +83,10 @@ class BarsView(BaseLkView):
 
         return context
 
+
+class BarsSettingsView(BaseLkView):
+    template_name = 'lk/bars_settings.html'
+
     def post(self, request):
         return bars.update_settings(request)
 
