@@ -39,7 +39,7 @@ class StorageService:
         return True
 
     def storages_all(self) -> List[model]:
-        return self.model.objects.filter(is_office=1)
+        return self.model.objects.filter(is_office=0)
 
     def storage_get(self, **kwargs) -> model:
         return self.model.objects.get(**kwargs)
