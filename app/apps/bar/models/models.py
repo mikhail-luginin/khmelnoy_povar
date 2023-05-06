@@ -125,5 +125,8 @@ class Pays(models.Model):
 class Setting(models.Model):
     percent = models.FloatField(null=True)
     expenses_types_with_employees_in_comment = models.ManyToManyField(to=Catalog)
-
     objects = managers.SettingManager()
+
+class TelegramChats(models.Model):
+    chat_id = models.CharField(max_length=16)
+    name = models.CharField(max_length=32)
