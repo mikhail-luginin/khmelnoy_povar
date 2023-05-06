@@ -4,7 +4,7 @@ services:
       context: .
     restart: always
     ports:
-      - "8080:8080"
+      - "80:80"
     volumes:
       - ./app:/app
       - ./app/assets:/app/static
@@ -12,7 +12,7 @@ services:
       - ./app/.env
     command: >
       sh -c "python manage.py migrate
-             gunicorn --bind 0.0.0.0:8080 config.wsgi"
+             gunicorn --bind 0.0.0.0:80 config.wsgi"
 
   nginx:
     image: nginx:1.19.8-alpine
@@ -20,7 +20,7 @@ services:
     depends_on:
       - app
     ports:
-      - "80:80"
+      - "8080:8080"
     env_file:
       - ./app/.env
     volumes:
