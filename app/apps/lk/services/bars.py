@@ -1,26 +1,22 @@
 from django.shortcuts import redirect
 from django.contrib import messages
 
-from apps.bar.models import Setting
+from apps.bar.models import Setting, TelegramChats
 
 
 def update_settings(request) -> redirect:
     percent = request.POST.get('percent', None)
-    chat_type_id = request.POST.get('chat-type-id', None)
-    chat_id = request.POST.get('chat-id', None)
+    try:
+        settings = Setting.objects.get(id=1)
+    except Setting.DoesNotExist:
+        settings = None
 
-    settings = Setting.objects.first()
     if settings:
-        if not percent:
-            settings.percent = percent
-
-        if chat_type_id and chat_type_id != '-1' and chat_id:
-            settings.telegram_chats[chat_type_id] = chat_id
-
+        settings.percent = percent
         settings.save()
 
-        messages.success(request, 'Настройки успешно обновлены :)')
-        return redirect('/lk/bars')
+    else:
+        Setting.objects.create(percent=percent).save()
 
-    messages.error(request, 'Настройки не были найдены :(')
+    messages.success(request, 'Настройки успешно обновлены :)')
     return redirect('/lk/bars')

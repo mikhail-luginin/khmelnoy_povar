@@ -17,6 +17,7 @@ urlpatterns = [
     path('catalog/types/delete', CatalogTypeDeleteView.as_view(), name="catalog_type_delete"),
 
     path('bars', BarsView.as_view(), name="bars"),
+    path('bars/settings', BarsSettingsView.as_view(), name="bars_settings"),
 
     path('positions', PositionsView.as_view(), name="positions"),
     path('positions/edit', PositionsEditView.as_view(), name="position_edit"),
