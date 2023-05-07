@@ -32,7 +32,6 @@ def iiko_stoplist_items():
     for row in IikoService().get_stop_list_events():
         storage_name = sessions.get(int(row["session"].split('.')[0]))
         if storage_name:
-            message = None
             date_string = row['date'].split('.')[0]
             date = datetime.datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S')
 
@@ -58,7 +57,6 @@ def iiko_stoplist_items():
                 try:
                     stoplist_item_for_delete = StopList.objects.get(storage=storage,
                                                                     product=product)
-                    message = f'Дата: {date}%0AЗаведение: {storage_name}%0A%0AТовар: {row["dish"]} (удален из стоп листа)'
                     stoplist_item_for_delete.delete()
                 except StopList.DoesNotExist:
                     continue
@@ -80,7 +78,6 @@ def iiko_stoplist_items():
                     StopList.objects.create(date_at=date,
                                             storage=storage,
                                             product=product)
-                    message = f'Дата: {date}%0AЗаведение: {storage_name}%0A%0AТовар: {row["dish"]} (добавлен на стоп лист)'
 
                 if not tovar_request:
                     TovarRequest.objects.create(
@@ -91,6 +88,3 @@ def iiko_stoplist_items():
                         product_main_unit='task',
                         supplier=product.supplier
                     )
-
-            # if message:
-            #     send_message_to_telegram('-771733341', message)

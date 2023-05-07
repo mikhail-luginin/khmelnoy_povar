@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import redirect
 
 from core.utils import ObjectEditMixin, BaseLkView
@@ -10,7 +11,7 @@ from apps.iiko.services.storage import StorageService
 from apps.iiko.services.supplier import SupplierService
 from apps.iiko.services.category import CategoryService
 from apps.iiko.services.payment_type import PaymentTypeService
-from apps.iiko.services.stoplist import stoplist_get
+from apps.iiko.services.stoplist import StoplistService
 
 
 @login_required
@@ -119,6 +120,17 @@ class StopListView(BaseLkView):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['rows'] = stoplist_get()
+        context['rows'] = StoplistService().get_stoplist_items()
 
         return context
+
+
+class StopListUpdateView(BaseLkView):
+
+    def get(self, request):
+        if StoplistService().update():
+            response = {"status": True, "rows": StoplistService().get_stoplist_items()}
+        else:
+            response = {"status": False}
+
+        return JsonResponse(response, status=200)

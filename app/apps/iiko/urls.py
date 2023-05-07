@@ -23,5 +23,6 @@ urlpatterns = [
 
     path('storages/update', update_storages_view, name="storages_update"),
 
-    path('stoplist', StopListView.as_view())
+    path('stoplist', StopListView.as_view()),
+    path('stoplist/update', StopListUpdateView.as_view(), name="stoplist_update")
 ]
