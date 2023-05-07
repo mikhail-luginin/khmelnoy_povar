@@ -155,7 +155,7 @@ class ArrivalMixin(ProductsMovementMixin):
                 else get_main_barmen(today_date(), storage).fio
 
             try:
-                expense_type = CatalogService().get_catalog_by_type(settings.TOVAR_ARRIVAL_CATEGORY)
+                expense_type = CatalogService().get_catalog_by_name(settings.TOVAR_ARRIVAL_CATEGORY)
             except Catalog.DoesNotExist:
                 messages.error(request, 'Категория для типа расхода не найдена.')
                 return redirect(request.META.get('HTTP_REFERER'))
