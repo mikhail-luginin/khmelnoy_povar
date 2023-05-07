@@ -23,7 +23,9 @@
                             <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                             <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                             <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
-                            <th></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                         </tr>
                         <tr>
                             <th>Дата</th>
@@ -31,11 +33,15 @@
                             <th>Сотрудник</th>
                             <th>Позиция</th>
                             <th>Оклад</th>
-                            <th></th>
+                            <th>Процент</th>
+                            <th>Премия</th>
+                            <th>Штраф</th>
                         </tr>
                         </thead>
                         <tfoot>
                             <tr>
+                                <th></th>
+                                <th></th>
                                 <th></th>
                                 <th></th>
                                 <th></th>
@@ -58,7 +64,10 @@
             {data: 'storage_name'},
             {data: 'employee_fio'},
             {data: 'position_name'},
-            {data: 'oklad'}
+            {data: 'oklad'},
+            {data: 'percent'},
+            {data: 'bonus'},
+            {data: 'fine'}
         ])
     </script>
 {% endblock %}
