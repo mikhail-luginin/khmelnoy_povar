@@ -10,7 +10,7 @@
                 <h3 class="card-title">Настройки</h3>
             </div>
             <div class="card-body">
-                <form action="{% url 'LK:bars' %}" method="post">
+                <form action="{% url 'LK:bars_settings' %}" method="post">
                     {% csrf_token %}
                     <div class="mb-2">
                         <label class="form-label" for="percent">Процент барменов</label>
@@ -29,14 +29,8 @@
                                 <select class="form-select" name="chat-type-id"
                                         aria-label="Floating label select example">
                                     <option value="-1" selected="">Список чатов</option>
-                                    {% for chat in chats %}
-                                        {% for k, v in setting.telegram_chats.items %}
-                                            {% if chat.id == k %}
-                                                <option value="{{ chat.id }}">{{ chat.name }} (заполнено)</option>
-                                            {% else %}
-                                                <option value="{{ chat.id }}">{{ chat.name }}</option>
-                                            {% endif %}
-                                        {% endfor %}
+                                    {% for chat in telegram_chats %}
+                                        <option value="{{ chat.id }}">{{ chat.name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -87,4 +81,9 @@
             </div>
         </div>
     </div>
+    {% for chat in telegram_chats %}
+        {{ chat.id }}
+        {{ chat.name }}
+    {% endfor %}
+
 {% endblock %}
