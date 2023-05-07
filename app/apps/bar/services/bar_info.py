@@ -19,20 +19,20 @@ def get_bar_settings() -> Setting:
     return Setting.objects.get(id=1)
 
 
-def get_position_main_id(is_called: bool, job_name: str) -> Position:
+def get_position_main_id(is_called: bool, job_name: str) -> int:
     job = JobPlace.objects.get(name=job_name)
     for position in Position.objects.all():
         if position.args['is_usil'] is False and position.args['is_trainee'] is False and position.args['is_called'] is is_called:
             if job in position.linked_jobs.all():
-                return position
+                return position.id
 
 
 def get_main_barmen(date_at: str, storage: Storage) -> Employee | None:
     if Timetable.objects.filter(date_at=date_at,
                                 storage=storage,
                                 position_id__in=[
-                                    get_position_main_id(False, 'Бармен').id,
-                                    get_position_main_id(True, 'Бармен').id
+                                    get_position_main_id(False, 'Бармен'),
+                                    get_position_main_id(True, 'Бармен')
                                 ]).exists() is False:
         return None
 
