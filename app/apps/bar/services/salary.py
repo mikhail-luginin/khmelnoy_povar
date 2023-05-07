@@ -163,8 +163,8 @@ class SalaryService:
             writer=get_main_barmen(today_date(), storage),
             date_at=today_date(),
             storage=storage,
-            expense_type=CatalogService().get_catalog_by_type('Зарплата'),
-            expense_source=CatalogService().get_catalog_by_type('Бизнес-карта'),
+            expense_type=CatalogService().get_catalog_by_name('Зарплата'),
+            expense_source=CatalogService().get_catalog_by_name('Бизнес-карта'),
             payment_receiver=employee.fio,
             sum=total_sum,
             comment=comment
