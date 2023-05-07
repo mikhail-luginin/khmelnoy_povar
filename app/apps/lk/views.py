@@ -14,7 +14,7 @@ from .services.expenses import ExpenseService
 from apps.iiko.services.storage import StorageService
 
 from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee
-from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest
+from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest, TelegramChats
 from apps.iiko.models import Product, Supplier
 
 
@@ -86,6 +86,10 @@ class BarsView(BaseLkView):
 
 class BarsSettingsView(BaseLkView):
     template_name = 'lk/bars_settings.html'
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        return context
 
     def post(self, request):
         return bars.update_settings(request)
