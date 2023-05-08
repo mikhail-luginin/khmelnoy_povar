@@ -5,6 +5,8 @@ from apps.iiko.services.storage import StorageService
 from core.time import today_date
 from core import total_values
 
+from apps.bar.tasks import add_percent_and_premium_to_timetable
+
 from django.contrib import messages
 from django.shortcuts import redirect
 
@@ -41,5 +43,6 @@ def complete_day(request):
     row.difference = difference
     row.save()
 
+    add_percent_and_premium_to_timetable.delay(str(row.date_at), storage.id)
     messages.success(request, 'Остаток в кассе успешно заполнен :)')
     return redirect('/bar/end_day?code=' + code)

@@ -1,9 +1,9 @@
 from core.time import today_date
 from core.total_values import get_total_expenses_by_date_and_storage
+from global_services.salary import SalaryService
 
 from .utils import BaseView, ObjectDeleteMixin, TovarRequestMixin, ArrivalMixin, InventoryMixin
 
-from .services.salary import SalaryService
 from .services.index import HomePageService
 from .services.expenses import ExpensesPageService
 from .services.end_day import complete_day

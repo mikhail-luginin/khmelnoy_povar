@@ -1,5 +1,7 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.shortcuts import redirect
 
 from core.utils import BaseLkView, ObjectEditMixin, ObjectCreateMixin, ObjectDeleteMixin
 
@@ -16,6 +18,7 @@ from apps.iiko.services.storage import StorageService
 from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee
 from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest
 from apps.iiko.models import Product, Supplier
+from .services.timetable import TimetableService
 
 
 class IndexView(BaseLkView):
@@ -212,6 +215,18 @@ class CreateTimetableView(ObjectCreateMixin):
         context['positions'] = JobsService().positions_all()
 
         return context
+
+    def post(self, request):
+        date_at = request.POST.get('date_at')
+        employee_id = int(request.POST.get('employee_id'))
+        oklad = int(request.POST.get('oklad'))
+        position_id = int(request.POST.get('position_id'))
+        storage_id = int(request.POST.get('storage_id'))
+
+        if TimetableService().create(date_at=date_at, employee_id=employee_id,
+                                     oklad=oklad, position_id=position_id, storage_id=storage_id):
+            messages.success(request, 'Запись успешно создана.')
+            return redirect('/lk/timetable')
 
 
 class EditTimetableView(ObjectEditMixin):
