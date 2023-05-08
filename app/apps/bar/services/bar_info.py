@@ -5,14 +5,15 @@ from apps.iiko.services.api import IikoService
 from apps.lk.models import Position, JobPlace, Employee
 from apps.iiko.models import Storage, PaymentType
 
-from django.shortcuts import get_object_or_404
-
 from core import total_values
 from core.time import today_date
 
 
-def get_bar(**kwargs) -> Storage:
-    return get_object_or_404(Storage, **kwargs)
+def get_bar(**kwargs) -> Storage | None:
+    try:
+        return Storage.objects.get(**kwargs)
+    except Storage.DoesNotExist:
+        return None
 
 
 def get_bar_settings() -> Setting:
@@ -100,6 +101,11 @@ def get_full_information_of_day(date_at: str, storage: Storage) -> dict:
         total_bn = money_row.total_bn
         total_market = money_row.total_market
         total_cash = money_row.total_cash
+
+    if not total_day:
+        total_day = 0
+    if not total_market:
+        total_market = 0
 
     return dict(session_number=session_number, open_date=open_date, close_date=close_date,
                 total_day=total_day, sum_for_percent=total_day - total_market,
