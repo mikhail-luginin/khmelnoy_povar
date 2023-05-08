@@ -1,3 +1,5 @@
+from django.conf import settings
+
 import os
 
 from celery import Celery
@@ -10,9 +12,10 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks()
 
 
-app.conf.beat_schedule = {
-    'iiko-stoplist': {
-        'task': 'apps.iiko.tasks.iiko_stoplist_items',
-        'schedule': crontab(minute='*/15')
+if settings.DEBUG is False:
+    app.conf.beat_schedule = {
+        'iiko-stoplist': {
+            'task': 'apps.iiko.tasks.iiko_stoplist_items',
+            'schedule': crontab(minute='*/15')
+        }
     }
-}
