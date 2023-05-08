@@ -75,7 +75,20 @@ class SalaryService:
             accrued_month_data.append(row)
 
         for timetable in Timetable.objects.filter(date_at__month=month, employee=employee).order_by('-date_at'):
-            session_data.append(SalaryService().calculate_prepayment_salary_by_timetable_object(timetable_object=timetable))
+            calculated_salary = SalaryService().calculate_prepayment_salary_by_timetable_object(timetable_object=timetable)
+
+            oklad = calculated_salary['oklad']
+            percent = calculated_salary['percent']
+            premium = calculated_salary['premium']
+
+            row = dict()
+            row['date_at'] = timetable.date_at
+            row['oklad'] = oklad
+            row['percent'] = percent
+            row['premium'] = premium
+            row['total'] = oklad + percent + premium - timetable.fine
+            row['fine'] = timetable.fine
+            session_data.append(row)
 
         data['accrued_prepayed_data'] = accrued_prepayed_data
         data['session_data'] = session_data
