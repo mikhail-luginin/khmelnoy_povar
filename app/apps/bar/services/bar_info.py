@@ -5,14 +5,15 @@ from apps.iiko.services.api import IikoService
 from apps.lk.models import Position, JobPlace, Employee
 from apps.iiko.models import Storage, PaymentType
 
-from django.shortcuts import get_object_or_404
-
 from core import total_values
 from core.time import today_date
 
 
-def get_bar(**kwargs) -> Storage:
-    return get_object_or_404(Storage, **kwargs)
+def get_bar(**kwargs) -> Storage | None:
+    try:
+        return Storage.objects.get(**kwargs)
+    except Storage.DoesNotExist:
+        return None
 
 
 def get_bar_settings() -> Setting:
