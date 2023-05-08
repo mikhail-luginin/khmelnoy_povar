@@ -68,7 +68,7 @@ class Timetable(models.Model):
     storage = models.ForeignKey(Storage, on_delete=models.SET_NULL, null=True)
     position = models.ForeignKey(Position, on_delete=models.SET_NULL, null=True)
     oklad = models.IntegerField()
-    percnet = models.FloatField(null=True, default=0)
+    percent = models.IntegerField(default=0)
     premium = models.IntegerField(default=0)
     fine = models.IntegerField(default=0)
 
