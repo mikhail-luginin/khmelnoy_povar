@@ -1,27 +1,25 @@
-from typing import List
-
-from apps.bar.models import Timetable, Salary
-from apps.iiko.models import Storage
-from apps.lk.models import Employee, Fine, Expense
-
-from .bar_info import get_full_information_of_day, get_main_barmen
-
-from apps.iiko.services.storage import StorageService
-from apps.lk.services.catalog import CatalogService
-
-from core.time import today_date, get_current_time, monthdelta, get_months
-
 from django.shortcuts import redirect
 from django.contrib import messages
 
-from calendar import monthrange
+from core.time import today_date, get_current_time, monthdelta, get_months
 
-from apps.bar.models import Setting
+from apps.bar.models import Timetable, Salary, Setting
+from apps.iiko.models import Storage
+from apps.lk.models import Employee, Fine, Expense
+
+from apps.bar.services.bar_info import get_full_information_of_day, get_main_barmen
+from apps.iiko.services.storage import StorageService
+from apps.lk.services.catalog import CatalogService
+
+from calendar import monthrange
+from typing import List, Literal
 
 
 class SalaryService:
 
-    def _calculate_oklad_percent_premium(self, timetable_object: Timetable) -> dict:
+    def calculate_prepayment_salary_by_timetable_object(self, timetable_object: Timetable) -> dict[
+        Literal["oklad", "percent", "premium"], int
+    ]:
         percent_num = Setting.objects.first().percent
 
         percent = 0
@@ -34,19 +32,14 @@ class SalaryService:
 
         if timetable_object.position.args['has_premium']:
             total_day = today_money['total_day']
-            if 60000 <= total_day < 70000:
-                premium += 200
-            elif 70000 <= total_day < 100000:
+            if 80000 <= total_day < 100000:
                 premium += 500
-            elif total_day >= 100000:
+            elif 100000 <= total_day < 120000:
                 premium += 1000
+            elif total_day >= 120000:
+                premium += 2000
 
-        row = dict()
-        row['oklad'] = timetable_object.oklad
-        row['percent'] = percent
-        row['premium'] = premium
-
-        return row
+        return {"oklad": timetable_object.oklad, "percent": percent, "premium": premium}
 
     def get_money_data_employee(self, request) -> dict:
         data = dict()
@@ -82,7 +75,7 @@ class SalaryService:
             accrued_month_data.append(row)
 
         for timetable in Timetable.objects.filter(date_at__month=month, employee=employee).order_by('-date_at'):
-            session_data.append(SalaryService()._calculate_oklad_percent_premium(timetable))
+            session_data.append(SalaryService().calculate_prepayment_salary_by_timetable_object(timetable_object=timetable))
 
         data['accrued_prepayed_data'] = accrued_prepayed_data
         data['session_data'] = session_data
@@ -102,7 +95,7 @@ class SalaryService:
         for timetable in Timetable.objects.filter(storage=bar, date_at=today_date()):
             row = dict()
 
-            employee_money_information = self._calculate_oklad_percent_premium(timetable)
+            employee_money_information = self.calculate_prepayment_salary_by_timetable_object(timetable_object=timetable)
             percent = employee_money_information['percent']
             premium = employee_money_information['premium']
 
@@ -134,8 +127,8 @@ class SalaryService:
 
         return rows
 
-    def accrue_salary(self, storage: Storage, employee: Employee, salary_type: int, oklad: int, percent: int = 0,
-                      premium: int = 0, month: int = 0, period: int = None) -> None:
+    def _accrue_salary(self, storage: Storage, employee: Employee, salary_type: int, oklad: int, percent: int = 0,
+                       premium: int = 0, month: int = 0, period: int = None) -> None:
         Salary.objects.create(
             date_at=today_date(),
             employee=employee,
@@ -184,7 +177,7 @@ class SalaryService:
                     percent = percent if percent is not None and len(percent) > 0 else 0
                     premium = premium if premium is not None and len(premium) > 0 else 0
 
-                    self.accrue_salary(bar, timetable.employee, 1, int(oklad), int(percent), int(premium))
+                    self._accrue_salary(bar, timetable.employee, 1, int(oklad), int(percent), int(premium))
                     employee = timetable.employee.fio
                 else:
                     messages.error(request, f'{timetable.employee.fio} уже получил зарплату :(')
@@ -212,8 +205,8 @@ class SalaryService:
             messages.error(request, 'Нельзя получить нулевую зарплату :(')
             return redirect(request.META.get('HTTP_REFERER'))
 
-        self.accrue_salary(storage=bar, employee=employee, salary_type=2,
-                           oklad=salary_sum, month=data['month'], period=data['period'])
+        self._accrue_salary(storage=bar, employee=employee, salary_type=2,
+                            oklad=salary_sum, month=data['month'], period=data['period'])
 
         messages.success(request, f'{employee.fio} успешно получил зарплату :)')
         return redirect(request.META.get('HTTP_REFERER'))
@@ -230,7 +223,7 @@ class SalaryService:
                         get_current_time(), -1).month:
                     oklad += timetable.oklad
 
-                    employee_money_information = self._calculate_oklad_percent_premium(timetable)
+                    employee_money_information = self.calculate_prepayment_salary_by_timetable_object(timetable_object=timetable)
                     percent += employee_money_information['percent']
                     premium += employee_money_information['premium']
 
@@ -284,8 +277,8 @@ class SalaryService:
             Salary.objects.get(employee=employee, period=3)
             messages.error(request, 'Данный сотрудник уже получил зарплату при увольнении :(')
         except Salary.DoesNotExist:
-            self.accrue_salary(storage, employee, 2, oklad=self.get_retired_employee_accrue_sum(employee),
-                          month=get_current_time().month, period=3)
+            self._accrue_salary(storage, employee, 2, oklad=self.get_retired_employee_accrue_sum(employee),
+                                month=get_current_time().month, period=3)
             messages.success(request, f'{employee.fio} успешно получил зарплату :)')
 
         return redirect('/bar/salary/retired_employees?code=' + code)
@@ -313,7 +306,7 @@ class SalaryService:
             premium = 0
             fines = 0
 
-            employee_money_information = self._calculate_oklad_percent_premium(timetable)
+            employee_money_information = self.calculate_prepayment_salary_by_timetable_object(timetable_object=timetable)
             percent += employee_money_information['percent']
             premium += employee_money_information['premium']
 
