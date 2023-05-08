@@ -102,6 +102,11 @@ def get_full_information_of_day(date_at: str, storage: Storage) -> dict:
         total_market = money_row.total_market
         total_cash = money_row.total_cash
 
+    if not total_day:
+        total_day = 0
+    if not total_market:
+        total_market = 0
+
     return dict(session_number=session_number, open_date=open_date, close_date=close_date,
                 total_day=total_day, sum_for_percent=total_day - total_market,
                 total_cash=total_cash, total_bn=total_bn,
