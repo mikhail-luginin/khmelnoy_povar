@@ -208,7 +208,7 @@ class CreateTimetableView(ObjectCreateMixin):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context['storages'] = StorageService().storages_all()
-        context['employees'] = EmployeeService().employees_all(True)
+        context['employees'] = EmployeeService().employees_all(False)
         context['positions'] = JobsService().positions_all()
 
         return context
