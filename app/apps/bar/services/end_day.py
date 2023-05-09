@@ -33,11 +33,11 @@ def complete_day(request):
     row.total_bn = information_of_day["total_bn"]
     row.total_cash = information_of_day["total_cash"]
     row.total_market = information_of_day["yandex"] + information_of_day["delivery"]
-    row.total_expenses = total_values.get_total_expenses_by_date_and_storage(row.date_at, row.storage, is_bn=False)
-    row.total_salary = total_values.get_total_salary_by_date_and_storage(row.date_at, row.storage, 1) \
-                       + total_values.get_total_salary_by_date_and_storage(row.date_at, row.storage, 1)
-    row.total_payin = total_values.get_total_payin_by_date_and_storage(row.date_at, row.storage)
-    row.total_payout = total_values.get_total_payout_by_date_and_storage(row.date_at, row.storage)
+    row.total_expenses = total_values.get_total_expenses_by_date_and_storage(row.storage, row.date_at, is_bn=False)
+    row.total_salary = total_values.get_total_salary_by_date_and_storage(row.storage, row.date_at, 1) \
+                       + total_values.get_total_salary_by_date_and_storage(row.storage, row.date_at, 1)
+    row.total_payin = total_values.get_total_payin_by_date_and_storage(row.storage, row.date_at)
+    row.total_payout = total_values.get_total_payout_by_date_and_storage(row.storage, row.date_at)
     row.sum_cash_end_day = sum_cash_end_day
     row.calculated = calculated
     row.difference = difference
