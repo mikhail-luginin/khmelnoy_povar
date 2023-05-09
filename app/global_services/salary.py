@@ -228,7 +228,7 @@ class SalaryService:
         oklad = 0
         percent = 0
         premium = 0
-        fines = 0
+        fine = 0
 
         if Salary.objects.filter(employee=employee, period=3).exists() is False:
             for timetable in Timetable.objects.filter(employee=employee):
@@ -241,7 +241,7 @@ class SalaryService:
                     premium += employee_money_information['premium']
 
                     try:
-                        salary = Salary.objects.get(employee=employee, date_at=timetable.date_at)
+                        salary = Salary.objects.get(employee=employee, date_at=timetable.date_at, type=1)
                         oklad -= salary.oklad
                         percent -= salary.percent
                         premium -= salary.premium
@@ -249,12 +249,19 @@ class SalaryService:
                         pass
 
                     try:
-                        fine = Fine.objects.get(employee=employee, date_at=timetable.date_at)
-                        fines += fine.sum
+                        salary = Salary.objects.get(employee=employee, date_at=timetable.date_at, type=2)
+                        oklad -= salary.oklad
+                    except Salary.DoesNotExist:
+                        pass
+
+                    try:
+                        fines = Fine.objects.filter(employee=employee, date_at=timetable.date_at)
+                        for row in fines:
+                            fine += row.sum
                     except Fine.DoesNotExist:
                         pass
 
-            return oklad + percent + premium - fines
+            return oklad + percent + premium - fine
         else:
             return False
 
@@ -317,7 +324,7 @@ class SalaryService:
             oklad = timetable.oklad
             percent = 0
             premium = 0
-            fines = 0
+            fine = 0
 
             employee_money_information = self.calculate_prepayment_salary_by_timetable_object(timetable_object=timetable)
             percent += employee_money_information['percent']
@@ -332,8 +339,9 @@ class SalaryService:
                 pass
 
             try:
-                fine = Fine.objects.get(employee=employee, date_at=timetable.date_at)
-                fines += fine.sum
+                fines = Fine.objects.filter(employee=employee, date_at=timetable.date_at)
+                for row in fines:
+                    fine += row.sum
             except Fine.DoesNotExist:
                 pass
 
