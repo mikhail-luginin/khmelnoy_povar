@@ -43,6 +43,6 @@ def complete_day(request):
     row.difference = difference
     row.save()
 
-    add_percent_and_premium_to_timetable.delay(str(row.date_at), storage.id)
+    add_percent_and_premium_to_timetable.delay(today_date(), storage.id)
     messages.success(request, 'Остаток в кассе успешно заполнен :)')
     return redirect('/bar/end_day?code=' + code)
