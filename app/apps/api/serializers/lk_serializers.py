@@ -118,7 +118,7 @@ class CardSerializer(serializers.ModelSerializer):
 
 
 class StatementSerializer(serializers.ModelSerializer):
-    linked = serializers.CharField(source='linked.name')
+    linked = serializers.CharField(source='linked.name', default='Не привязана')
     payer_name = serializers.CharField(source='payer.name')
     recipient_name = serializers.CharField(source='recipient.name')
 

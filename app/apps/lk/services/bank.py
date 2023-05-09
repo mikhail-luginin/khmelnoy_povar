@@ -59,9 +59,9 @@ class StatementUpdateService:
             'ДатаПоступило': 'date_receipt',
             'Сумма': 'sum',
             'НазначениеПлатежа': 'payment_purpose',
-            'Плательщик': 'payer',
+            'Плательщик': 'payer_id',
             'ПлательщикИНН': 'payer_inn',
-            'Получатель': 'recipient',
+            'Получатель': 'recipient_id',
             'ПолучательИНН': 'recipient_inn'
         }
 
@@ -146,15 +146,15 @@ class StatementUpdateService:
                         linked = card.id
 
                 data = dict(
-                    linked=linked,
+                    linked_id=linked,
                     document_type=document['document_type'],
                     document_number=document['document_number'],
                     date=document['date'],
                     date_write_off=document['date_write_off'],
                     date_receipt=document['date_receipt'],
                     sum=document['sum'],
-                    payer=document['payer_id'],
-                    recipient=document['recipient_id'],
+                    payer_id=document['payer_id'],
+                    recipient_id=document['recipient_id'],
                     payment_purpose=document['payment_purpose'],
                 )
                 self._create_statement(data)
@@ -165,7 +165,7 @@ class StatementUpdateService:
     def update(self, request):
         self._parse_documents(request)
         messages.success(request, 'Выписка успешно загружена :)')
-        return redirect('/lk/statement')
+        return redirect('/lk/bank')
 
 
 def statement_all() -> List[Statement]:
@@ -221,12 +221,12 @@ class CardService:
             name=name,
             num=num,
             type=1 if len(num) == 4 else 2,
-            storage=storage_id)
+            storage_id=storage_id)
 
         for statement in statement_all():
             n = f'**{num}' if len(num) == 4 else num
-            if n in statement.payment_purpose and not statement.linked:
-                statement.linked = card.id
+            if n in statement.payment_purpose and not statement.linked_id:
+                statement.linked_id = card.id
                 statement.save()
 
         if self.validate_card(num, undefined_cards):
