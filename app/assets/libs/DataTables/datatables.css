@@ -4,10 +4,10 @@
  *
  * To rebuild or modify this file with the latest versions of the included
  * software please visit:
- *   https://datatables.net/download/#bs5/jq-3.6.0/jszip-2.5.0/pdfmake-0.1.36/dt-1.13.4/af-2.5.3/b-2.3.6/b-colvis-2.3.6/b-html5-2.3.6/b-print-2.3.6/cr-1.6.2/date-1.4.0/fc-4.2.2/fh-3.3.2/kt-2.8.2/r-2.4.1/rg-1.3.1/rr-1.3.3/sc-2.1.1/sb-1.4.2/sp-2.1.2/sl-1.6.2/sr-1.2.2
+ *   https://datatables.net/download/#bs5/jq-3.6.0/jszip-2.5.0/dt-1.13.4/af-2.5.3/b-2.3.6/b-colvis-2.3.6/b-html5-2.3.6/b-print-2.3.6/cr-1.6.2/date-1.4.1/fc-4.2.2/fh-3.3.2/kt-2.9.0/r-2.4.1/rg-1.3.1/rr-1.3.3/sc-2.1.1/sb-1.4.2/sp-2.1.2/sl-1.6.2/sr-1.2.2
  *
  * Included libraries:
- *   jQuery 3 3.6.0, JSZip 2.5.0, pdfmake 0.1.36, DataTables 1.13.4, AutoFill 2.5.3, Buttons 2.3.6, Column visibility 2.3.6, HTML5 export 2.3.6, Print view 2.3.6, ColReorder 1.6.2, DateTime 1.4.0, FixedColumns 4.2.2, FixedHeader 3.3.2, KeyTable 2.8.2, Responsive 2.4.1, RowGroup 1.3.1, RowReorder 1.3.3, Scroller 2.1.1, SearchBuilder 1.4.2, SearchPanes 2.1.2, Select 1.6.2, StateRestore 1.2.2
+ *   jQuery 3 3.6.0, JSZip 2.5.0, DataTables 1.13.4, AutoFill 2.5.3, Buttons 2.3.6, Column visibility 2.3.6, HTML5 export 2.3.6, Print view 2.3.6, ColReorder 1.6.2, DateTime 1.4.1, FixedColumns 4.2.2, FixedHeader 3.3.2, KeyTable 2.9.0, Responsive 2.4.1, RowGroup 1.3.1, RowReorder 1.3.3, Scroller 2.1.1, SearchBuilder 1.4.2, SearchPanes 2.1.2, Select 1.6.2, StateRestore 1.2.2
  */
 
 @charset "UTF-8";

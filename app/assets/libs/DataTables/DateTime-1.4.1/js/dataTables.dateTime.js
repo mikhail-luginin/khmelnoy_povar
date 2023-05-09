@@ -1,4 +1,4 @@
-/*! DateTime picker for DataTables.net v1.4.0
+/*! DateTime picker for DataTables.net v1.4.1
  *
  * © SpryMedia Ltd, all rights reserved.
  * License: MIT datatables.net/license/mit
@@ -16,7 +16,7 @@
 		var jq = require('jquery');
 		var cjsRequires = function (root, $) {		};
 
-		if (typeof window !== 'undefined') {
+		if (typeof window === 'undefined') {
 			module.exports = function (root, $) {
 				if ( ! root ) {
 					// CommonJS environments without a window global must pass a
@@ -48,7 +48,7 @@
 
 /**
  * @summary     DateTime picker for DataTables.net
- * @version     1.4.0
+ * @version     1.4.1
  * @file        dataTables.dateTime.js
  * @author      SpryMedia Ltd
  * @contact     www.datatables.net/contact
@@ -684,7 +684,7 @@ $.extend( DateTime.prototype, {
 	 * @param {string|null} to Format to convert to. If null a `Date` will be returned
 	 * @returns {string|Date} Converted value
 	 */
-	_convert(val, from, to) {
+	_convert: function(val, from, to) {
 		if (! val) {
 			return val;
 		}
@@ -1586,6 +1586,11 @@ DateTime.use = function (lib) {
 DateTime._instance = 0;
 
 /**
+ * To indicate to DataTables what type of library this is
+ */
+DateTime.type = 'DateTime';
+
+/**
  * Defaults for the date time picker
  *
  * @type {Object}
@@ -1650,7 +1655,7 @@ DateTime.defaults = {
 	yearRange: 25
 };
 
-DateTime.version = '1.4.0';
+DateTime.version = '1.4.1';
 
 /**
  * CommonJS factory function pass through. Matches DataTables.

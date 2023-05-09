@@ -1,11 +1,11 @@
-/*! DataTables styling wrapper for KeyTable
+/*! Foundation styling wrapper for KeyTable
  * © SpryMedia Ltd - datatables.net/license
  */
 
 (function( factory ){
 	if ( typeof define === 'function' && define.amd ) {
 		// AMD
-		define( ['jquery', 'datatables.net-dt', 'datatables.net-keytable'], function ( $ ) {
+		define( ['jquery', 'datatables.net-zf', 'datatables.net-keytable'], function ( $ ) {
 			return factory( $, window, document );
 		} );
 	}
@@ -14,7 +14,7 @@
 		var jq = require('jquery');
 		var cjsRequires = function (root, $) {
 			if ( ! $.fn.dataTable ) {
-				require('datatables.net-dt')(root, $);
+				require('datatables.net-zf')(root, $);
 			}
 
 			if ( ! $.fn.dataTable.KeyTable ) {
@@ -22,7 +22,7 @@
 			}
 		};
 
-		if (typeof window !== 'undefined') {
+		if (typeof window === 'undefined') {
 			module.exports = function (root, $) {
 				if ( ! root ) {
 					// CommonJS environments without a window global must pass a
