@@ -8,17 +8,20 @@ from core.utils import BaseLkView, ObjectEditMixin, ObjectCreateMixin, ObjectDel
 from .services import bars
 from .services.catalog import CatalogService
 from .services.positions import JobsService
-from .services.bank import StatementUpdateService, CardService
+from .services.bank import StatementUpdateService
+from .services.cards.cards_services import CardService
 from .services.money import MoneyService
 from .services.employees import EmployeeService
 from .services.expenses import ExpenseService
+from .services.timetable import TimetableService
 
 from apps.iiko.services.storage import StorageService
+
+from .services.cards.cards_exceptions import CardNotFoundException, CardUniqueException
 
 from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee
 from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest
 from apps.iiko.models import Product, Supplier
-from .services.timetable import TimetableService
 
 
 class IndexView(BaseLkView):
@@ -168,7 +171,18 @@ class BankCardCreateView(ObjectCreateMixin):
         return context
 
     def post(self, request):
-        return CardService().card_create(request)
+        try:
+            CardService().card_create(request)
+            messages.success(request, 'Карта успешно создана и привязана к уже созданным с ней записям.')
+            return redirect('/lk/bank/cards')
+
+        except CardNotFoundException:
+            messages.error(request, 'Карта не найдена.')
+            return redirect('/lk/bank/cards/create')
+
+        except CardUniqueException:
+            messages.error(request, 'Такая карта уже существует')
+            return redirect('/lk/bank/cards/create')
 
 
 class BankCardEditView(ObjectEditMixin):
