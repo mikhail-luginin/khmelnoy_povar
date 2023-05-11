@@ -7,9 +7,10 @@ from core.utils import BaseLkView, ObjectEditMixin, ObjectCreateMixin, ObjectDel
 
 from .services import bars
 from .services.catalog import CatalogService
+from .services.partner import PartnerService
 from .services.positions import JobsService
 from .services.bank import StatementUpdateService
-from .services.cards.cards_services import CardService
+from .services.cards.services import CardService
 from .services.money import MoneyService
 from .services.employees import EmployeeService
 from .services.expenses import ExpenseService
@@ -17,9 +18,9 @@ from .services.timetable import TimetableService
 
 from apps.iiko.services.storage import StorageService
 
-from .services.cards.cards_exceptions import CardNotFoundException, CardUniqueException
+from .services.cards.exceptions import CardNotFoundException, CardUniqueException, CardNameIsNoneException
 
-from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee
+from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee, Partner
 from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest
 from apps.iiko.models import Product, Supplier
 
@@ -148,6 +149,22 @@ class BankPartnersView(BaseLkView):
     template_name = 'lk/partners/index.html'
 
 
+class BankPartnersEditView(ObjectEditMixin):
+    template_name = 'lk/partners/edit.html'
+    model = Partner
+    success_url = 'lk/bank/partners'
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context['storages'] = StorageService().storages_all()
+        context['expense_type'] = CatalogService().get_catalog()
+
+        return context
+
+    def post(self, request):
+        return PartnerService().partner_edit(request)
+
+
 class BankCardsView(BaseLkView):
     template_name = 'lk/cards/index.html'
 
@@ -183,7 +200,9 @@ class BankCardCreateView(ObjectCreateMixin):
         except CardUniqueException:
             messages.error(request, 'Такая карта уже существует')
             return redirect('/lk/bank/cards/create')
-
+        except CardNameIsNoneException:
+            messages.error(request, 'Название карты не может быть пустым')
+            return redirect('/lk/bank/cards/create')
 
 class BankCardEditView(ObjectEditMixin):
     template_name = 'lk/cards/edit.html'
@@ -195,6 +214,20 @@ class BankCardEditView(ObjectEditMixin):
         context['storages'] = StorageService().storages_all()
 
         return context
+
+    def post(self, request):
+        try:
+            CardService().card_update(request)
+            messages.success(request, 'Карта успешно отредактирована.')
+            return redirect('/lk/bank/cards')
+        except CardNameIsNoneException:
+            messages.error(request, 'Название карты не может быть пустым')
+            return redirect(f'/lk/bank/cards/edit?id={request.GET.get("id")}')
+
+
+class BankCardDeleteView(ObjectDeleteMixin):
+    model= Card
+    success_url = '/lk/bank/cards'
 
 
 class MoneyView(BaseLkView):
