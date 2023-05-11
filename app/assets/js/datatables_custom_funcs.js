@@ -1,4 +1,4 @@
-function run_datatable(table_id, ajax_url, url, ajax_columns = null, has_delete = true, has_update = false) {
+function run_datatable(table_id, ajax_url, url, ajax_columns = null, has_delete = true, has_update = false, has_edit = false) {
     let table = $('#' + table_id).DataTable({
         language: {
             "url": "//cdn.datatables.net/plug-ins/1.11.1/i18n/ru.json"
@@ -15,7 +15,10 @@ function run_datatable(table_id, ajax_url, url, ajax_columns = null, has_delete 
             {
                 "data": null,
                 render: function (data, type, row) {
-                    let actions = '<a href="' + url + '/edit?id=' + row.id + '"><i class="fa fa-edit"></i></a>'
+                    let actions = ''
+                    if (has_edit === true){
+                        actions += '<a href="' + url + '/edit?id=' + row.id + '"><i class="fa fa-edit"></i></a>'
+                    }
                     if (has_delete === true) {
                         actions += '<a href="#" onclick="delete_confirm(' + '\'' + row.id + '\'' + ', ' + '\'Вы действительно хотите удалить данную запись?\'' + ', ' + '\'' + url + '/delete' + '\'' + ')"><i class="fa fa-trash"></i></a>'
                     }
