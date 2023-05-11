@@ -1,0 +1,49 @@
+{% extends 'bar_base.html' %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3 mb-2">
+            <div class="card-header card-header-light rounded-top-3">Штрафы</div>
+            <div class="card-table">
+                <table class="table table-sm table-striped nowrap w-100">
+                    <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Сотрудник</th>
+                            <th>Сумма</th>
+                            <th>Причина</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fine in fines %}
+                            <tr>
+                                <td>{{ fine.date_at }}</td>
+                                <td>{{ fine.employee.fio }}</td>
+                                <td>{{ fine.sum }}</td>
+                                <td>{{ fine.reason.name }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card rounded-3">
+            <div class="card-body">
+                <div class="row">
+                    {% if is_current %}
+                        <div class="col-6">
+                            <a href="{% url 'Bar:fines' %}?code={{ code }}&month={{ previous }}" class="btn btn-tabler w-100">Предыдущий месяц</a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'Bar:fines' %}?code={{ code }}&month={{ next }}" class="btn btn-tabler w-100">Следующий месяц</a>
+                        </div>
+                    {% else %}
+                        <div class="col-12">
+                            <a href="{% url 'Bar:fines' %}?code={{ code }}&month={{ previous }}" class="btn btn-tabler w-100">Предыдущий месяц</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

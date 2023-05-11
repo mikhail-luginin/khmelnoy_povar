@@ -8,6 +8,7 @@ from .services.index import HomePageService
 from .services.expenses import ExpensesPageService
 from .services.end_day import complete_day
 from .services.malfunctions import MalfunctionService
+from .services.fines import get_fines_on_storage_by_month
 from .services.bar_info import get_full_information_of_day
 
 from apps.bar.models import Timetable, TovarRequest, Arrival, Pays, Setting, Salary
@@ -216,3 +217,24 @@ class PaysAddView(BaseView):
 
 class PaysDeleteView(ObjectDeleteMixin):
     model = Pays
+
+
+class FinesView(BaseView):
+    template_name = 'bar/fines.html'
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        month = None
+        if request.GET.get('month'):
+            month = int(request.GET.get('month'))
+
+        context['fines'] = get_fines_on_storage_by_month(storage=context['bar'],
+                                                         month_id=request.GET.get('month'))
+        if month:
+            context['previous'] = month - 1
+            context['next'] = month + 1
+            context['is_current'] = True
+        else:
+            context['previous'] = -1
+            context['is_current'] = False
+        return context

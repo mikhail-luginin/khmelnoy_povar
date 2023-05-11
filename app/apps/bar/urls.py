@@ -41,5 +41,7 @@ urlpatterns = [
 
     path('malfunctions', views.MalfunctionsView.as_view(), name="malfunctions"),
 
+    path('fines', views.FinesView.as_view(), name="fines"),
+
     path('end_day', views.EndDayView.as_view(), name="end_day")
 ]
