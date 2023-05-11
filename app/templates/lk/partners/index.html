@@ -32,9 +32,9 @@
 
 {% block scripts %}
     <script>
-        let partners_table = run_datatable('partners-table', '/api/partners', '/lk/partners', [
+        let partners_table = run_datatable('partners-table', '/api/partners', '/lk/bank/partners', [
             {data: 'name'},
             {data: 'inn'}
-        ])
+        ], has_delete=false, has_update=false, has_edit=true)
     </script>
 {% endblock %}

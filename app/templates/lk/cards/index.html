@@ -42,10 +42,10 @@
 
 {% block scripts %}
     <script>
-        run_datatable('cards-table', '/api/cards', '/lk/cards', [
+        run_datatable('cards-table', '/api/cards', '/lk/bank/cards', [
             {data: 'name'},
             {data: 'num'},
-            {data: 'storage'}
-        ])
+            {data: 'storage_name'}
+        ],has_delete = true, has_update = false, has_edit = true)
     </script>
 {% endblock %}
