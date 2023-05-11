@@ -12,7 +12,7 @@
                     {% csrf_token %}
                     <div class="mb-4">
                         <label class="form-label">Наименование</label>
-                        <input class="form-control" name="name" placeholder="Введите наименование карты или мерчанта" value="{{ row.name }}">
+                        <input class="form-control" name="name" placeholder="Введите наименование карты или мерчанта" value="">
                     </div>
                     <div class="mb-4">
                         <label class="form-label">Номер карты/мерчанта</label>
@@ -21,7 +21,7 @@
                     <div class="mb-4">
                         <label class="form-label">Заведение</label>
                         <select class="form-select" name="storage_id">
-                            <option value="-1">Выберите или оставьте пустым</option>
+                            <option value="">Выберите или оставьте пустым</option>
                             {% for storage in storages %}
                                 <option value="{{ storage.id }}" {% if storage.id == row.storage_id %}selected{% endif %}>{{ storage.name }}</option>
                             {% endfor %}
