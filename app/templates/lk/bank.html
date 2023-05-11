@@ -90,26 +90,26 @@
             {data: 'date_write_off'},
             {data: 'date_receipt'},
             {data: 'sum'},
-            {data: 'payer'},
-            {data: 'recipient'},
+            {data: 'payer_name'},
+            {data: 'recipient_name'},
             {data: 'payment_purpose'},
             {data: 'document_type'}
-        ])
+        ], has_delete=false)
         let myDropzone = new Dropzone('#myDropzone', {})
         myDropzone.on("complete", file => {
             bank_table.destroy()
-            bank_table = run_datatable('bank-table', '/api/statement', '/lk/bank', [
+            run_datatable('bank-table', '/api/statement', '/lk/bank', [
                 {data: 'linked'},
                 {data: 'document_number'},
                 {data: 'date'},
                 {data: 'date_write_off'},
                 {data: 'date_receipt'},
                 {data: 'sum'},
-                {data: 'payer'},
-                {data: 'recipient'},
+                {data: 'payer_name'},
+                {data: 'recipient_name'},
                 {data: 'payment_purpose'},
                 {data: 'document_type'}
-            ])
+            ], has_delete=false)
             notification(true, 'Банковская выписка успешно загружена :)')
         });
     </script>
