@@ -52,6 +52,19 @@
         <div class="mb-2">
             <div class="card rounded-3">
                 <div class="list-group list-group-flush">
+                    <div class="list-group-header sticky-top"><b>Журналы</b></div>
+                    <a href="{% url 'Bar:data_log_timetable' %}?code={{ code }}"
+                       class="list-group-item list-group-item-action">График</a>
+                    <a href="{% url 'Bar:data_log_arrivals' %}?code={{ code }}"
+                       class="list-group-item list-group-item-action">Поступления товара</a>
+                    <a href="{% url 'Bar:data_log_end_day' %}?code={{ code }}"
+                       class="list-group-item list-group-item-action">Конец дня</a>
+                </div>
+            </div>
+        </div>
+        <div class="mb-2">
+            <div class="card rounded-3">
+                <div class="list-group list-group-flush">
                     <div class="list-group-header sticky-top"><b>Зарплата</b></div>
                     <a href="{% url 'Bar:salary_calculation' %}?code={{ code }}"
                        class="list-group-item list-group-item-action">Расчет</a>

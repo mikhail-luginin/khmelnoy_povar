@@ -10,17 +10,19 @@ from apps.bar.models import TovarRequest, Arrival
 
 from .services.bar_info import get_bar, get_main_barmen
 
-from apps.iiko.models import Product, Category
+from apps.iiko.models import Product, Category, Storage
 from apps.iiko.services.api import IikoService
 from apps.iiko.services.storage import StorageService
 
-from core.time import today_date
+from core.time import today_date, monthdelta, get_current_time
 from core.logs import create_log
 from core.payment_types import get_bn_category, get_nal_category
 import xml.etree.ElementTree as ET
 
 from apps.lk.models import Expense, Catalog
 from apps.lk.services.catalog import CatalogService
+
+from typing import List
 
 
 class BaseView(View):
@@ -237,3 +239,43 @@ class InventoryMixin(BaseView):
             send_message_to_telegram(chat_id='-619967297', message=message)
 
         return render(request, 'bar/inventory_table.html', self.get_context_data(request, rows=row))
+
+
+class DataLogsMixin(BaseView):
+    model = None
+    type = None  # type = 1 по дням, type = 2 по месяцам
+
+    def _prepare_context(self, obj: str | None) -> dict:
+        context = dict()
+
+        if obj and obj != '0':
+            obj = int(obj)
+            context['obj'] = obj
+            context['previous'] = obj - 1
+            context['next'] = obj + 1
+            context['is_current'] = True
+        else:
+            context['previous'] = -1
+            context['is_current'] = False
+
+        return context
+
+    def _prepare_rows(self, storage: Storage, obj: int | None) -> List[model]:
+        current_date = get_current_time()
+
+        filter_args = None
+        match self.type:
+            case 1:
+                day = current_date.day + obj if obj else current_date.day
+                filter_args = {"date_at__day": day}
+            case 2:
+                obj = monthdelta(current_date, obj).month if obj else current_date.month
+                filter_args = {"date_at__month": obj}
+
+        return [row for row in self.model.objects.filter(**filter_args, storage=storage)]
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context.update(self._prepare_context(obj=request.GET.get('date')))
+        context['rows'] = self._prepare_rows(storage=context.get('bar'), obj=context.get('obj'))
+        return context

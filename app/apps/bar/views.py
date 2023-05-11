@@ -1,8 +1,10 @@
+from typing import List
+
 from core.time import today_date
 from core.total_values import get_total_expenses_by_date_and_storage
 from global_services.salary import SalaryService
 
-from .utils import BaseView, ObjectDeleteMixin, TovarRequestMixin, ArrivalMixin, InventoryMixin
+from .utils import BaseView, ObjectDeleteMixin, TovarRequestMixin, ArrivalMixin, InventoryMixin, DataLogsMixin
 
 from .services.index import HomePageService
 from .services.expenses import ExpensesPageService
@@ -11,14 +13,16 @@ from .services.malfunctions import MalfunctionService
 from .services.fines import get_fines_on_storage_by_month
 from .services.bar_info import get_full_information_of_day
 
-from apps.bar.models import Timetable, TovarRequest, Arrival, Pays, Setting, Salary
-from apps.lk.models import Expense
+from apps.bar.models import Timetable, TovarRequest, Arrival, Pays, Setting, Salary, Money
+from apps.lk.models import Expense, Fine
 
 from apps.lk.services import catalog, positions, employees
 
 from django.conf import settings
 
 from django.db.models import Sum
+
+from ..iiko.models import Storage
 
 
 class IndexView(BaseView):
@@ -219,22 +223,33 @@ class PaysDeleteView(ObjectDeleteMixin):
     model = Pays
 
 
-class FinesView(BaseView):
+class FinesView(DataLogsMixin):
     template_name = 'bar/fines.html'
+    model = Fine
+    type = 2
+
+    def _prepare_rows(self, storage: Storage, obj: int | None) -> List[model]:
+        return get_fines_on_storage_by_month(storage=storage, month=obj)
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        month = None
-        if request.GET.get('month'):
-            month = int(request.GET.get('month'))
-
-        context['fines'] = get_fines_on_storage_by_month(storage=context['bar'],
-                                                         month_id=request.GET.get('month'))
-        if month:
-            context['previous'] = month - 1
-            context['next'] = month + 1
-            context['is_current'] = True
-        else:
-            context['previous'] = -1
-            context['is_current'] = False
+        context['fines'] = self._prepare_rows(storage=context.get('bar'), obj=request.GET.get('date'))
         return context
+
+
+class TimetableDataLogView(DataLogsMixin):
+    model = Timetable
+    template_name = 'bar/data_logs/timetable.html'
+    type = 1
+
+
+class ArrivalsDataLogView(DataLogsMixin):
+    model = Arrival
+    template_name = 'bar/data_logs/arrivals.html'
+    type = 1
+
+
+class EndDayDataLogView(DataLogsMixin):
+    model = Money
+    template_name = 'bar/data_logs/end_day.html'
+    type = 1
