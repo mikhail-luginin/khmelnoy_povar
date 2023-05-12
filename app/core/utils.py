@@ -45,21 +45,6 @@ class ObjectCreateMixin(AccessMixin, BaseLkView):
     def get(self, request):
         return render(request, self.template_name, self.get_context_data(request))
 
-    def post(self, request):
-        data = dict()
-
-        for k, v in request.POST.items():
-            if k != 'csrfmiddlewaretoken':
-                data[k] = v if v != '' else None
-                if k == 'created_at':
-                    data[k] = today_datetime()
-
-        self.model.objects.create(**data)
-        create_log(request.user.username, request.path, f'Создание записи в модели {str(self.model)}')
-
-        messages.success(request, 'Объект успешно создан :)')
-        return redirect(self.success_url)
-
     def dispatch(self, request, *args, **kwargs):
         if request.user.id is not None:
             if not self.has_access(request.user.id):
@@ -110,26 +95,6 @@ class ObjectEditMixin(AccessMixin, BaseLkView):
         context = self.get_context_data(request, row=row)
 
         return render(request, self.template_name, context)
-
-    def post(self, request):
-        data = dict()
-
-        fio = ''
-        for k, v in request.POST.items():
-            if k != 'csrfmiddlewaretoken':
-                data[k] = v if v != '' else None
-                if k == 'first-name':
-                    fio += v
-                    data.pop('first-name')
-                if k == 'last-name':
-                    fio += v
-                    data.pop('last-name')
-
-        self.model.objects.filter(id=request.GET.get('id')).update(**data)
-        create_log(request.user.username, request.path, f'Редактирование записи в модели {str(self.model)}')
-
-        messages.success(request, 'Данные объекта успешно обновлены :)')
-        return redirect(self.success_url)
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.id is not None:
