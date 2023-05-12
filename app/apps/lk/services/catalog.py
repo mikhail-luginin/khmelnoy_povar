@@ -1,9 +1,8 @@
-from django.contrib import messages
-from django.shortcuts import redirect
-
 from apps.lk.models import Catalog, CatalogType
 
 from typing import List
+
+from core import exceptions
 
 
 class CatalogService:
@@ -42,41 +41,77 @@ class CatalogService:
     def get_catalog(self) -> List[catalog_model]:
         return self.catalog_model.objects.all()
 
-    def catalog_edit(self, request) -> redirect:
-        row_id = request.GET.get('id')
-        name = request.POST.get('name')
-        linked = request.POST.getlist('linked')
+    def catalog_type_create(self, name: str | None) -> bool:
+        if not name:
+            raise exceptions.FieldNotFoundError('Наименование типа справочника не найдено.')
+        if name == '':
+            raise exceptions.FieldCannotBeEmptyError('Наименование типа справочника не может быть пустым.')
+        
+        self.catalog_type_model.objects.create(name=name)
 
-        try:
-            row = self.catalog_model.objects.get(id=row_id)
-        except Catalog.DoesNotExist:
-            messages.error(request, 'Запись не найдена :(')
-            return redirect('/lk/catalog')
+        return True
 
-        row.name = name
+    def catalog_type_edit(self, row_id: str | None, name: str | None) -> bool:
+        if not row_id:
+            raise exceptions.FieldNotFoundError('Идентификатор записи не найден.')
 
-        row.catalog_types.set(linked)
+        if not name:
+            raise exceptions.FieldNotFoundError('Наименование записи для типа справочника не найдено.')
+        if name == '':
+            raise exceptions.FieldCannotBeEmptyError('Наименование записи для типа справочника не может быть пустым.')
 
-        row.save()
+        row = self.catalog_type_model.objects.filter(id=row_id)
+        if row.exists():
+            row = row.first()
+            row.name = name
+            row.save()
+        else:
+            raise self.catalog_type_model.DoesNotExist('Записи с данным идентификатором не существует.')
 
-        messages.success(request, 'Каталог успешно отредактирован :)')
-        return redirect('/lk/catalog')
+        return True
 
-    def catalog_create(self, request) -> redirect:
-        name = request.POST.get('catalog-name')
-        linked = request.POST.getlist('linked')
+    def catalog_edit(self, row_id: str | None, name: str | None, linked: list | None) -> bool:
+        if not row_id:
+            raise exceptions.FieldNotFoundError('Идентификатор записи в справочнике не найден.')
+
+        if not name:
+            raise exceptions.FieldNotFoundError('Наименование записи для справочника не найдено.')
+        if name == '':
+            raise exceptions.FieldCannotBeEmptyError('Наименование записи для справочника не может быть пустым.')
+
+        if not linked:
+            raise exceptions.FieldNotFoundError('Типы справочников не найдены.')
+        if linked == '':
+            raise exceptions.FieldCannotBeEmptyError('Типы справочников не могут быть не заполнены.')
+
+        row = self.catalog_model.objects.filter(id=row_id)
+        if row.exists():
+            row = row.first()
+            row.name = name
+            row.catalog_types.set(linked)
+            row.save()
+            return True
+        else:
+            raise self.catalog_model.DoesNotExist(f'Запись в справочнике с идентификатором {row_id} не найдена.')
+
+    def catalog_create(self, name: str | None, linked: list | None) -> bool:
+        if not name:
+            raise exceptions.FieldNotFoundError('Наименование записи для справочника не указано.')
+        if name == '':
+            raise exceptions.FieldCannotBeEmptyError('Наименование записи для справочника не может быть пустым.')
+        
+        if not linked:
+            raise exceptions.FieldNotFoundError('Поле с типами справочников не найдено.')
+        if len(linked) == 0:
+            raise exceptions.FieldCannotBeEmptyError('Типы справочников не могут быть не указаны.')
 
         row = self.catalog_model.objects.create(name=name)
-
         for link in linked:
             try:
                 catalog_type = self.catalog_type_model.objects.get(id=link)
             except self.catalog_type_model.DoesNotExist:
-                messages.error(request, f'Объект с идентификатором {link} не найден :(')
-                return redirect('/lk/catalog')
+                raise self.catalog_type_model.DoesNotExist(f'Тип справочника с идентификатором {link} не найден.')
             row.catalog_types.add(catalog_type)
-
         row.save()
 
-        messages.success(request, 'Объект успешно записан в справочник :)')
-        return redirect('/lk/catalog')
+        return True

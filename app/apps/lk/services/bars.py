@@ -1,22 +1,16 @@
-from django.shortcuts import redirect
-from django.contrib import messages
+from apps.bar.models import Setting
 
-from apps.bar.models import Setting, TelegramChats
+from core import exceptions
 
 
-def update_settings(request) -> redirect:
-    percent = request.POST.get('percent', None)
-    try:
-        settings = Setting.objects.get(id=1)
-    except Setting.DoesNotExist:
-        settings = None
+def settings_edit(percent: str | None) -> bool:
+    settings = Setting.objects.get_or_create(id=1)
 
-    if settings:
-        settings.percent = percent
-        settings.save()
+    if not percent:
+        raise exceptions.FieldNotFoundError('Поле процент не найдено.')
+    if percent == '0' or percent == '':
+        raise exceptions.FieldCannotBeEmptyError('Поле процент не может быть пустым или равняться нулю.')
 
-    else:
-        Setting.objects.create(percent=percent).save()
-
-    messages.success(request, 'Настройки успешно обновлены :)')
-    return redirect('/lk/bars')
+    settings.percent = percent
+    settings.save()
+    return True

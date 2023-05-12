@@ -4,6 +4,7 @@ from django.conf import settings
 from django.shortcuts import redirect
 
 from core.utils import BaseLkView, ObjectEditMixin, ObjectCreateMixin, ObjectDeleteMixin
+from core import exceptions
 
 from .services import bars
 from .services.catalog import CatalogService
@@ -38,12 +39,32 @@ class CatalogView(BaseLkView):
 class CatalogAddView(ObjectCreateMixin):
 
     def post(self, request):
-        return CatalogService().catalog_create(request)
+        name = request.POST.get('catalog-name')
+        linked = request.POST.getlist('linked')
+
+        try:
+            if CatalogService().catalog_create(name, linked):
+                messages.success(request, 'Запись успешно добавлена в справочник.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, CatalogType.DoesNotExist) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/catalog')
 
 
 class CatalogTypeAddView(ObjectCreateMixin):
     model = CatalogType
     success_url = '/lk/catalog'
+
+    def post(self, request):
+        name = request.POST.get('name')
+
+        try:
+            if CatalogService().catalog_type_create(name):
+                messages.success(request, 'Тип каталога успешно создан.')
+        except (exceptions.FieldCannotBeEmptyError, exceptions.FieldNotFoundError) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/catalog')
 
 
 class CatalogDeleteView(ObjectDeleteMixin):
@@ -68,13 +89,34 @@ class CatalogEditView(ObjectEditMixin):
         return context
 
     def post(self, request):
-        return CatalogService().catalog_edit(request)
+        row_id = request.GET.get('id')
+        name = request.POST.get('name')
+        linked = request.POST.getlist('linked')
+
+        try:
+            if CatalogService().catalog_edit(row_id=row_id, name=name, linked=linked):
+                messages.success(request, 'Запись успешно отредактирована.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, CatalogType.DoesNotExist) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/catalog')
 
 
 class CatalogTypeEditView(ObjectEditMixin):
     model = CatalogType
     template_name = 'lk/catalog/type_edit.html'
-    success_url = '/lk/catalog'
+
+    def post(self, request):
+        row_id = request.GET.get('id')
+        name = request.POST.get('name')
+
+        try:
+            if CatalogService().catalog_type_edit(row_id=row_id, name=name):
+                messages.success(request, 'Тип справочника успешно отредактирован.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, CatalogType.DoesNotExist) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/catalog')
 
 
 class BarsView(BaseLkView):
@@ -91,7 +133,15 @@ class BarsSettingsView(BaseLkView):
     template_name = 'lk/bars_settings.html'
 
     def post(self, request):
-        return bars.update_settings(request)
+        percent = request.POST.get('percent')
+
+        try:
+            if bars.settings_edit(percent=percent):
+                messages.success(request, 'Настройки бара успешно обновлены')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/bars/settings')
 
 
 class PositionsView(BaseLkView):
@@ -104,7 +154,30 @@ class PositionsView(BaseLkView):
         return context
 
     def post(self, request):
-        return JobsService().position_create(request)
+        position_name = request.POST.get('position-name')
+        position_oklad = request.POST.get('position-oklad')
+        position_all_storages = True if request.POST.get('position-all-storages') is not None else False
+        position_is_usil = True if request.POST.get('position-is-usil') is not None else False
+        position_is_called = True if request.POST.get('position-is-calling') is not None else False
+        position_is_trainee = True if request.POST.get('position-is-trainee') is not None else False
+        position_has_percent = True if request.POST.get('position-has-percent') is not None else False
+        position_has_premium = True if request.POST.get('position-has-premium') is not None else False
+        position_job_ids = request.POST.getlist('job_id')
+        priority_id = request.POST.get('priority-id')
+
+        try:
+            if JobsService().position_create(position_oklad=position_oklad, position_is_usil=position_is_usil,
+                                             position_name=position_name, position_is_trainee=position_is_trainee,
+                                             position_is_called=position_is_called,
+                                             position_all_storages=position_all_storages,
+                                             position_has_percent=position_has_percent,
+                                             position_has_premium=position_has_premium,
+                                             position_job_ids=position_job_ids, priority_id=priority_id):
+                messages.success(request, 'Позиция успешно создана.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/positions')
 
 
 class PositionsEditView(ObjectEditMixin):
