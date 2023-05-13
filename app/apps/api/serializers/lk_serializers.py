@@ -110,7 +110,7 @@ class PartnerSerializer(serializers.ModelSerializer):
 
 
 class CardSerializer(serializers.ModelSerializer):
-    storage_name = serializers.CharField(source='storage.name', default='Не привязана')
+    storage_name = serializers.CharField(source='storage.name', default='Не привязано')
 
     class Meta:
         model = Card
