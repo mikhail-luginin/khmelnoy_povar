@@ -18,8 +18,8 @@ from .services.timetable import TimetableService
 
 from apps.iiko.services.storage import StorageService
 
-from .services.cards.exceptions import CardNotFoundException, CardUniqueException, CardNameIsNoneException
-
+from .services.cards.exceptions import CardNotFoundException, CardUniqueException, CardNameIsNoneException, \
+    FieldNotFoundError
 from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee, Partner
 from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest
 from apps.iiko.models import Product, Supplier
@@ -162,7 +162,20 @@ class BankPartnersEditView(ObjectEditMixin):
         return context
 
     def post(self, request):
-        return PartnerService().partner_edit(request)
+        row_id = request.GET.get('id')
+        friendly_name = request.POST.get('friendly_name')
+        expense_type = request.POST.getlist('expense_type')
+        storage_id = request.POST.getlist('storage_id')
+
+        try:
+            PartnerService().partner_edit(row_id=row_id, friendly_name=friendly_name, expense_type=expense_type, storage_id=storage_id)
+            messages.success(request, 'Контрагент успешно отредактирован :)')
+            url = '/lk/bank/partners'
+        except (FieldNotFoundError, Partner.DoesNotExist) as error:
+            messages.error(request, error)
+            url = '/lk/bank/partners/edit'
+
+        return redirect(url)
 
 
 class BankCardsView(BaseLkView):
@@ -188,21 +201,19 @@ class BankCardCreateView(ObjectCreateMixin):
         return context
 
     def post(self, request):
+        name = request.POST.get('name')
+        num = request.POST.get('num')
+        storage_id = request.POST.get('storage_id')
+
         try:
-            CardService().card_create(request)
+            CardService().card_create(name=name, num=num, storage_id=storage_id)
             messages.success(request, 'Карта успешно создана и привязана к уже созданным с ней записям.')
-            return redirect('/lk/bank/cards')
+            url = '/lk/bank/cards'
+        except (CardNotFoundException, CardNameIsNoneException, CardUniqueException) as error:
+            messages.error(request, error)
+            url = '/lk/bank/cards/create'
 
-        except CardNotFoundException:
-            messages.error(request, 'Карта не найдена.')
-            return redirect('/lk/bank/cards/create')
-
-        except CardUniqueException:
-            messages.error(request, 'Такая карта уже существует')
-            return redirect('/lk/bank/cards/create')
-        except CardNameIsNoneException:
-            messages.error(request, 'Название карты не может быть пустым')
-            return redirect('/lk/bank/cards/create')
+        return redirect(url)
 
 class BankCardEditView(ObjectEditMixin):
     template_name = 'lk/cards/edit.html'
@@ -216,14 +227,19 @@ class BankCardEditView(ObjectEditMixin):
         return context
 
     def post(self, request):
-        try:
-            CardService().card_update(request)
-            messages.success(request, 'Карта успешно отредактирована.')
-            return redirect('/lk/bank/cards')
-        except CardNameIsNoneException:
-            messages.error(request, 'Название карты не может быть пустым')
-            return redirect(f'/lk/bank/cards/edit?id={request.GET.get("id")}')
+        row_id = request.GET.get('id')
+        name = request.POST.get('name')
+        storage_id = request.POST.get('storage_id')
 
+        try:
+            CardService().card_update(row_id=row_id, name=name, storage_id=storage_id)
+            messages.success(request, 'Карта успешно отредактирована.')
+            url = '/lk/bank/cards'
+        except (FieldNotFoundError, CardNameIsNoneException) as error:
+            messages.error(request, error)
+            url = f'/lk/bank/cards/edit?id={request.GET.get("id")}'
+
+        return redirect(url)
 
 class BankCardDeleteView(ObjectDeleteMixin):
     model= Card
