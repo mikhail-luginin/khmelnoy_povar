@@ -24,12 +24,13 @@
                     <div class="mb-4">
                         <label class="form-label">Имя для отображения</label>
                         <input class="form-control" name="friendly_name" placeholder="Введите наименование карты или мерчанта"
-                               value="">
+                               value="{{ row.friendly_name }}">
                     </div>
                     <div class="mb-4">
                     <label class="form-label">Тип расчета</label>
-                        <select class="form-select" name="expense_type">
+                        <select class="form-select" name="expense_type" multiple>
                         <option value="">Выберите или оставьте пустым</option>
+                            <option></option>
                             {% for type in expense_type %}
                                 <option value="{{ type.id }}" {% if type in row.expense_type.all %}selected{% endif %}>{{ type.name }}</option>
                             {% endfor %}
@@ -37,7 +38,8 @@
                     </div>
                     <div class="mb-4">
                         <label class="form-label">Заведение</label>
-                        <select class="form-select" name="storage_id">
+                        <select class="form-select" name="storage_id" multiple>
+                            <option></option>
                             <option value="">Выберите или оставьте пустым</option>
                             {% for storage in storages %}
                                 <option value="{{ storage.id }}" {% if storage in row.storages.all %}selected{% endif %}>{{ storage.name }}</option>
