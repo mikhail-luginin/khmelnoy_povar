@@ -28,7 +28,8 @@ LOCAL_APPS = [
     'apps.bar.apps.BarConfig',
     'apps.iiko.apps.IikoConfig',
     'apps.repairer.apps.RepairerConfig',
-    'apps.api.apps.ApiConfig'
+    'apps.api.apps.ApiConfig',
+    'apps.purchaser.apps.PurchaserConfig'
 ]
 THIRD_PARTY_APPS = [
     'whitenoise.runserver_nostatic',
