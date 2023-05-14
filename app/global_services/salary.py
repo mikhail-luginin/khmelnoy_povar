@@ -26,20 +26,22 @@ class SalaryService:
         premium = 0
 
         today_money = get_full_information_of_day(str(timetable_object.date_at), timetable_object.storage)
+        if 'error' not in today_money:
+            if timetable_object.position.args['has_percent']:
+                percent += round(today_money['sum_for_percent'] * (percent_num / 100))
 
-        if timetable_object.position.args['has_percent']:
-            percent += round(today_money['sum_for_percent'] * (percent_num / 100))
+            if timetable_object.position.args['has_premium']:
+                total_day = today_money['total_day']
+                if 80000 <= total_day < 100000:
+                    premium += 500
+                elif 100000 <= total_day < 120000:
+                    premium += 1000
+                elif total_day >= 120000:
+                    premium += 2000
 
-        if timetable_object.position.args['has_premium']:
-            total_day = today_money['total_day']
-            if 80000 <= total_day < 100000:
-                premium += 500
-            elif 100000 <= total_day < 120000:
-                premium += 1000
-            elif total_day >= 120000:
-                premium += 2000
-
-        return {"oklad": timetable_object.oklad, "percent": percent, "premium": premium}
+            return {"oklad": timetable_object.oklad, "percent": percent, "premium": premium}
+        else:
+            return {"oklad": 0, "percent": 0, "premium": 0}
 
     def get_money_data_employee(self, request) -> dict:
         data = dict()
