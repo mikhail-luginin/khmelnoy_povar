@@ -7,12 +7,15 @@ from core.utils import BaseLkView, ObjectEditMixin, ObjectCreateMixin, ObjectDel
 from core import exceptions
 
 from .services import bars
+from .services.salary import SalaryService
 from .services.catalog import CatalogService
 from .services.positions import JobsService
 from .services.bank import StatementUpdateService, CardService
 from .services.money import MoneyService
 from .services.employees import EmployeeService
 from .services.expenses import ExpenseService
+from .services.pays import PaysService
+from .services.fines import FineService
 
 from apps.iiko.services.storage import StorageService
 
@@ -156,24 +159,24 @@ class PositionsView(BaseLkView):
     def post(self, request):
         position_name = request.POST.get('position-name')
         position_oklad = request.POST.get('position-oklad')
-        position_all_storages = True if request.POST.get('position-all-storages') is not None else False
-        position_is_usil = True if request.POST.get('position-is-usil') is not None else False
-        position_is_called = True if request.POST.get('position-is-calling') is not None else False
-        position_is_trainee = True if request.POST.get('position-is-trainee') is not None else False
-        position_has_percent = True if request.POST.get('position-has-percent') is not None else False
-        position_has_premium = True if request.POST.get('position-has-premium') is not None else False
+        position_all_storages = bool(request.POST.get('position-all-storages'))
+        position_is_usil = bool(request.POST.get('position-is-usil'))
+        position_is_called = bool(request.POST.get('position-is-calling'))
+        position_is_trainee = bool(request.POST.get('position-is-trainee'))
+        position_has_percent = bool(request.POST.get('position-has-percent'))
+        position_has_premium = bool(request.POST.get('position-has-premium'))
         position_job_ids = request.POST.getlist('job_id')
         priority_id = request.POST.get('priority-id')
 
         try:
-            if JobsService().position_create(position_oklad=position_oklad, position_is_usil=position_is_usil,
-                                             position_name=position_name, position_is_trainee=position_is_trainee,
-                                             position_is_called=position_is_called,
-                                             position_all_storages=position_all_storages,
-                                             position_has_percent=position_has_percent,
-                                             position_has_premium=position_has_premium,
-                                             position_job_ids=position_job_ids, priority_id=priority_id):
-                messages.success(request, 'Позиция успешно создана.')
+            JobsService().position_create(position_oklad=position_oklad, position_is_usil=position_is_usil,
+                                          position_name=position_name, position_is_trainee=position_is_trainee,
+                                          position_is_called=position_is_called,
+                                          position_all_storages=position_all_storages,
+                                          position_has_percent=position_has_percent,
+                                          position_has_premium=position_has_premium,
+                                          position_job_ids=position_job_ids, priority_id=priority_id)
+            messages.success(request, 'Позиция успешно создана.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
             messages.error(request, error)
 
@@ -191,7 +194,31 @@ class PositionsEditView(ObjectEditMixin):
         return context
 
     def post(self, request):
-        return JobsService().position_edit(request)
+        position_id = request.GET.get('id')
+        position_name = request.POST.get('position-name')
+        position_oklad = request.POST.get('position-oklad')
+        position_all_storages = bool(request.POST.get('position-all-storages'))
+        position_is_usil = bool(request.POST.get('position-is-usil'))
+        position_is_called = bool(request.POST.get('position-is-calling'))
+        position_is_trainee = bool(request.POST.get('position-is-trainee'))
+        position_has_percent = bool(request.POST.get('position-has-percent'))
+        position_has_premium = bool(request.POST.get('position-has-premium'))
+        position_job_ids = request.POST.getlist('job_id')
+        priority_id = request.POST.get('priority-id')
+
+        try:
+            JobsService().position_edit(position_id=position_id, position_name=position_name,
+                                        position_is_trainee=position_is_trainee, position_is_called=position_is_called,
+                                        position_job_ids=position_job_ids, position_is_usil=position_is_usil,
+                                        position_has_premium=position_has_premium,
+                                        position_has_percent=position_has_percent,
+                                        position_all_storages=position_all_storages, position_oklad=position_oklad,
+                                        priority_id=priority_id)
+            messages.success(request, 'Позиция успешно отредактирована')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Position.DoesNotExist) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/positions')
 
 
 class PositionDeleteView(ObjectDeleteMixin):
@@ -202,7 +229,16 @@ class PositionDeleteView(ObjectDeleteMixin):
 class JobAddView(BaseLkView):
 
     def post(self, request):
-        return JobsService().job_create(request)
+        job_name = request.POST.get('job-name')
+        job_oklad = request.POST.get('job-oklad')
+
+        try:
+            JobsService().job_create(job_name=job_name, job_oklad=job_oklad)
+            messages.success(request, 'Должность успешно создана.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/positions')
 
 
 class BankView(BaseLkView):
@@ -262,14 +298,33 @@ class MoneyView(BaseLkView):
 
 @login_required
 def update_money(request):
-    return MoneyService().update(request)
+    row_id = request.GET.get('id')
+
+    try:
+        MoneyService().update(row_id=row_id)
+        messages.success(request, 'Запись успешно обновлена.')
+    except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Money.DoesNotExist) as error:
+        messages.error(request, error)
+
+    return redirect('/lk/money')
 
 
 class MoneyEditView(ObjectEditMixin):
     model = Money
 
     def post(self, request):
-        return MoneyService().money_edit(request)
+        row_id = request.GET.get('id')
+        sum_cash_morning = request.POST.get('sum_cash_morning')
+        sum_cash_end_day = request.POST.get('sum_cash_end_day')
+
+        try:
+            MoneyService().money_edit(row_id=row_id, sum_cash_morning=sum_cash_morning,
+                                      sum_cash_end_day=sum_cash_end_day)
+            messages.success(request, 'Запись успешно отредактирована.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Money.DoesNotExist) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/money')
 
 
 class TimetableView(BaseLkView):
@@ -291,15 +346,19 @@ class CreateTimetableView(ObjectCreateMixin):
 
     def post(self, request):
         date_at = request.POST.get('date_at')
-        employee_id = int(request.POST.get('employee_id'))
-        oklad = int(request.POST.get('oklad'))
-        position_id = int(request.POST.get('position_id'))
-        storage_id = int(request.POST.get('storage_id'))
+        employee_id = request.POST.get('employee_id')
+        oklad = request.POST.get('oklad')
+        position_id = request.POST.get('position_id')
+        storage_id = request.POST.get('storage_id')
 
-        if TimetableService().create(date_at=date_at, employee_id=employee_id,
-                                     oklad=oklad, position_id=position_id, storage_id=storage_id):
+        try:
+            TimetableService().create(date_at=date_at, employee_id=employee_id,
+                                      oklad=oklad, position_id=position_id, storage_id=storage_id)
             messages.success(request, 'Запись успешно создана.')
-            return redirect('/lk/timetable')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/timetable')
 
 
 class EditTimetableView(ObjectEditMixin):
@@ -314,6 +373,23 @@ class EditTimetableView(ObjectEditMixin):
         context['positions'] = JobsService().positions_all()
 
         return context
+
+    def post(self, request):
+        timetable_id = request.GET.get('id')
+        date_at = request.POST.get('date_at')
+        employee_id = request.POST.get('employee_id')
+        oklad = request.POST.get('oklad')
+        position_id = request.POST.get('position_id')
+        storage_id = request.POST.get('storage_id')
+
+        try:
+            TimetableService().edit(timetable_id=timetable_id, date_at=date_at, employee_id=employee_id,
+                                    oklad=oklad, position_id=position_id, storage_id=storage_id)
+            messages.success(request, 'Запись успешно отредактирована.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Timetable.DoesNotExist) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/timetable')
 
 
 class DeleteTimetableView(ObjectDeleteMixin):
@@ -339,7 +415,23 @@ class CreateExpenseView(ObjectCreateMixin):
         return context
 
     def post(self, request):
-        return ExpenseService().create_expense(request)
+        date_at = request.POST.get('date_at')
+        payment_receiver = request.POST.get('payment_receiver')
+        expense_sum = request.POST.get('sum')
+        comment = request.POST.get('comment')
+        storage_id = request.POST.get('storage_id')
+        type_id = request.POST.get('type_id')
+        source_id = request.POST.get('source_id')
+
+        try:
+            ExpenseService().create(date_at=date_at, payment_receiver=payment_receiver, expense_sum=expense_sum,
+                                    comment=comment, storage_id=storage_id,
+                                    expense_type_id=type_id, expense_source_id=source_id)
+            messages.success(request, 'Расход успешно создан.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/expenses')
 
 
 class EditExpenseView(ObjectEditMixin):
@@ -354,6 +446,27 @@ class EditExpenseView(ObjectEditMixin):
         context['sources'] = CatalogService().get_catalog_by_type(settings.EXPENSE_SOURCE_CATEGORY)
 
         return context
+
+    def post(self, request):
+        expense_id = request.GET.get('id')
+        date_at = request.POST.get('date_at')
+        payment_receiver = request.POST.get('payment_receiver')
+        expense_sum = request.POST.get('sum')
+        comment = request.POST.get('comment')
+        storage_id = request.POST.get('storage_id')
+        type_id = request.POST.get('type_id')
+        source_id = request.POST.get('source_id')
+
+        try:
+            ExpenseService().edit(expense_id=expense_id, date_at=date_at, payment_receiver=payment_receiver,
+                                  expense_sum=expense_sum,
+                                  comment=comment, storage_id=storage_id,
+                                  expense_type_id=type_id, expense_source_id=source_id)
+            messages.success(request, 'Расход успешно отредактирован.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Expense.DoesNotExist) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/expenses')
 
 
 class DeleteExpenseView(ObjectDeleteMixin):
@@ -373,9 +486,29 @@ class CreateSalaryView(ObjectCreateMixin):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context['storages'] = StorageService().storages_all()
-        context['employees'] = EmployeeService().employees_all(True)
+        context['employees'] = EmployeeService().employees_all(False)
 
         return context
+
+    def post(self, request):
+        date_at = request.POST.get('date_at')
+        salary_type = request.POST.get('type')
+        employee_id = request.POST.get('employee_id')
+        storage_id = request.POST.get('storage_id')
+        oklad = request.POST.get('oklad')
+        percent = request.POST.get('percent')
+        premium = request.POST.get('premium')
+        month = request.POST.get('month')
+        period = request.POST.get('period')
+
+        try:
+            SalaryService().create(date_at=date_at, salary_type=salary_type, employee_id=employee_id,
+                                   storage_id=storage_id, oklad=oklad, percent=percent, premium=premium,
+                                   month=month, period=period)
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/salary')
 
 
 class EditSalaryView(ObjectEditMixin):
@@ -386,9 +519,31 @@ class EditSalaryView(ObjectEditMixin):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context['storages'] = StorageService().storages_all()
-        context['employees'] = EmployeeService().employees_all(True)
+        context['employees'] = EmployeeService().employees_all(False)
 
         return context
+
+    def post(self, request):
+        salary_id = request.GET.get('id')
+        date_at = request.POST.get('date_at')
+        salary_type = request.POST.get('type')
+        employee_id = request.POST.get('employee_id')
+        storage_id = request.POST.get('storage_id')
+        oklad = request.POST.get('oklad')
+        percent = request.POST.get('percent')
+        premium = request.POST.get('premium')
+        month = request.POST.get('month')
+        period = request.POST.get('period')
+
+        try:
+            SalaryService().edit(salary_id=salary_id, date_at=date_at, salary_type=salary_type,
+                                 employee_id=employee_id, storage_id=storage_id, oklad=oklad,
+                                 percent=percent, premium=premium, month=month, period=period)
+            messages.success(request, 'Запись успешно отредактирована.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Salary.DoesNotExist) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/salary')
 
 
 class DeleteSalaryView(ObjectDeleteMixin):
@@ -414,6 +569,22 @@ class CreatePaysView(ObjectCreateMixin):
 
         return context
 
+    def post(self, request):
+        date_at = request.POST.get('date_at')
+        storage_id = request.POST.get('storage_id')
+        pay_type = request.POST.get('type')
+        pay_sum = request.POST.get('sum')
+        comment = request.POST.get('comment')
+
+        try:
+            PaysService().create(date_at=date_at, storage_id=storage_id,
+                                 pay_type=pay_type, pay_sum=pay_sum, comment=comment)
+            messages.success(request, 'Запись успешно создана.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/pays')
+
 
 class EditPaysView(ObjectEditMixin):
     template_name = 'lk/pays/edit.html'
@@ -428,6 +599,23 @@ class EditPaysView(ObjectEditMixin):
             [settings.PAYIN_CATEGORY, settings.PAYOUT_CATEGORY])
 
         return context
+
+    def post(self, request):
+        pay_id = request.GET.get('id')
+        date_at = request.POST.get('date_at')
+        storage_id = request.POST.get('storage_id')
+        pay_type = request.POST.get('type')
+        pay_sum = request.POST.get('sum')
+        comment = request.POST.get('comment')
+
+        try:
+            PaysService().edit(pay_id=pay_id, date_at=date_at, storage_id=storage_id,
+                               pay_type=pay_type, pay_sum=pay_sum, comment=comment)
+            messages.success(request, 'Запись успешно создана.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Pays.DoesNotExist) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/pays')
 
 
 class DeletePaysView(ObjectDeleteMixin):
@@ -452,6 +640,21 @@ class CreateFineView(ObjectCreateMixin):
 
         return context
 
+    def post(self, request):
+        date_at = request.POST.get('date_at')
+        employee_id = request.POST.get('employee_id')
+        fine_sum = request.POST.get('sum')
+        reason_id = request.POST.get('reason_id')
+
+        try:
+            FineService().create(date_at=date_at, employee_id=employee_id,
+                                 fine_sum=fine_sum, reason_id=reason_id)
+            messages.success(request, 'Запись успешно создана.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/fines')
+
 
 class EditFinesView(ObjectEditMixin):
     template_name = 'lk/fines/edit.html'
@@ -465,6 +668,22 @@ class EditFinesView(ObjectEditMixin):
         context['reasons'] = CatalogService().get_catalog_by_type(settings.FINE_REASON_CATEGORY)
 
         return context
+
+    def post(self, request):
+        fine_id = request.GET.get('id')
+        date_at = request.POST.get('date_at')
+        employee_id = request.POST.get('employee_id')
+        fine_sum = request.POST.get('sum')
+        reason_id = request.POST.get('reason_id')
+
+        try:
+            FineService().edit(fine_id=fine_id, date_at=date_at, employee_id=employee_id,
+                               fine_sum=fine_sum, reason_id=reason_id)
+            messages.success(request, 'Запись успешно отредактирована.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Fine.DoesNotExist) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/fines')
 
 
 class DeleteFineView(ObjectDeleteMixin):
@@ -503,6 +722,9 @@ class EditEmployeeView(ObjectEditMixin):
 
         return context
 
+    def post(self, request):
+        pass
+
 
 class DissmissEmployeeView(BaseLkView):
 
@@ -530,11 +752,15 @@ class ArrivalCreateView(ObjectCreateMixin):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context['storages'] = StorageService().storages_all()
-        context['products'] = Product.objects.filter(category__name__in=[settings.TOVAR_BEER_CATEGORY, settings.TOVAR_DRINKS_CATEGORY])
+        context['products'] = Product.objects.filter(
+            category__name__in=[settings.TOVAR_BEER_CATEGORY, settings.TOVAR_DRINKS_CATEGORY])
         context['suppliers'] = Supplier.objects.all()
         context['payment_types'] = Catalog.objects.filter(catalog_types__name=settings.EXPENSE_SOURCE_CATEGORY)
 
         return context
+
+    def post(self, request):
+        pass
 
 
 class ArrivalEditView(ObjectEditMixin):
@@ -551,6 +777,9 @@ class ArrivalEditView(ObjectEditMixin):
         context['payment_types'] = Catalog.objects.filter(catalog_types__name=settings.EXPENSE_SOURCE_CATEGORY)
 
         return context
+
+    def post(self, request):
+        pass
 
 
 class ArrivalDeleteView(ObjectDeleteMixin):

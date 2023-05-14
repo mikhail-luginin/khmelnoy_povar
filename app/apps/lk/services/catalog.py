@@ -51,7 +51,7 @@ class CatalogService:
 
         return True
 
-    def catalog_type_edit(self, row_id: str | None, name: str | None) -> bool:
+    def catalog_type_edit(self, row_id: int | None, name: str | None) -> bool:
         if not row_id:
             raise exceptions.FieldNotFoundError('Идентификатор записи не найден.')
 
@@ -70,7 +70,7 @@ class CatalogService:
 
         return True
 
-    def catalog_edit(self, row_id: str | None, name: str | None, linked: list | None) -> bool:
+    def catalog_edit(self, row_id: int | None, name: str | None, linked: list | None) -> bool:
         if not row_id:
             raise exceptions.FieldNotFoundError('Идентификатор записи в справочнике не найден.')
 

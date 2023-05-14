@@ -1,12 +1,6 @@
-from apps.iiko.services.storage import StorageService
-
-from core.time import today_datetime
-from .catalog import CatalogService
+from core import validators
 
 from apps.lk.models import Expense
-
-from django.shortcuts import redirect
-from django.contrib import messages
 
 from typing import List
 
@@ -17,53 +11,50 @@ class ExpenseService:
     def expenses_all(self) -> List[model]:
         return self.model.objects.all()
 
-    def create_expense(self, request) -> redirect:
-        catalog_service = CatalogService()
-
-        date_at = request.POST.get('date_at')
-        payment_receiver = request.POST.get('payment_receiver')
-        expense_sum = float(request.POST.get('sum'))
-        comment = request.POST.get('comment')
-        storage_id = int(request.POST.get('storage_id'))
-
-        if not self._check_required_field(request, 'storage_id'):
-            return redirect(request.META.get('HTTP_REFERER'))
-
-        storage = StorageService().storage_get(id=storage_id)
-
-        type_id: int = int(request.POST.get('type_id'))
-
-        if not self._check_required_field(request, 'type_id'):
-            return redirect(request.META.get('HTTP_REFERER'))
-
-        expense_type_catalog = catalog_service.get_catalog_by_id(type_id)
-
-        source_id: int = int(request.POST.get('source_id'))
-
-        if not self._check_required_field(request, 'source_id'):
-            return redirect(request.META.get('HTTP_REFERER'))
-
-        expense_source_catalog = catalog_service.get_catalog_by_id(source_id)
+    def create(self, date_at: str | None, payment_receiver: str | None,
+               expense_sum: float | None, comment: str | None, storage_id: int | None,
+               expense_type_id: int | None, expense_source_id: int | None) -> None:
+        validators.validate_field(date_at, 'дата')
+        validators.validate_field(payment_receiver, 'получатель платежа')
+        validators.validate_field(expense_sum, 'сумма расхода')
+        validators.validate_field(comment, 'комментарий')
+        validators.validate_field(storage_id, 'заведение')
+        validators.validate_field(expense_type_id, 'тип расхода')
+        validators.validate_field(expense_source_id, 'источник расхода')
 
         self.model.objects.create(
             date_at=date_at,
-            created_at=today_datetime(),
             writer='Сайт',
             payment_receiver=payment_receiver,
             sum=expense_sum,
             comment=comment,
-            storage=storage,
-            expense_type=expense_type_catalog,
-            expense_source=expense_source_catalog,
+            storage_id=storage_id,
+            expense_type_id=expense_type_id,
+            expense_source_id=expense_source_id,
         )
 
-        messages.success(request, 'Расход успешно создан :)')
-        return redirect('/lk/expenses')
+    def edit(self, expense_id: int | None, date_at: str | None, payment_receiver: str | None,
+             expense_sum: float | None, comment: str | None, storage_id: int | None,
+             expense_type_id: int | None, expense_source_id: int | None) -> None:
+        validators.validate_field(expense_id, 'идентификатор записи')
+        validators.validate_field(date_at, 'дата')
+        validators.validate_field(payment_receiver, 'получатель платежа')
+        validators.validate_field(expense_sum, 'сумма расхода')
+        validators.validate_field(comment, 'комментарий')
+        validators.validate_field(storage_id, 'заведение')
+        validators.validate_field(expense_type_id, 'тип расхода')
+        validators.validate_field(expense_source_id, 'источник расхода')
 
-    def _check_required_field(self, request, field_name: str) -> bool:
-        input_value = request.POST.get(field_name)
-        if not input_value:
-            messages.error(request, f'Необходимо заполнить поле {field_name}.')
-            return False
-        return True
-
+        expense = self.model.objects.filter(id=expense_id)
+        if expense.exists():
+            expense = expense.first()
+            expense.date_at = date_at
+            expense.payment_receiver = payment_receiver
+            expense.sum = expense_sum
+            expense.comment = comment
+            expense.storage_id = storage_id
+            expense.expense_type_id = expense_type_id
+            expense.expense_source_id = expense_source_id
+            expense.save()
+        else:
+            raise self.model.DoesNotExist('Запись с данным идентификатором не найдена.')
