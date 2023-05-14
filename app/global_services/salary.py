@@ -3,11 +3,11 @@ from django.contrib import messages
 
 from core.time import today_date, get_current_time, monthdelta, get_months
 
-from apps.bar.models import Timetable, Salary, Setting
+from apps.bar.models import Timetable, Salary
 from apps.iiko.models import Storage
 from apps.lk.models import Employee, Fine, Expense
 
-from apps.bar.services.bar_info import get_full_information_of_day, get_main_barmen
+from apps.bar.services.bar_info import get_full_information_of_day, get_main_barmen, get_bar_settings
 from apps.iiko.services.storage import StorageService
 from apps.lk.services.catalog import CatalogService
 
@@ -20,7 +20,7 @@ class SalaryService:
     def calculate_prepayment_salary_by_timetable_object(self, timetable_object: Timetable) -> dict[
         Literal["oklad", "percent", "premium"], int
     ]:
-        percent_num = Setting.objects.first().percent
+        percent_num = get_bar_settings().percent
 
         percent = 0
         premium = 0

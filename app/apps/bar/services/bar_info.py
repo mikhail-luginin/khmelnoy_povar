@@ -17,7 +17,7 @@ def get_bar(**kwargs) -> Storage | None:
 
 
 def get_bar_settings() -> Setting:
-    return Setting.objects.get(id=1)
+    return Setting.objects.get_or_create(id=1, percent=2.5)[0]
 
 
 def get_position_main_id(is_called: bool, job_name: str) -> int:
