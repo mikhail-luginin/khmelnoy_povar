@@ -62,18 +62,5 @@
                 </div>
             </div>
         </div>
-        <div class="mb-2">
-            <div class="card rounded-3">
-                <div class="list-group list-group-flush">
-                    <div class="list-group-header sticky-top"><b>Зарплата</b></div>
-                    <a href="{% url 'Bar:salary_calculation' %}?code={{ code }}"
-                       class="list-group-item list-group-item-action">Расчет</a>
-                    <a href="?code={{ code }}" class="list-group-item list-group-item-action">Офис</a>
-                    <a href="{% url 'Bar:fines' %}?code={{ code }}" class="list-group-item list-group-item-action">Штрафы</a>
-                    <a href="{% url 'Bar:salary_for_retired_employees' %}?code={{ code }}"
-                       class="list-group-item list-group-item-action">Уволенные сотрудники</a>
-                </div>
-            </div>
-        </div>
     </div>
 {% endblock %}
