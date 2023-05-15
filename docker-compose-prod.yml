@@ -11,7 +11,7 @@ services:
       - ./app/.env
     command: >
       sh -c "python manage.py migrate
-             gunicorn --bind 0.0.0.0:8000 config.wsgi --worker-tmp-dir=/temp/gunicorn-worker"
+             gunicorn --bind 0.0.0.0:8000 config.wsgi --worker-tmp-dir"
 
   nginx:
     image: nginx:1.19.8-alpine
