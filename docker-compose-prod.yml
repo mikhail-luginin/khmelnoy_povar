@@ -4,15 +4,14 @@ services:
       context: .
     restart: always
     ports:
-      - "80:80"
+      - "8000:8000"
     volumes:
       - ./app:/app
     env_file:
       - ./app/.env
     command: >
       sh -c "python manage.py migrate
-             python manage.py collectstatic --noinput
-             gunicorn --bind 0.0.0.0:80 config.wsgi"
+             gunicorn --bind 0.0.0.0:8000 config.wsgi"
 
   nginx:
     image: nginx:1.19.8-alpine
@@ -20,7 +19,7 @@ services:
     depends_on:
       - app
     ports:
-      - "8080:8080"
+      - "80:80"
     env_file:
       - ./app/.env
 
