@@ -49,35 +49,16 @@
 {% block scripts %}
     <script>
         $(document).ready(function () {
-            var table = run_datatable('table', '/api/suppliers', [
-                {data: 'table_name'},
-                {data: 'category'},
-                {data: 'is_revise'}])
-            $('#update_suppliers').click(function () {
-                $.ajax({
-                    data: $(this).serialize(),
-                    type: $(this).attr('method'),
-                    url: "{% url 'IIKO:suppliers_update' %}",
-                    success: function (response) {
-                        if (response.status === true) {
-                            table.destroy()
-                            table = run_datatable('table', '/iiko/api/suppliers', [
-                                {data: 'table_name'},
-                                {data: 'category'},
-                                {data: 'is_revise'},
-                                {data: 'actions'}])
-                            notification(true, response.message)
-                        } else {
-                            notification(false)
-                        }
-                    },
-                    error: function (response) {
-                        notification(false)
+            run_datatable('table', '/api/suppliers', '/iiko/suppliers', [
+                {
+                    data: 'name',
+                    'render': function ( data, type, row ) {
+                        return row.name + ' (' + row.friendly_name + ')';
                     }
-                });
-                return false;
-
-            });
+                },
+                {data: 'category'},
+                {data: 'is_revise'}],
+            has_delete=false)
         })
     </script>
 {% endblock %}
