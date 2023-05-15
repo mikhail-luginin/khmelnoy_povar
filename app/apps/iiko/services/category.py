@@ -3,6 +3,9 @@ from django.shortcuts import redirect
 from apps.iiko.services.api import IikoService
 from apps.iiko.models import Category
 
+from core.exceptions import FieldNotFoundError
+from core.validators import validate_field
+
 from typing import List
 
 import json
@@ -27,16 +30,10 @@ class CategoryService:
                 category.name = dict_data[i]['name']
                 category.save()
             else:
-                args = dict()
-
-                args['in_remains'] = {'name': 'Остатки', 'status': False}
-                args['in_sales'] = {'name': 'Продажи', 'status': False}
-                args['in_income'] = {'name': 'Поступления', 'status': False}
 
                 self.model.objects.create(
                     category_id=dict_data[i]["id"],
-                    name=dict_data[i]["name"],
-                    args=args
+                    name=dict_data[i]["name"]
                 )
 
         for category in self.model.objects.all():
@@ -45,16 +42,24 @@ class CategoryService:
 
         return True
 
-    def category_edit(self, request, success_url: str) -> redirect:
-        category = self.model.objects.get(id=request.GET.get('id'))
+    def category_edit(self, row_id: str | None, is_income: str | None, is_sales: str | None, is_remains: str | None) -> redirect:
 
-        for k, v in category.args.items():
-            arg = request.POST.get(k)
-            category.args[k]['status'] = True if arg == '1' else False
+        validate_field(row_id, 'идентификатор')
 
-        category.save()
+        row = self.model.objects.filter(id=row_id)
 
-        return redirect(success_url)
+        is_income = True if is_income == 'is_income_1' else False
+        is_sales = True if is_sales == 'is_sales_1' else False
+        is_remains = True if is_remains == 'is_remains_1' else False
+
+        if row.exists():
+            row = row.first()
+            row.is_income = is_income
+            row.is_sales = is_sales
+            row.is_remains = is_remains
+            row.save()
+        else:
+            raise self.model.DoesNotExist(f'Запись в справочнике с идентификатором {row.id} не найдена.')
 
     def categories_all(self) -> List[model]:
         return self.model.objects.all()
