@@ -1,5 +1,5 @@
 upstream app {
-    server app:8000;
+    server app:80;
 }
 
 server {
