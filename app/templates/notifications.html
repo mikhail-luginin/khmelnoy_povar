@@ -1,0 +1,212 @@
+<div class="modal modal-blur fade" id="notification-success" tabindex="-1" aria-hidden="true"
+     style="display: none;">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-status bg-success"></div>
+            <div class="modal-body text-center py-4">
+                <!-- Download SVG icon from http://tabler-icons.io/i/circle-check -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-green icon-lg" width="24"
+                     height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+                    <path d="M9 12l2 2l4 -4"></path>
+                </svg>
+                <h3>Успешно!</h3>
+                <div class="text-muted" id="notification-success-text"></div>
+            </div>
+            <div class="modal-footer">
+                <div class="w-100">
+                    <div class="row">
+                        <div class="col"><a href="#" class="btn btn-success w-100" data-bs-dismiss="modal">
+                            ОК
+                        </a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal modal-blur fade" id="PromiseConfirm" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-status bg-danger"></div>
+            <div class="modal-body text-center py-4">
+                <!-- Download SVG icon from http://tabler-icons.io/i/alert-triangle -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-danger icon-lg" width="24"
+                     height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M12 9v2m0 4v.01"></path>
+                    <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75"></path>
+                </svg>
+                <h3>Вы уверены?</h3>
+                <div class="text-muted" id="confirm-text">Вы уверены, что хотите удалить эту запись?</div>
+            </div>
+            <div class="modal-footer">
+                <div class="w-100">
+                    <div class="row">
+                        <div class="col"><a href="#" class="btn w-100" data-bs-dismiss="modal">
+                            Отмена
+                        </a></div>
+                        <div class="col">
+                            <button id="confirm-delete1" class="btn btn-danger w-100"
+                                    data-bs-dismiss="modal">
+                                Удалить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal modal-blur fade" id="notification-error" tabindex="-1" aria-hidden="true"
+     style="display: none;">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-status bg-danger"></div>
+            <div class="modal-body text-center py-4">
+                <!-- Download SVG icon from http://tabler-icons.io/i/alert-triangle -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-danger icon-lg" width="24"
+                     height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M12 9v2m0 4v.01"></path>
+                    <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75"></path>
+                </svg>
+                <h3>Упс..</h3>
+                <div class="text-muted" id="notification-error-text">Произошла неизвестная ошибка.<br><br>Сообщить
+                    о ней Вы можете данному телеграмм боту: <b>@LugininSupportRobot</b></div>
+            </div>
+            <div class="modal-footer">
+                <div class="w-100">
+                    <div class="row">
+                        <div class="col">
+                            <button id="confirm-delete" class="btn btn-danger w-100"
+                                    data-bs-dismiss="modal">
+                                ОК
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% for message in messages %}
+    {% if message.level == 40 %}
+        <div class="modal modal-blur fade" id="django-message-error" tabindex="-1" aria-hidden="true"
+             style="display: none;">
+            <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    <div class="modal-status bg-danger"></div>
+                    <div class="modal-body text-center py-4">
+                        <!-- Download SVG icon from http://tabler-icons.io/i/alert-triangle -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-danger icon-lg"
+                             width="24"
+                             height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                             fill="none"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M12 9v2m0 4v.01"></path>
+                            <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75"></path>
+                        </svg>
+                        <h3>Упс..</h3>
+                        <div class="text-muted" id="notification-error-text">{{ message }}</div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="w-100">
+                            <div class="row">
+                                <div class="col">
+                                    <button id="confirm-delete" class="btn btn-danger w-100"
+                                            data-bs-dismiss="modal">
+                                        ОК
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if message.level == 20 %}
+        <div class="modal modal-blur fade" id="django-message-info" tabindex="-1" aria-hidden="true"
+             style="display: none;">
+            <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    <div class="modal-status bg-primary"></div>
+                    <div class="modal-body text-center py-4">
+                        <!-- Download SVG icon from http://tabler-icons.io/i/circle-check -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-primary icon-lg"
+                             width="24"
+                             height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                             fill="none"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+                            <path d="M12 8l.01 0"></path>
+                            <path d="M11 12l1 0l0 4l1 0"></path>
+                        </svg>
+                        <h3 id="info-alert-header">Информация</h3>
+                        <div class="text-muted" id="info-alert-text">{{ message }}</div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="w-100">
+                            <div class="row">
+                                <div class="col"><a href="#" class="btn btn-primary w-100"
+                                                    data-bs-dismiss="modal">
+                                    ОК
+                                </a></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if message.level == 25 %}
+        <div class="modal modal-blur fade" id="django-message-success" tabindex="-1" aria-hidden="true"
+             style="display: none;">
+            <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    <div class="modal-status bg-success"></div>
+                    <div class="modal-body text-center py-4">
+                        <!-- Download SVG icon from http://tabler-icons.io/i/circle-check -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-green icon-lg"
+                             width="24"
+                             height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                             fill="none"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+                            <path d="M9 12l2 2l4 -4"></path>
+                        </svg>
+                        <h3>Успешно!</h3>
+                        <div class="text-muted" id="notification-success-text">{{ message }}</div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="w-100">
+                            <div class="row">
+                                <div class="col"><a href="#" class="btn btn-success w-100"
+                                                    data-bs-dismiss="modal">
+                                    ОК
+                                </a></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endfor %}
