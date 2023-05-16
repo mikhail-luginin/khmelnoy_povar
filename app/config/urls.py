@@ -13,6 +13,7 @@ urlpatterns = [
     path('bar/', include('apps.bar.urls')),
     path('repairer/', include('apps.repairer.urls')),
     path('api/', include('apps.api.urls')),
+    path('purchaser/', include('apps.purchaser.urls')),
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
     re_path(r'^assets/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
 

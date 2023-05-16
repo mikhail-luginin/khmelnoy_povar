@@ -1,0 +1,4 @@
+<br> <br><div id="footer-bar" class="footer-bar-5 rounded-3">
+    <a href="{% url 'Purchaser:index' %}" {% if request.path == '/purchaser/' %}class="active-nav"{% endif %}class="active-nav"><i class="fa fa-home"></i><span>Главная</span><strong></strong></a>
+    <a href="{% url 'Purchaser:expense_create' %}" {% if request.path == '/purchaser/expense/create' %}class="active-nav"{% endif %}class="active-nav"><i class="fa fa-credit-card"></i><span>Создать расход</span><strong></strong></a>
+</div>

@@ -28,7 +28,8 @@ LOCAL_APPS = [
     'apps.bar.apps.BarConfig',
     'apps.iiko.apps.IikoConfig',
     'apps.repairer.apps.RepairerConfig',
-    'apps.api.apps.ApiConfig'
+    'apps.api.apps.ApiConfig',
+    'apps.purchaser.apps.PurchaserConfig'
 ]
 THIRD_PARTY_APPS = [
     'rest_framework'
@@ -160,6 +161,8 @@ TOVAR_WARE_CATEGORY = 'Посуда'
 
 PAYMENT_TYPE_NAL = 'Наличные'
 PAYMENT_TYPE_BN = 'Бизнес-карта'
+
+PURCHASER_CATEGORY = 'Закупщик'
 
 REDIS_HOST = os.environ.get('REDIS_HOST')
 REDIS_PORT = os.environ.get('REDIS_PORT')
