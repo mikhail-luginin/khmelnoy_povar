@@ -34,7 +34,7 @@ class StoplistService:
             row = dict()
             stoplist = []
             row['storage_id'] = storage.id
-            row['storage'] = storage.district
+            row['storage'] = storage.name
             for item in StopList.objects.all():
                 if item.storage.id == storage.id:
                     stoplist.append(item.product.name)

@@ -8,21 +8,19 @@
         <button class="btn w-100 mb-2" id="update-button">Обновить стоплист</button>
         <div class="row row-cards">
             {% for row in rows %}
-                <div class="col-6">
-                    <div class="card rounded-3" id="storage_{{ row.storage_id }}">
-                        <div class="card-header card-header-light rounded-top-3"><b>{{ row.storage }}</b></div>
-                        <div class="data-card" style="">
-                            <div class="list-group list-group-flush" id="list-group_{{ row.storage_id }}">
-                                {% for item in row.stoplist %}
-                                    <a class="list-group-item">{{ item }}</a>
-                                {% endfor %}
-                            </div>
+                <div class="card rounded-3" id="storage_{{ row.storage_id }}">
+                    <div class="card-header card-header-light rounded-top-3"><b>{{ row.storage }}</b></div>
+                    <div class="data-card" style="">
+                        <div class="list-group list-group-flush" id="list-group_{{ row.storage_id }}">
+                            {% for item in row.stoplist %}
+                                <a class="list-group-item">{{ item }}</a>
+                            {% endfor %}
                         </div>
-                        <div class="card-body preloader-card" style="display: none;">
-                            <div class="text-center">
-                                <div class="progress progress-sm">
-                                    <div class="progress-bar progress-bar-indeterminate"></div>
-                                </div>
+                    </div>
+                    <div class="card-body preloader-card" style="display: none;">
+                        <div class="text-center">
+                            <div class="progress progress-sm">
+                                <div class="progress-bar progress-bar-indeterminate"></div>
                             </div>
                         </div>
                     </div>
