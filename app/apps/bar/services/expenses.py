@@ -14,13 +14,13 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from django.conf import settings
 
-from typing import List
-
 
 class ExpensesPageService:
 
-    def get_expenses_today(self, storage: Storage) -> List[Expense]:
-        return Expense.objects.filter(storage=storage, date_at=today_date())
+    def get_expenses_today(self, storage: Storage) -> list[Expense]:
+        return Expense.objects\
+            .filter(storage=storage, date_at=today_date())\
+            .exclude(expense_type__name=settings.SALARY_CATEGORY)
 
     def create_expense(self, request) -> redirect:
         code = request.GET.get('code')
