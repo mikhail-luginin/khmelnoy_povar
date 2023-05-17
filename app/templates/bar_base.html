@@ -473,11 +473,6 @@
             };
             new TomSelect(el, settings);
         });
-        document.querySelectorAll('.date-at').forEach((el) => {
-            new Litepicker({
-                element: el
-            });
-        });
         if (document.getElementById('django-message-error') !== null) {
             $('#django-message-error').modal('show')
         }
@@ -487,6 +482,13 @@
         if (document.getElementById('django-message-info') !== null) {
             $('#django-message-info').modal('show')
         }
+        $('.date-at').datepicker({
+            format: 'yyyy-mm-dd',
+            weekStart: 1,
+            clearBtn: true,
+            language: 'ru',
+            todayHighlight: true
+        });
     })
 </script>
 {% block scripts %}{% endblock %}
