@@ -51,7 +51,7 @@ class EmployeeService:
         row.save()
 
         messages.success(request, 'Сотрудник успешно создан.')
-        return redirect(request.META.get('HTTP_REFERER'))
+        return redirect('/lk/employees')
 
     def employee_edit(self, employee_id: int | None, first_name: str | None, last_name: str | None,
                       birth_date: str | None, address: str | None, job_place_id: int | None,
@@ -72,8 +72,8 @@ class EmployeeService:
             employee.job_place_id = job_place_id
             employee.storage_id = storage_id
 
-            similar_employee = self.model.objects.filter(phone=phone)
-            if similar_employee.count() > 1:
+            similar_employee = self.model.objects.filter(phone=phone).exclude(id=employee_id)
+            if similar_employee.exists():
                 raise Exception('Данный номер телефона уже присутствует в базе сотрудников.')
             else:
                 employee.phone = phone
