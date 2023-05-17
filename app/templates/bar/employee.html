@@ -106,6 +106,31 @@
                 </table>
             </div>
         </div>
+     <div class="card rounded-3 mb-2">
+            <div class="card-header rounded-top-3">
+                <center>Полученные месячные штрафы</center>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped table-bordered nowrap w-100">
+                    <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Сумма</th>
+                        <th>Причина</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in data.fine_data %}
+                        <tr>
+                            <td>{{ row.date_at }}</td>
+                            <td>{{ row.sum }}</td>
+                            <td>{{ row.reason }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 {% endblock %}
 

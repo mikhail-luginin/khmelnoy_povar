@@ -58,10 +58,10 @@ class SalaryService:
         else:
             month = monthdelta(current_date, -1).month
             data['previous'] = True
-
         accrued_prepayed_data = []
         accrued_month_data = []
         session_data = []
+        fine_data = []
 
         for salary in Salary.objects.filter(date_at__month=month, employee=employee, type=1).order_by('-date_at'):
             row = dict()
@@ -75,6 +75,12 @@ class SalaryService:
             row['month_name'] = salary.get_month_name()
             row['period_name'] = salary.get_period_name()
             accrued_month_data.append(row)
+        for fine in Fine.objects.filter(date_at__month=int('0' + str(month)), employee=employee).order_by('-date_at'):
+            row = dict()
+            row['date_at'] = fine.date_at
+            row['sum'] = fine.sum
+            row['reason'] = fine.reason.name
+            fine_data.append(row)
 
         for timetable in Timetable.objects.filter(date_at__month=month, employee=employee).order_by('-date_at'):
             calculated_salary = SalaryService().calculate_prepayment_salary_by_timetable_object(timetable_object=timetable)
@@ -95,6 +101,7 @@ class SalaryService:
         data['accrued_prepayed_data'] = accrued_prepayed_data
         data['session_data'] = session_data
         data['accrued_month_data'] = accrued_month_data
+        data['fine_data'] = fine_data
         data['employee'] = employee
         data['month_name'] = get_months(month)
         data['first_period'] = self.calculate_salary(employee, current_date.year, month, 1)
