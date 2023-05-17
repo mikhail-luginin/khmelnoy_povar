@@ -508,6 +508,8 @@ class CreateSalaryView(ObjectCreateMixin):
                                    month=month, period=period)
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
             messages.error(request, error)
+        except ValueError:
+            messages.error(request, 'В полях "Оклад", "Процент" и "Премия" должны быть только числа')
 
         return redirect('/lk/salary')
 
@@ -545,7 +547,7 @@ class EditSalaryView(ObjectEditMixin):
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Salary.DoesNotExist) as error:
             messages.error(request, error)
         except ValueError:
-            messages.error(request, 'В полях "Процент" и "Премия" должны быть только числа')
+            messages.error(request, 'В полях "Оклад", "Процент" и "Премия" должны быть только числа')
         return redirect('/lk/salary')
 
 
