@@ -217,7 +217,8 @@ class PositionsEditView(ObjectEditMixin):
             messages.success(request, 'Позиция успешно отредактирована')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Position.DoesNotExist) as error:
             messages.error(request, error)
-
+        except ValueError:
+            messages.error(request, 'В поле "Расположение должности" должны быть только числа')
         return redirect('/lk/positions')
 
 
