@@ -58,6 +58,7 @@ class SalaryService:
         else:
             month = monthdelta(current_date, -1).month
             data['previous'] = True
+
         accrued_prepayed_data = []
         accrued_month_data = []
         session_data = []
