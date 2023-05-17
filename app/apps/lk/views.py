@@ -139,8 +139,8 @@ class BarsSettingsView(BaseLkView):
         percent = request.POST.get('percent')
 
         try:
-            if bars.settings_edit(percent=percent):
-                messages.success(request, 'Настройки бара успешно обновлены')
+            bars.settings_edit(percent=percent)
+            messages.success(request, 'Настройки бара успешно обновлены')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
             messages.error(request, error)
 
