@@ -77,7 +77,8 @@ class SalaryService:
             accrued_month_data.append(row)
 
         for timetable in Timetable.objects.filter(date_at__month=month, employee=employee).order_by('-date_at'):
-            calculated_salary = SalaryService().calculate_prepayment_salary_by_timetable_object(timetable_object=timetable)
+            calculated_salary = SalaryService().calculate_prepayment_salary_by_timetable_object(
+                timetable_object=timetable)
 
             oklad = calculated_salary['oklad']
             percent = calculated_salary['percent']
@@ -115,7 +116,8 @@ class SalaryService:
         for timetable in Timetable.objects.filter(storage=bar, date_at=today_date()):
             row = dict()
 
-            employee_money_information = self.calculate_prepayment_salary_by_timetable_object(timetable_object=timetable)
+            employee_money_information = self.calculate_prepayment_salary_by_timetable_object(
+                timetable_object=timetable)
             percent = employee_money_information['percent']
             premium = employee_money_information['premium']
 
@@ -247,7 +249,8 @@ class SalaryService:
                         get_current_time(), -1).month:
                     oklad += timetable.oklad
 
-                    employee_money_information = self.calculate_prepayment_salary_by_timetable_object(timetable_object=timetable)
+                    employee_money_information = self.calculate_prepayment_salary_by_timetable_object(
+                        timetable_object=timetable)
                     percent += employee_money_information['percent']
                     premium += employee_money_information['premium']
 
@@ -276,8 +279,11 @@ class SalaryService:
         else:
             return False
 
-    def get_retired_employee_salary(self, storage: Storage) -> list:
-        rows = []
+    def get_retired_employee_salary(self, storage: Storage) -> dict:
+        data = {
+            "rows": [],
+            "total_sum": 0
+        }
 
         for employee in Employee.objects.filter(is_deleted=1, storage=storage):
             row = dict()
@@ -287,10 +293,12 @@ class SalaryService:
             row['employee'] = employee
             row['sum'] = salary_sum
 
-            if salary_sum is not False and salary_sum != 0:
-                rows.append(row)
+            data['total_sum'] += salary_sum
 
-        return rows
+            if salary_sum is not False and salary_sum != 0:
+                data['rows'].append(row)
+
+        return data
 
     def accrue_retired_employee_salary(self, request):
         employee_code = request.GET.get('employee_code')
@@ -337,7 +345,8 @@ class SalaryService:
             premium = 0
             fine = 0
 
-            employee_money_information = self.calculate_prepayment_salary_by_timetable_object(timetable_object=timetable)
+            employee_money_information = self.calculate_prepayment_salary_by_timetable_object(
+                timetable_object=timetable)
             percent += employee_money_information['percent']
             premium += employee_money_information['premium']
 
@@ -376,27 +385,41 @@ class SalaryService:
 
         return dict(month=month, period=period, year=year, month_name=get_months(month))
 
-    def get_salary_calculation_rows(self, storage: Storage):
-        rows = []
+    def get_salary_calculation_rows(self, storage: Storage) -> dict:
+        data = {
+            "rows": [],
+            "total_sum": 0,
+            "issued_sum": 0,
+            "left_sum": 0
+        }
 
-        data = self.data_for_calculate_month_salary()
+        data_for_calculate = self.data_for_calculate_month_salary()
 
         for employee in Employee.objects.filter(storage=storage, is_deleted=0):
             row = dict()
 
-            salary_sum = self.calculate_salary(employee, data['year'], data['month'], data['period'])
+            salary_sum = self.calculate_salary(employee, data_for_calculate['year'],
+                                               data_for_calculate['month'], data_for_calculate['period'])
+            is_accrued = Salary.objects.filter(period=data_for_calculate['period'],
+                                               month=data_for_calculate['month'],
+                                               date_at__year=data_for_calculate['year'],
+                                               type=2,
+                                               employee=employee).exists()
 
             row['employee'] = employee
             row['sum'] = salary_sum
-            row['is_accrued'] = Salary.objects.filter(period=data['period'],
-                                                      month=data['month'],
-                                                      date_at__year=data['year'],
-                                                      type=2,
-                                                      employee=employee).exists()
-            if salary_sum != 0:
-                rows.append(row)
+            row['is_accrued'] = is_accrued
+            data['total_sum'] += salary_sum
 
-        return rows
+            if is_accrued:
+                data['issued_sum'] += salary_sum
+
+            if salary_sum != 0:
+                data["rows"].append(row)
+
+        data['left_sum'] = data['total_sum'] - data['issued_sum']
+
+        return data
 
     def get_accrued_salary_month(self, date_at: str, storage: Storage):
         return Salary.objects.filter(date_at=date_at, storage=storage, type=2)

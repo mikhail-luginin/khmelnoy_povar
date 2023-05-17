@@ -1,6 +1,6 @@
 from typing import List
 
-from core.time import today_date
+from core.time import today_date, get_months, get_current_time
 from core.total_values import get_total_expenses_by_date_and_storage
 from global_services.salary import SalaryService
 
@@ -96,7 +96,7 @@ class SalaryForRetiredEmployeesView(BaseView):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['rows'] = SalaryService().get_retired_employee_salary(context['bar'])
+        context['data'] = SalaryService().get_retired_employee_salary(context['bar'])
 
         return context
 
@@ -172,7 +172,7 @@ class SalaryCalculationView(BaseView):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['rows'] = SalaryService().get_salary_calculation_rows(context['bar'])
+        context['data'] = SalaryService().get_salary_calculation_rows(context['bar'])
         context['data_for_calculate_month_salary'] = SalaryService().data_for_calculate_month_salary()
         context['records'] = SalaryService().get_accrued_salary_month(today_date(), context['bar'])
 
@@ -228,12 +228,13 @@ class FinesView(DataLogsMixin):
     model = Fine
     type = 2
 
-    def _prepare_rows(self, storage: Storage, obj: int | None) -> List[model]:
+    def _prepare_rows(self, storage: Storage, obj: int | None) -> list[model]:
         return get_fines_on_storage_by_month(storage=storage, month=obj)
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context['fines'] = self._prepare_rows(storage=context.get('bar'), obj=request.GET.get('date'))
+        context['month'] = get_months(get_current_time().month + int(request.GET.get('date'))) if request.GET.get('date') else get_months(get_current_time().month)
         return context
 
 

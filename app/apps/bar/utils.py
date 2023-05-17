@@ -1,3 +1,5 @@
+import datetime
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
@@ -14,7 +16,7 @@ from apps.iiko.models import Product, Category, Storage
 from apps.iiko.services.api import IikoService
 from apps.iiko.services.storage import StorageService
 
-from core.time import today_date, monthdelta, get_current_time
+from core.time import today_date, monthdelta, get_current_time, get_months
 from core.logs import create_log
 from core.payment_types import get_bn_category, get_nal_category
 import xml.etree.ElementTree as ET
@@ -266,8 +268,8 @@ class DataLogsMixin(BaseView):
         filter_args = None
         match self.type:
             case 1:
-                day = current_date.day + obj if obj else current_date.day
-                filter_args = {"date_at__day": day, "date_at__month": current_date.month}
+                day = (current_date + datetime.timedelta(days=obj)) if obj else current_date.day
+                filter_args = {"date_at__day": day.day, "date_at__month": day.month if obj else current_date.month}
             case 2:
                 obj = monthdelta(current_date, obj).month if obj else current_date.month
                 filter_args = {"date_at__month": obj}
@@ -275,7 +277,7 @@ class DataLogsMixin(BaseView):
         day = filter_args.get('date_at__day')
         month = filter_args.get('date_at__month')
 
-        date = f"{month if month else current_date.month}.{day if day else current_date.day}"
+        date = f"{get_months(month) if month else get_months(current_date.month)} {day if day else current_date.day}"
 
         return [row for row in self.model.objects.filter(**filter_args, storage=storage)], date
 
@@ -285,6 +287,7 @@ class DataLogsMixin(BaseView):
 
         prepare_rows = self._prepare_rows(storage=context.get('bar'), obj=context.get('obj'))
 
-        context['rows'] = prepare_rows[0]
-        context['date'] = prepare_rows[1]
+        if type(prepare_rows) is tuple:
+            context['rows'] = prepare_rows[0]
+            context['date'] = prepare_rows[1]
         return context
