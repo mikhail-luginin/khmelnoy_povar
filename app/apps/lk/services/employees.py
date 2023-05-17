@@ -1,6 +1,7 @@
 import secrets
 
 from core.time import today_date
+from core import validators
 from apps.lk.models import Employee
 
 from . import positions
@@ -51,6 +52,34 @@ class EmployeeService:
 
         messages.success(request, 'Сотрудник успешно создан.')
         return redirect(request.META.get('HTTP_REFERER'))
+
+    def employee_edit(self, employee_id: int | None, first_name: str | None, last_name: str | None,
+                      birth_date: str | None, address: str | None, job_place_id: int | None,
+                      storage_id: int | None, phone: str | None) -> None:
+        validators.validate_field(employee_id, 'идентификатор записи')
+        validators.validate_field(first_name, 'имя')
+        validators.validate_field(last_name, 'фамилия')
+        validators.validate_field(phone, 'телефон')
+        validators.validate_field(job_place_id, 'должность')
+        validators.validate_field(storage_id, 'заведение')
+
+        employee = self.model.objects.filter(id=employee_id)
+        if employee.exists():
+            employee = employee.first()
+            employee.fio = f'{last_name} {first_name}'
+            employee.birth_date = birth_date
+            employee.address = address
+            employee.job_place_id = job_place_id
+            employee.storage_id = storage_id
+
+            similar_employee = self.model.objects.filter(phone=phone)
+            if similar_employee.count() > 1:
+                raise Exception('Данный номер телефона уже присутствует в базе сотрудников.')
+            else:
+                employee.phone = phone
+                employee.save()
+        else:
+            raise self.model.DoesNotExist('Запись с указанным идентификатором не найдена.')
 
     def dismiss(self, request) -> redirect:
         try:
