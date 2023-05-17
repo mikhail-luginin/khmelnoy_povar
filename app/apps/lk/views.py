@@ -587,6 +587,8 @@ class CreatePaysView(ObjectCreateMixin):
             messages.success(request, 'Запись успешно создана.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
             messages.error(request, error)
+        except ValueError:
+            messages.error(request, 'В поле "Сумма" могут быть только числа')
 
         return redirect('/lk/pays')
 
@@ -619,7 +621,8 @@ class EditPaysView(ObjectEditMixin):
             messages.success(request, 'Запись успешно создана.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Pays.DoesNotExist) as error:
             messages.error(request, error)
-
+        except ValueError:
+            messages.error(request, 'В поле "Сумма" могут быть только числа')
         return redirect('/lk/pays')
 
 
