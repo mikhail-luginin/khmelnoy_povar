@@ -1,5 +1,9 @@
 {% extends 'bar_base.html' %}
 
+{% block page_name %}
+    Дата: {{ date }}
+{% endblock %}
+
 {% block body %}
     <div class="container-xl">
         <div class="card rounded-3 mb-2">
@@ -8,16 +12,18 @@
                 <table class="table table-sm table-striped nowrap w-100">
                     <thead>
                         <tr class="{% if row.type == 0 %}table-danger{% else %}table-success{% endif %}">
-                            <th>Дата</th>
                             <th>Товар</th>
+                            <th>№</th>
+                            <th>Кол-во</th>
                             <th>Сумма</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for row in rows %}
                             <tr>
-                                <td>{{ row.date_at }}</td>
                                 <td>{{ row.product.name }}</td>
+                                <td>{{ row.num }}</td>
+                                <td>{{ row.amount }}</td>
                                 <td>{{ row.sum }}</td>
                             </tr>
                         {% endfor %}

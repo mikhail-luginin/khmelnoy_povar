@@ -260,22 +260,31 @@ class DataLogsMixin(BaseView):
 
         return context
 
-    def _prepare_rows(self, storage: Storage, obj: int | None) -> List[model]:
+    def _prepare_rows(self, storage: Storage, obj: int | None) -> tuple[list, str]:
         current_date = get_current_time()
 
         filter_args = None
         match self.type:
             case 1:
                 day = current_date.day + obj if obj else current_date.day
-                filter_args = {"date_at__day": day}
+                filter_args = {"date_at__day": day, "date_at__month": current_date.month}
             case 2:
                 obj = monthdelta(current_date, obj).month if obj else current_date.month
                 filter_args = {"date_at__month": obj}
 
-        return [row for row in self.model.objects.filter(**filter_args, storage=storage)]
+        day = filter_args.get('date_at__day')
+        month = filter_args.get('date_at__month')
+
+        date = f"{month if month else current_date.month}.{day if day else current_date.day}"
+
+        return [row for row in self.model.objects.filter(**filter_args, storage=storage)], date
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context.update(self._prepare_context(obj=request.GET.get('date')))
-        context['rows'] = self._prepare_rows(storage=context.get('bar'), obj=context.get('obj'))
+
+        prepare_rows = self._prepare_rows(storage=context.get('bar'), obj=context.get('obj'))
+
+        context['rows'] = prepare_rows[0]
+        context['date'] = prepare_rows[1]
         return context
