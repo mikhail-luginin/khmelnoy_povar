@@ -4,7 +4,7 @@ from django.conf import settings
 from django.shortcuts import redirect
 
 from core.utils import BaseLkView, ObjectEditMixin, ObjectCreateMixin, ObjectDeleteMixin
-from core import exceptions
+from core import exceptions, time
 
 from .services import bars
 from .services.salary import SalaryService
@@ -521,6 +521,7 @@ class EditSalaryView(ObjectEditMixin):
         context = super().get_context_data(request, **kwargs)
         context['storages'] = StorageService().storages_all()
         context['employees'] = EmployeeService().employees_all(False)
+        context['months'] = time.get_months()
 
         return context
 
@@ -543,7 +544,8 @@ class EditSalaryView(ObjectEditMixin):
             messages.success(request, 'Запись успешно отредактирована.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Salary.DoesNotExist) as error:
             messages.error(request, error)
-
+        except ValueError:
+            messages.error(request, 'В полях "Процент" и "Премия" должны быть только числа')
         return redirect('/lk/salary')
 
 
