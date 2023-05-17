@@ -102,8 +102,13 @@ class SalaryService:
 
         return data
 
-    def get_accrued_rows(self, code: str) -> List[dict]:
-        rows = []
+    def get_accrued_rows(self, code: str) -> dict:
+        data = {
+            "rows": [],
+            "total_sum": 0,
+            "issued_sum": 0,
+            "left_sum": 0
+        }
 
         bar = StorageService().storage_get(code=code)
 
@@ -121,12 +126,14 @@ class SalaryService:
                 is_accrued = False
 
             row['employee'] = timetable.employee
+            row['position'] = timetable.position
             row['is_accrued'] = is_accrued
 
             if is_accrued:
                 row['oklad'] = salary.oklad
                 row['percent'] = salary.percent
                 row['premium'] = salary.premium
+                data['issued_sum'] = salary.oklad + salary.percent + salary.premium
             else:
                 if timetable.position.args['is_usil'] or timetable.position.args['is_called']:
                     row['oklad'] = timetable.oklad
@@ -137,10 +144,12 @@ class SalaryService:
 
             row['has_percent'] = timetable.position.args['has_percent']
             row['has_premium'] = timetable.position.args['has_premium']
+            data['total_sum'] += row['oklad'] + row['percent'] + row['premium']
 
-            rows.append(row)
+            data['rows'].append(row)
+            data['left_sum'] = data['total_sum'] - data['issued_sum']
 
-        return rows
+        return data
 
     def _accrue_salary(self, storage: Storage, employee: Employee, salary_type: int, oklad: int, percent: int = 0,
                        premium: int = 0, month: int = 0, period: int = None) -> None:
@@ -172,7 +181,7 @@ class SalaryService:
             date_at=today_date(),
             storage=storage,
             expense_type=CatalogService().get_catalog_by_name('Зарплата'),
-            expense_source=CatalogService().get_catalog_by_name('Бизнес-карта'),
+            expense_source=CatalogService().get_catalog_by_name('Наличные'),
             payment_receiver=employee.fio,
             sum=total_sum,
             comment=comment

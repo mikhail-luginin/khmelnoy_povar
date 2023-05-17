@@ -80,7 +80,7 @@ class SalaryView(BaseView):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['rows'] = SalaryService().get_accrued_rows(request.GET.get('code'))
+        context['data'] = SalaryService().get_accrued_rows(request.GET.get('code'))
         context['salaries'] = Salary.objects.filter(storage=context['bar'], date_at=today_date(), type=1).annotate(
             total_sum=Sum('oklad') + Sum('percent') + Sum('premium')
         )

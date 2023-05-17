@@ -30,14 +30,19 @@
                 </table>
             </div>
         </div>
-        {% for row in rows %}
+        <div class="card rounded-3 mb-2">
+            <div class="card-body">
+                Сумма к выдаче: {{ data.total_sum }} руб. (выдано: {{ data.issued_sum }} / осталось: {{ data.left_sum }})
+            </div>
+        </div>
+        {% for row in data.rows %}
             <form action="{% url 'Bar:salary' %}?code={{ code }}&employee_code={{ row.employee.code }}" method="post">
                 {% csrf_token %}
                 <div class="mb-3">
                     <div class="card rounded-3">
                         <div class="card-body">
                             <div class="mb-1">
-                                <center><b>{{ row.employee.fio }} ({{ row.employee.job_place.name }})</b></center>
+                                <center><b>{{ row.employee.fio }} {% if row.employee.job_place.name == 'Су-Шеф' %}({{ row.employee.job_place.name }}){% else %}({{ row.position.name }}){% endif %}</b></center>
                             </div>
                             <div class="mb-1">
                                 <div class="row">
