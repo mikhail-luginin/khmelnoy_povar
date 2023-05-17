@@ -112,7 +112,8 @@ class Pays(models.Model):
     PAYS_TYPES = [
         (1, 'Внесение'),
         (2, 'Изъятие'),
-        (4, 'Закупщик')
+        (4, 'Закупщик'),
+        (5, 'Масло')
     ]
 
     date_at = models.DateField()

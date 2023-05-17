@@ -43,7 +43,7 @@
                         </div>
                         {% if type in bar_setting.expenses_types_with_employees_in_comment.all %}
                         <div class="col-4">
-                            <select class="form-select" placeholder="Выберите сотрудника" name="comment[{{ type.id }}]">
+                            <select class="form-select" placeholder="Cотрудник" name="comment[{{ type.id }}]">
                                 <option></option>
                                 {% for row in timetable %}
                                 <option>{{ row.employee.fio }}</option>
@@ -82,30 +82,12 @@
                 {% csrf_token %}
                 <div class="mb-2">
                     <div class="row mb-2">
-                        <div class="col-4">Внесение</div>
+                        <div class="col-4">Масло</div>
                         <div class="col-4">
-                            <select class="form-select" name="payin_comment">
-                                {% for type in payin_types %}
-                                    <option>{{ type.name }}</option>
-                                {% endfor %}
-                            </select>
+                            <input class="form-control" name="oil_comment" placeholder="Комментарий">
                         </div>
                         <div class="col-4">
-                            <input class="form-control" type="tel" inputmode="numeric" name="payin_sum"
-                                placeholder="Сумма">
-                        </div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-4">Изъятие</div>
-                        <div class="col-4">
-                            <select class="form-select" name="payout_comment">
-                                {% for type in payout_types %}
-                                    <option>{{ type.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-4">
-                            <input class="form-control" type="tel" inputmode="numeric" name="payout_sum"
+                            <input class="form-control" type="tel" inputmode="numeric" name="oil_sum"
                                 placeholder="Сумма">
                         </div>
                     </div>
