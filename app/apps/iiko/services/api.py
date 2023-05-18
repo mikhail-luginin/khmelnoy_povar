@@ -10,8 +10,6 @@ import requests
 
 import xml.etree.ElementTree as ET
 
-from core.telegram import send_message_to_telegram
-
 
 class IikoService:
 
@@ -21,7 +19,7 @@ class IikoService:
         return response.text
 
     def _iiko_disconnect(self, token: str):
-        url = settings.IIKO_API_URL + '/resto/api/auth?key=' + token
+        url = settings.IIKO_API_URL + '/resto/api/logout?key=' + token
         requests.get(url)
 
     def get_nomenclature(self):
