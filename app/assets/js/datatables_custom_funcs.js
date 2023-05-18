@@ -16,15 +16,15 @@ function run_datatable(table_id, ajax_url, url, ajax_columns = null, has_delete 
                 "data": null,
                 render: function (data, type, row) {
                     let actions = '<a href="' + url + '/edit?id=' + row.id + '"><i class="fa fa-edit"></i></a>'
-                    if (has_delete === true) {
+                    if (has_delete == true) {
                         actions += '<a href="#" onclick="delete_confirm(' + '\'' + row.id + '\'' + ', ' + '\'Вы действительно хотите удалить данную запись?\'' + ', ' + '\'' + url + '/delete' + '\'' + ')"><i class="fa fa-trash"></i></a>'
                     }
-                    if (has_update === true) {
+                    if (has_update == true) {
                         actions += '<a href="' + url + '/update?id=' + row.id + '"><i class="fa fa-cloud-upload"></i></a>'
                     }
-                    if (has_dismiss === true) {
+                    if (has_dismiss == true) {
                         if(row.status === 'Активный') { actions += '<a href="' + url + '/dismiss?id=' + row.id + '"><i class="fa fa-user-minus"></i></a>' }
-                        else { actions += '<a href="' + url + '/return?id=' + row.id + '"<i class="fa fa-user-circle"></i</a>' }
+                        else { actions += '<a href="' + url + '/return?id=' + row.id + '"<i class="fa fa-user"></i</a>' }
                     }
                     return actions
                 }
