@@ -23,7 +23,7 @@ function run_datatable(table_id, ajax_url, url, ajax_columns = null, has_delete 
                         actions += '<a href="' + url + '/update?id=' + row.id + '"><i class="fa fa-cloud-upload"></i></a>'
                     }
                     if (has_dismiss == true) {
-                        if(row.status === 'Активный') { actions += '<a href="#" onclick="delete_confirm(' + '\'' + row.id + '\'' + ', ' + '\'Вы действительно хотите уволить ' + row.fio + '?\'' + ', ' + '\'' + url + '/dismiss' + '\'' + ')"><i class="fa fa-user-minus"></i></a>' }
+                        if(row.active_status === 'Активный') { actions += '<a href="#" onclick="delete_confirm(' + '\'' + row.id + '\'' + ', ' + '\'Вы действительно хотите уволить ' + row.fio + '?\'' + ', ' + '\'' + url + '/dismiss' + '\'' + ')"><i class="fa fa-user-minus"></i></a>' }
                         else { actions += '<a href="' + url + '/return?id=' + row.id + '"<i class="fa fa-user"></i</a>' }
                     }
                     return actions
