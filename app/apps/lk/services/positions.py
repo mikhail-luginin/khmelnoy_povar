@@ -83,4 +83,4 @@ class JobsService:
         )
 
     def job_get(self, **kwargs) -> jobs_model:
-        return self.jobs_model.objects.get(**kwargs)
+        return self.jobs_model.objects.filter(**kwargs).first()
