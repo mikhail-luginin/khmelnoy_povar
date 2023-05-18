@@ -32,12 +32,20 @@ class SalaryService:
 
             if timetable_object.position.args['has_premium']:
                 total_day = today_money['total_day']
-                if 80000 <= total_day < 100000:
-                    premium += 500
-                elif 100000 <= total_day < 120000:
-                    premium += 1000
-                elif total_day >= 120000:
-                    premium += 2000
+                if timetable_object.date_at.year >= 2023 and timetable_object.date_at.month >= 5:
+                    if 80000 <= total_day < 100000:
+                        premium += 500
+                    elif 100000 <= total_day < 120000:
+                        premium += 1000
+                    elif total_day >= 120000:
+                        premium += 2000
+                else:
+                    if 60000 <= total_day < 70000:
+                        premium += 200
+                    elif 70000 <= total_day < 100000:
+                        premium += 500
+                    elif total_day >= 100000:
+                        premium += 1000
 
             return {"oklad": timetable_object.oklad, "percent": percent, "premium": premium}
         else:
