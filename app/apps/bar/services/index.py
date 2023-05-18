@@ -69,7 +69,7 @@ class HomePageService:
                     error = True
                     continue
 
-                timetable = Timetable.objects.create(
+                timetable = Timetable(
                     date_at=today_date(),
                     storage=storage,
                     employee=employee,
