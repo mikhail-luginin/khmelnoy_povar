@@ -34,27 +34,43 @@ class MoneyService:
             payout = get_total_payout_by_date_and_storage(storage, date_at)
             point_of_sale = storage.point_of_sale
 
+            total_day = 0
+            cash = 0
+            cash_point = 0
+            delivery = 0
+            yandex = 0
+            total_cashshifts = 0
+
             cashshifts_data = json.loads(IikoService().get_cashshifts(str(date_at), str(date_at)))
-            sales_data = (json.loads(IikoService().get_sales_by_department(row["id"])) for row in cashshifts_data
-                          if row["pointOfSaleId"] == point_of_sale)
-            sales_by_payment = (sale["info"] for sale in sales_data for sale in sale["cashlessRecords"])
-            cash_payments = (sale["sum"] for sale in sales_by_payment if
-                             PaymentType.objects.get(payment_id=sale["paymentTypeId"]).name in ('Наличные', 'Наличные.'))
-            market_payments = (sale["sum"] for sale in sales_by_payment if
-                               PaymentType.objects.get(payment_id=sale["paymentTypeId"]).name in (
-                               'Delivery Club', 'индекс'))
-            total_day = sum(row["payOrders"] for row in cashshifts_data)
-            total_cashshifts = sum(sale["sum"] for sale in sales_by_payment)
-            unexpected_cash = total_day - total_cashshifts
-            total_cash = sum(cash_payments) + unexpected_cash
-            total_market = sum(market_payments)
-            total_bn = total_day - total_cash - total_market
-            calculated = money_record.sum_cash_morning + total_cash - expenses - salary_calculated - salary_avans - payout + payin
+
+            for i in range(len(cashshifts_data)):
+                if cashshifts_data[i]["pointOfSaleId"] == point_of_sale:
+                    first_data = IikoService().get_sales_by_department(cashshifts_data[i]["id"])
+                    data = json.loads(first_data)
+                    total_day += cashshifts_data[i]["payOrders"]
+
+                    for a in range(len(data["cashlessRecords"])):
+                        row = PaymentType.objects.get(payment_id=data["cashlessRecords"][a]["info"]["paymentTypeId"])
+                        if row.name == 'Наличные':
+                            cash += int(data["cashlessRecords"][a]["info"]["sum"])
+                        if row.name == 'Наличные.':
+                            cash_point += int(data["cashlessRecords"][a]["info"]["sum"])
+                        if row.name == 'Delivery Club':
+                            delivery += int(data["cashlessRecords"][a]["info"]["sum"])
+                        if row.name == 'Яндекс ЕДА' or row.name == '-Яндекс ЕДА':
+                            yandex += int(data["cashlessRecords"][a]["info"]["sum"])
+                        total_cashshifts += data["cashlessRecords"][a]["info"]["sum"]
+            nal = int(total_day) - int(total_cashshifts)
+            sum_nal = int(cash) + nal + int(cash_point)
+            sum_bn = int(total_day) - sum_nal - int(yandex) - int(delivery)
+            sum_for_percent = total_day - yandex - delivery
+
+            calculated = money_record.sum_cash_morning + sum_nal - expenses - salary_calculated - salary_avans - payout + payin
 
             money_record.total_day = total_day
-            money_record.total_cash = total_cash
-            money_record.total_bn = total_bn
-            money_record.total_market = total_market
+            money_record.total_cash = sum_nal
+            money_record.total_bn = sum_bn
+            money_record.total_market = yandex + delivery
             money_record.total_expenses = expenses
             money_record.total_salary = salary_avans + salary_calculated
             money_record.total_payin = payin
