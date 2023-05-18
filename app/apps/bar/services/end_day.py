@@ -1,6 +1,7 @@
-from apps.bar.models import Money
+from apps.bar.models import Money, TovarRequest
 from apps.bar.services.bar_info import get_full_information_of_day
 from apps.iiko.services.storage import StorageService
+from core.telegram import send_message_to_telegram
 
 from core.time import today_date
 from core import total_values
@@ -45,4 +46,10 @@ def complete_day(request):
 
     add_percent_and_premium_to_timetable.delay(today_date(), storage.id)
     messages.success(request, 'Остаток в кассе успешно заполнен :)')
+
+    message = f'Дата: {today_date()}\nЗаведение: {storage.name}\n\n'
+    for tovar_request in TovarRequest.objects.filter(date_at=today_date(), storage_id=storage.id):
+        message += f'{tovar_request.product.name}\n'
+    send_message_to_telegram('-1001646808631', message)
+
     return redirect('/bar/end_day?code=' + code)
