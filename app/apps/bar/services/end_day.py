@@ -25,7 +25,7 @@ def complete_day(request):
         messages.error(request, 'Смена в CRM не была открыта :(')
         return redirect('/bar/end_day?code=' + code)
 
-    calculated = int(row.sum_cash_morning) - information_of_day["total_cash"] - \
+    calculated = int(row.sum_cash_morning) + information_of_day["total_cash"] - \
                  information_of_day["expenses_nal"] - information_of_day["salary_prepayment"] - \
                  information_of_day['salary_month'] - information_of_day["payout"] + information_of_day["payin"]
     difference = int(sum_cash_end_day) - calculated
