@@ -439,40 +439,7 @@
     $(window).on('load', function () {
         $('#preloader').fadeOut().end().delay().fadeOut('slow');
     });
-    const navItems = document.getElementsByClassName('nav-item');
-
-    for (let i = 0; i < navItems.length; i++) {
-        navItems[i].addEventListener('click', () => {
-            for (let j = 0; j < navItems.length; j++)
-                navItems[j].classList.remove('active');
-
-            navItems[i].classList.add('active');
-        });
-    }
     $(document).ready(function () {
-        document.querySelectorAll('.form-select').forEach((el) => {
-            let settings = {
-                copyClassesToDropdown: false,
-                dropdownClass: 'dropdown-menu ts-dropdown',
-                optionClass: 'dropdown-item',
-                controlInput: '<input>',
-                render: {
-                    item: function (data, escape) {
-                        if (data.customProperties) {
-                            return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
-                        }
-                        return '<div>' + escape(data.text) + '</div>';
-                    },
-                    option: function (data, escape) {
-                        if (data.customProperties) {
-                            return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
-                        }
-                        return '<div>' + escape(data.text) + '</div>';
-                    },
-                },
-            };
-            new TomSelect(el, settings);
-        });
         if (document.getElementById('django-message-error') !== null) {
             $('#django-message-error').modal('show')
         }
