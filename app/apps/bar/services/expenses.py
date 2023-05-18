@@ -39,7 +39,7 @@ class ExpensesPageService:
                           date_at=today_date(),
                           expense_source__name=settings.PAYMENT_TYPE_NAL)
                   .exclude(expense_type__name=settings.SALARY_CATEGORY)
-                  .exclude(writer__in='акупщик')
+                  .exclude(writer__contains='акупщик')
                   .aggregate(total_sum=Sum('sum'))['total_sum'] or 0
         }
 
