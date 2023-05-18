@@ -146,7 +146,7 @@ class SalaryService:
                 row['oklad'] = salary.oklad
                 row['percent'] = salary.percent
                 row['premium'] = salary.premium
-                data['issued_sum'] = salary.oklad + salary.percent + salary.premium
+                data['issued_sum'] += salary.oklad + salary.percent + salary.premium
             else:
                 if (timetable.position.args['is_usil']
                         or timetable.position.args['is_called']
