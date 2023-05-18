@@ -24,6 +24,8 @@ urlpatterns = [
     path('positions/delete', PositionDeleteView.as_view(), name="position_delete"),
 
     path('jobs/add', JobAddView.as_view(), name="job_add"),
+    path('jobs/edit', JobEditView.as_view(), name="job_edit"),
+    path('jobs/delete', JobDeleteView.as_view(), name="job_delete"),
 
     path('bank', BankView.as_view(), name="bank"),
     path('bank/update', bank_update, name="update_bank"),

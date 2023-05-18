@@ -82,5 +82,20 @@ class JobsService:
             oklad=job_oklad
         )
 
+    def job_edit(self, row_id: str | None, name: str | None, oklad: int | None):
+        validators.validate_field(row_id, 'идентификатор')
+        validators.validate_field(name, 'наименование должности')
+        validators.validate_field(oklad, 'оклад должности')
+
+        row = self.jobs_model.objects.filter(id=row_id)
+
+        if row.exists():
+            row = row.first()
+            row.name = name
+            row.oklad = oklad
+            row.save()
+        else:
+            raise self.jobs_model.DoesNotExist('Должность с указанным идентификатором не найдена.')
+
     def job_get(self, **kwargs) -> jobs_model:
         return self.jobs_model.objects.get(**kwargs)

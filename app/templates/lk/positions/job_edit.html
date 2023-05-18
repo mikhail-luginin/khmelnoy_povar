@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">
+                Редактирование должности {{ row.name }}
+            </div>
+            <div class="card-body">
+                <form action="{% url 'LK:job_edit' %}?id={{ row.id }}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-2">
+                        <div class="row">
+                            <div class="col">
+                                <label class="form-label">Наименование</label>
+                                <input type="text" class="form-control" name="name"
+                                       placeholder="Введите наименование должности" value="{{ row.name }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="row">
+                            <div class="col">
+                                <label class="form-label">Оклад</label>
+                                <input class="form-control" name="oklad" type="tel" inputmode="numeric"
+                                       placeholder="Оклад позиции" value="{{ row.oklad }}">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Обновить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -19,7 +19,7 @@ from .services.fines import FineService
 
 from apps.iiko.services.storage import StorageService
 
-from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee
+from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee, JobPlace
 from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest
 from apps.iiko.models import Product, Supplier
 from .services.timetable import TimetableService
@@ -241,6 +241,39 @@ class JobAddView(BaseLkView):
 
         return redirect('/lk/positions')
 
+
+class JobEditView(ObjectEditMixin):
+    model = JobPlace
+    template_name = 'lk/positions/job_edit.html'
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context['jobs'] = JobsService().jobs_all()
+
+        return context
+
+    def post(self, request):
+        row_id = request.GET.get('id')
+        name = request.POST.get('name')
+        oklad = request.POST.get('oklad')
+
+        try:
+            JobsService().job_edit(row_id=row_id, name=name, oklad=oklad)
+            messages.success(request, 'Должность успешно отредактирована :)')
+            url = '/lk/positions'
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+            messages.error(request, error)
+            url = f'/lk/jobs/edit?id={row_id}'
+        except ValueError:
+            messages.error(request, 'В поле "Оклад" могут быть только числа')
+            url = f'/lk/jobs/edit?id={row_id}'
+
+        return redirect(url)
+
+
+class JobDeleteView(ObjectDeleteMixin):
+    model = JobPlace
+    success_url = '/lk/positions'
 
 class BankView(BaseLkView):
     template_name = 'lk/bank.html'
