@@ -32,14 +32,14 @@ class ExpensesPageService:
                           date_at=today_date(),
                           expense_source__name=settings.PAYMENT_TYPE_BN)
                   .exclude(expense_type__name=settings.SALARY_CATEGORY)
-                  .exclude(expense_type__name=settings.PURCHASER_CATEGORY)
+                  .exclude(writer__in='акупщик')
                   .aggregate(total_sum=Sum('sum'))['total_sum'] or 0,
             "nal": Expense.objects
                   .filter(storage=storage,
                           date_at=today_date(),
                           expense_source__name=settings.PAYMENT_TYPE_NAL)
                   .exclude(expense_type__name=settings.SALARY_CATEGORY)
-                  .exclude(expense_type__name=settings.PURCHASER_CATEGORY)
+                  .exclude(writer__in='акупщик')
                   .aggregate(total_sum=Sum('sum'))['total_sum'] or 0
         }
 
