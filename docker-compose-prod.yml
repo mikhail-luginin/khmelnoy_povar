@@ -11,7 +11,7 @@ services:
       - ./app/.env
     command: >
       sh -c "python manage.py migrate
-             gunicorn --bind 0.0.0.0:80 config.wsgi -w 4 --timeout 120"
+             gunicorn --bind 0.0.0.0:80 config.wsgi -w 6 --timeout 120"
 
   nginx:
     image: nginx:1.19.8-alpine
