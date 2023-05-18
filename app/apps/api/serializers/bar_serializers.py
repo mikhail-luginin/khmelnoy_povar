@@ -16,6 +16,7 @@ class MoneySerializer(serializers.ModelSerializer):
 class SalarySerializer(serializers.ModelSerializer):
     employee_fio = serializers.CharField(source='employee.fio')
     storage_name = serializers.CharField(source='storage.name')
+    type_name = serializers.CharField(source='get_type_display')
     total_sum = serializers.SerializerMethodField()
     month_name = serializers.SerializerMethodField()
     period_name = serializers.SerializerMethodField()
