@@ -29,11 +29,19 @@ class HomePageService:
         for position in Position.objects.all().order_by('-priority_id'):
             row = dict()
 
-            row['id'] = position.id
-            row['name'] = position.name
-            row['employees'] = [employee for employee in employees if employee.job_place in position.linked_jobs.all()]
-            row['priority_id'] = position.priority_id
-            row['args'] = position.args
+            if position.args['is_trainee']:
+                row['id'] = position.id
+                row['name'] = position.name
+                row['employees'] = [employee for employee in employees if employee.status == 2]
+                row['priority_id'] = position.priority_id
+                row['args'] = position.args
+            else:
+                row['id'] = position.id
+                row['name'] = position.name
+                row['employees'] = [employee for employee in employees if
+                                    employee.job_place in position.linked_jobs.all() if employee.status == 3]
+                row['priority_id'] = position.priority_id
+                row['args'] = position.args
 
             rows.append(row)
 
