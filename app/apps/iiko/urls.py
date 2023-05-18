@@ -7,7 +7,7 @@ app_name = 'IIKO'
 urlpatterns = [
     path('nomenclature', NomenclatureView.as_view(), name='nomenclature'),
     path('nomenclature/edit', NomenclatureEditView.as_view(), name='nomenclature_edit'),
-    path('nomenclature/update', update_nomenclature_view, name="nomenclature_update"),
+    path('nomenclature/update', update_nomenclature_view, name='nomenclature_update'),
 
     path('suppliers', SuppliersView.as_view(), name='suppliers'),
     path('suppliers/edit', SupplierEditView.as_view(), name='supplier_edit'),

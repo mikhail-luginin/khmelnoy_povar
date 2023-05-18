@@ -5,6 +5,7 @@ from django.http import Http404
 from django.shortcuts import render, redirect
 from django.views import View
 
+from .exceptions import FieldNotFoundError
 from .permissions import CanViewMixin, AccessMixin
 from .time import today_datetime
 from .logs import create_log
@@ -85,15 +86,25 @@ class ObjectEditMixin(AccessMixin, BaseLkView):
     success_url = None
     can_edit = 1
 
+    def _get_row(self, row_id):
+        row = self.model.objects.filter(id=row_id)
+        if row.exists():
+            return row.first()
+        raise FieldNotFoundError(f'Запись в справочнике с идентификатором {row.id} не найдена.')
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+
+        context['row'] = self._get_row(request.GET.get('id'))
+        return context
+
     def get(self, request):
-        try:
-            row = self.model.objects.get(id=request.GET.get('id'))
-        except self.model.DoesNotExist:
-            messages.error(request, 'Объект с данным ID не найден :(')
-            return redirect('/' if self.success_url is None else self.success_url)
 
-        context = self.get_context_data(request, row=row)
-
+        try :
+            context = self.get_context_data(request)
+        except FieldNotFoundError as error:
+            messages.error(request, error)
+            return redirect(request.META.get('HTTP_REFERER'))
         return render(request, self.template_name, context)
 
     def dispatch(self, request, *args, **kwargs):

@@ -16,21 +16,17 @@
                     </div>
                     <div class="mb-4">
                         <label class="form-label" for="category_id">Категория</label>
-                        <select class="form-select" id="category_id" name="category_id">
-                            <option value="-1">Выберите..</option>
+                        <select placeholder="Выберите должность" class="form-select" id="category_id" name="category_id" multiple>
+                            <option></option>
                             {% for category in categories %}
-                                <option value="{{ category.id }}" {% if row.category == category.id %}selected{% endif %}>{{ category.name }}</option>
+                                <option value="{{ category.id }}" {% for cat in row.category.all %}{% if cat.id == category.id %}selected{% endif %}{% endfor %}>{{ category.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="mb-4">
                         <label class="form-check">
-                            <input class="form-check-input" type="radio" name="is_revise" value="1" {% if row.is_revise == 1 %}checked{% endif %}>
+                            <input class="form-check-input" type="checkbox" name="is_revise" value="1" {% if row.is_revise == 1 %}checked{% endif %}>
                             <span class="form-check-label">Участвует в сверке</span>
-                        </label>
-                        <label class="form-check">
-                            <input class="form-check-input" type="radio" name="is_revise" value="0" {% if row.is_revise == 0 %}checked{% endif %}>
-                            <span class="form-check-label">Не участвует в сверке</span>
                         </label>
                     </div>
                     <div class="mb-2">

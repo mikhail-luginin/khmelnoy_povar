@@ -4,26 +4,27 @@
 {% block page_title %}Редактирование продукта {{ row.name }}{% endblock %}
 
 {% block body %}
+    <div class="container-xl">
     <div class="card rounded-3">
         <div class="card-header card-header-light rounded-top-3">
-            Редактирование
+            Редактирование {{ row.id }}
         </div>
         <div class="card-body">
             <form action="{% url 'IIKO:nomenclature_edit' %}?id={{ row.id }}" method="post">
                 {% csrf_token %}
                 <div class="mb-4">
                     <label class="form-label" for="supplier_id">Поставщик</label>
-                    <select class="form-select" id="supplier_id" name="supplier_id">
-                        <option value="-1">Выберите..</option>
+                    <select placeholder="Выберите поставщика" class="form-select" id="supplier_id" name="supplier_id">
+                        <option></option>
                         {% for supplier in suppliers %}
-                            <option value="{{ supplier.id }}" {% if row.supplier == supplier.id %}selected{% endif %}>{{ supplier.name }}</option>
+                            <option value="{{ supplier.id }}" {% if row.supplier_id == supplier.id %}selected{% endif %}>{{ supplier.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="mb-4">
                     <label class="form-label" for="category_id">Категория</label>
-                    <select class="form-select" id="category_id" name="category_id">
-                        <option>Выберите..</option>
+                    <select placeholder="Выберите категорию" class="form-select" id="category_id" name="category_id">
+                        <option></option>
                         {% for category in categories %}
                             <option value="{{ category.id }}" {% if row.category_id == category.id %}selected{% endif %}>{{ category.name }}</option>
                         {% endfor %}
@@ -31,16 +32,17 @@
                 </div>
                 <div class="mb-4">
                     <label class="form-label" for="minimal">Мин. кол-во</label>
-                    <input value="{{ row.minimal }}" class="form-control" id="minimal" name="minimal" type="tel" inputmode="numeric" placeholder="Введите минимальное количество">
+                    <input value="{% if row.minimal is not None %}{{ row.minimal }}{% endif %}" class="form-control" id="minimal" name="minimal" type="tel" inputmode="numeric" placeholder="Введите минимальное количество">
                 </div>
                 <div class="mb-4">
                     <label class="form-label" for="for_order">Для заказа</label>
-                    <input value="{{ row.for_order }}" class="form-control" id="for_order" name="for_order" type="tel" inputmode="numeric" placeholder="Введите кол-во для заказа">
+                    <input value="{% if row.for_order is not None %}{{ row.for_order }}{% endif %}" class="form-control" id="for_order" name="for_order" type="tel" inputmode="numeric" placeholder="Введите кол-во для заказа">
                 </div>
                 <div class="mb-2">
                     <button type="submit" class="btn btn-success w-100">Сохранить</button>
                 </div>
             </form>
         </div>
+    </div>
     </div>
 {% endblock %}

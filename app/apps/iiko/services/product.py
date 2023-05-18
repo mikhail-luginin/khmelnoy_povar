@@ -1,8 +1,15 @@
 from apps.iiko.models import Product, Category
 from apps.iiko.services.category import CategoryService
 from apps.iiko.services.api import IikoService
+from apps.iiko.services.supplier import SupplierService
+
+from core.exceptions import FieldNotFoundError, WrongFieldTypeError
+from core.validators import validate_field
 
 import xml.etree.ElementTree as ET
+
+from typing import List
+
 
 
 class ProductService:
@@ -60,4 +67,28 @@ class ProductService:
             if product.product_id not in ids:
                 product.delete()
 
-        return True
+    def nomenclature_all(self) -> List[model]:
+        return self.model.objects.all()
+
+
+    def nomenclature_edit(self, row_id: str | None, minimal: int | None, for_order: int | None,
+                          category_id: str | None, supplier_id: str | None):
+
+        validate_field(row_id, 'идентификатор')
+
+        if for_order == '':
+            for_order = None
+
+        if minimal == '':
+            minimal = None
+
+        row = self.model.objects.filter(id=row_id)
+        if row.exists():
+            row = row.first()
+            row.minimal = minimal
+            row.for_order = for_order
+            row.category_id = category_id
+            row.supplier_id = supplier_id
+            row.save()
+        else:
+            raise self.model.DoesNotExist(f'Запись в справочнике с идентификатором {row.id} не найдена.')

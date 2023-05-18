@@ -1,8 +1,10 @@
 from apps.iiko.models import PaymentType
 from apps.iiko.services.api import IikoService
 
-import json
+from core.exceptions import FieldNotFoundError
+from core.validators import validate_field
 
+import json
 
 class PaymentTypeService:
     model = PaymentType
@@ -31,3 +33,16 @@ class PaymentTypeService:
                 payment_type.delete()
 
         return True
+
+    def paymenttype_edit(self, row_id: str | None, is_active: str | None):
+
+        validate_field(row_id, 'идентификатор')
+
+        row = self.model.objects.filter(id=row_id)
+
+        if row.exists():
+            row = row.first()
+            row.is_active = 0 if not is_active else 1
+            row.save()
+        else:
+            raise self.model.DoesNotExist(f'Запись в справочнике с идентификатором {row.id} не найдена.')

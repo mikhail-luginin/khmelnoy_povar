@@ -9,7 +9,7 @@
             <div class="card-header card-header-light rounded-top-3">
                 <h3 class="card-title">Категории</h3>
                 <div class="card-actions">
-                    <a class="btn btn-primary" id="update">
+                    <a href="{% url 'IIKO:categories_update' %}" class="btn btn-primary" id="update">
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-cloud-upload"
                              width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
                              fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -51,37 +51,13 @@
 {% block scripts %}
     <script>
         $(document).ready(function () {
-            var table = run_datatable('table', '/api/categories', [
+            run_datatable('table', '/api/categories', '/iiko/categories', [
                 {data: 'name'},
-                {data: 'in_remains'},
-                {data: 'in_sales'},
-                {data: 'in_income'}])
-            $('#update').click(function () {
-                $.ajax({
-                    data: $(this).serialize(),
-                    type: $(this).attr('method'),
-                    url: "{% url 'IIKO:categories_update' %}",
-                    success: function (response) {
-                        if (response.status === true) {
-                            table.destroy()
-                            table = run_datatable('table', '/iiko/api/categories', [
-                                {data: 'name'},
-                                {data: 'in_remains'},
-                                {data: 'in_sales'},
-                                {data: 'in_income'},
-                                {data: 'actions'}])
-                            notification(true, response.message)
-                        } else {
-                            notification(false)
-                        }
-                    },
-                    error: function (response) {
-                        notification(false)
-                    }
-                });
-                return false;
+                {data: 'is_remains'},
+                {data: 'is_sales'},
+                {data: 'is_income'}],
+                has_delete=false)
 
-            });
-        })
+        });
     </script>
 {% endblock %}
