@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import redirect
 
 from core.utils import BaseLkView, ObjectEditMixin, ObjectCreateMixin, ObjectDeleteMixin
@@ -23,6 +24,8 @@ from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee
 from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest
 from apps.iiko.models import Product, Supplier
 from .services.timetable import TimetableService
+
+from .tasks import calculate_percent_premium_for_all
 
 
 class IndexView(BaseLkView):
@@ -816,3 +819,10 @@ class TovarRequestEditView(ObjectEditMixin):
 class TovarRequestDeleteView(ObjectDeleteMixin):
     model = TovarRequest
     success_url = '/lk/tovar/requests'
+
+
+class TimetableUpdateView(BaseLkView):
+
+    def get(self, request):
+        calculate_percent_premium_for_all.delay()
+        return HttpResponse('update started')

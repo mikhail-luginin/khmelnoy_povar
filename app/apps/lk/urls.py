@@ -40,6 +40,7 @@ urlpatterns = [
     path('timetable/create', CreateTimetableView.as_view(), name="create_timetable"),
     path('timetable/edit', EditTimetableView.as_view(), name="edit_timetable"),
     path('timetable/delete', DeleteTimetableView.as_view(), name="delete_timetable"),
+    path('timetable/update', TimetableUpdateView.as_view(), name="update_timetable"),
 
     path('expenses', ExpensesView.as_view(), name="expenses"),
     path('expenses/create', CreateExpenseView.as_view(), name="create_expense"),
