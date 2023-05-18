@@ -269,7 +269,7 @@ class DataLogsMixin(BaseView):
         match self.type:
             case 1:
                 day = (current_date + datetime.timedelta(days=obj)) if obj else current_date.day
-                filter_args = {"date_at__day": day.day, "date_at__month": day.month if obj else current_date.month}
+                filter_args = {"date_at__day": day if type(day) is int else day.day, "date_at__month": day.month if obj else current_date.month}
             case 2:
                 obj = monthdelta(current_date, obj).month if obj else current_date.month
                 filter_args = {"date_at__month": obj}
