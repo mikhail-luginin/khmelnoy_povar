@@ -13,7 +13,7 @@ def get_total_expenses_by_date_and_storage(storage: Storage, date_at: str, is_bn
         storage=storage,
         date_at=date_at,
         expense_source=source
-    ).exclude(expense_type__name=settings.SALARY_CATEGORY, writer__contains='акупщик').aggregate(total_sum=Sum('sum'))['total_sum'] or 0
+    ).exclude(expense_type__name=settings.SALARY_CATEGORY).exclude(writer__contains='акупщик').aggregate(total_sum=Sum('sum'))['total_sum'] or 0
 
 
 def get_total_salary_by_date_and_storage(storage: Storage, date_at: str, payslip_type: int) -> int:
