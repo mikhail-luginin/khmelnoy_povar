@@ -48,6 +48,7 @@ class PurchaserService:
             "nal": 0,
             "bn": 0
         }
+
         for expense in Expense.objects.filter(date_at=today_date(), writer__contains="акупщик"):
             if 'угинин' in expense.storage.entity:
                 data['ip_luginin'] += expense.sum

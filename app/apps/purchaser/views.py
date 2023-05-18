@@ -19,7 +19,8 @@ class IndexView(BaseView):
         context.update({
             "rows": PurchaserService().get_rows_by_date(date_at=request.GET.get('date_at'),
                                                         storage_id=request.GET.get('storage_id')),
-            "storages": StorageService().storages_all()
+            "storages": StorageService().storages_all(),
+            "data": PurchaserService().get_money_data()
         })
 
         return context
@@ -33,8 +34,7 @@ class ExpenseCreateView(BaseView):
         context.update({
             "storages": StorageService().storages_all(),
             "receivers": CatalogService().get_catalog_by_catalog_type_name_contains(settings.PURCHASER_CATEGORY),
-            "types": CatalogService().get_catalog_by_catalog_type_name_contains(settings.EXPENSE_SOURCE_CATEGORY),
-            "data": PurchaserService().get_money_data()
+            "types": CatalogService().get_catalog_by_catalog_type_name_contains(settings.EXPENSE_SOURCE_CATEGORY)
         })
 
         return context
