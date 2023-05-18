@@ -12,7 +12,7 @@ from apps.iiko.services.storage import StorageService
 from apps.lk.services.catalog import CatalogService
 
 from calendar import monthrange
-from typing import List, Literal
+from typing import Literal
 
 
 class SalaryService:
@@ -145,7 +145,10 @@ class SalaryService:
                 row['premium'] = salary.premium
                 data['issued_sum'] = salary.oklad + salary.percent + salary.premium
             else:
-                if timetable.position.args['is_usil'] or timetable.position.args['is_called']:
+                if (timetable.position.args['is_usil']
+                        or timetable.position.args['is_called']
+                        or 'Повар' in timetable.position.name
+                        or 'служащий' in timetable.position.name) and not timetable.position.args['is_trainee']:
                     row['oklad'] = timetable.oklad
                 else:
                     row['oklad'] = 0
