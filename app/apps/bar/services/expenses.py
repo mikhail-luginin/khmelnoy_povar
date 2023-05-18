@@ -1,3 +1,5 @@
+from django.db.models import Sum
+
 from apps.bar.models import Pays
 from apps.bar.services.bar_info import get_main_barmen
 
@@ -18,9 +20,21 @@ from django.conf import settings
 class ExpensesPageService:
 
     def get_expenses_today(self, storage: Storage) -> list[Expense]:
-        return Expense.objects\
-            .filter(storage=storage, date_at=today_date())\
+        return Expense.objects \
+            .filter(storage=storage, date_at=today_date()) \
             .exclude(expense_type__name=settings.SALARY_CATEGORY)
+
+    def get_sum_expenses_today(self, storage: Storage) -> dict[str, int]:
+        data = {
+            "bn": Expense.objects.filter(storage=storage,
+                                         date_at=today_date(),
+                                         expense_source__name=settings.PAYMENT_TYPE_BN).aggregate(total_sum=Sum('sum'))['total_sum'] or 0,
+            "nal": Expense.objects.filter(storage=storage,
+                                         date_at=today_date(),
+                                         expense_source__name=settings.PAYMENT_TYPE_NAL).aggregate(total_sum=Sum('sum'))['total_sum'] or 0
+        }
+
+        return data
 
     def create_expense(self, request) -> redirect:
         code = request.GET.get('code')

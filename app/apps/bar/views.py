@@ -54,8 +54,7 @@ class ExpensesView(BaseView):
         context['expenses_types'] = catalog.CatalogService().get_catalog_by_type(settings.EXPENSE_TYPE_CATEGORY)
         context['expenses_sources'] = catalog.CatalogService().get_catalog_by_type(settings.EXPENSE_SOURCE_CATEGORY)
         context['timetable'] = HomePageService().get_timetable_today(context['bar'])
-        context['expenses'] = dict(nal=get_total_expenses_by_date_and_storage(context['bar'], context['date'], False),
-                                   bn=get_total_expenses_by_date_and_storage(context['bar'], context['date'], True))
+        context['expenses'] = ExpensesPageService().get_sum_expenses_today(context['bar'])
         context['payin_types'] = catalog.CatalogService().get_catalog_by_type(settings.PAYIN_CATEGORY)
         context['payout_types'] = catalog.CatalogService().get_catalog_by_type(settings.PAYOUT_CATEGORY)
         context['pays_rows'] = Pays.objects.filter(date_at=today_date(), storage=context['bar'])
