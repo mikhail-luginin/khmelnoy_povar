@@ -488,8 +488,8 @@ class EditExpenseView(ObjectEditMixin):
         expense_sum = request.POST.get('sum')
         comment = request.POST.get('comment')
         storage_id = request.POST.get('storage_id')
-        type_id = request.POST.get('type_id')
-        source_id = request.POST.get('source_id')
+        type_id = request.POST.get('expense_type_id')
+        source_id = request.POST.get('expense_source_id')
 
         try:
             ExpenseService().edit(expense_id=expense_id, date_at=date_at, payment_receiver=payment_receiver,
