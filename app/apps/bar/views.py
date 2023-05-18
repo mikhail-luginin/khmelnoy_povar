@@ -1,7 +1,4 @@
-from typing import List
-
 from core.time import today_date, get_months, get_current_time
-from core.total_values import get_total_expenses_by_date_and_storage
 from global_services.salary import SalaryService
 
 from .utils import BaseView, ObjectDeleteMixin, TovarRequestMixin, ArrivalMixin, InventoryMixin, DataLogsMixin
@@ -22,7 +19,7 @@ from django.conf import settings
 
 from django.db.models import Sum
 
-from ..iiko.models import Storage
+from apps.iiko.models import Storage
 
 
 class IndexView(BaseView):
