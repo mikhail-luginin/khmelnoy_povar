@@ -23,7 +23,7 @@ class ExpensesPageService:
         return Expense.objects \
             .filter(storage=storage, date_at=today_date()) \
             .exclude(expense_type__name=settings.SALARY_CATEGORY) \
-            .exclude(expense_type__name=settings.PURCHASER_CATEGORY)
+            .exclude(writer__in='акупщик')
 
     def get_sum_expenses_today(self, storage: Storage) -> dict[str, int]:
         data = {
