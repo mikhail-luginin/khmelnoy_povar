@@ -152,11 +152,11 @@ class SalaryService:
                         or timetable.position.args['is_called']
                         or 'овар' in timetable.position.name
                         or 'служащий' in timetable.position.name) and not timetable.position.args['is_trainee']:
-                    if timetable.employee.job_place.name == 'Повар' and not timetable.position.args['is_called']:
+                    if timetable.employee.job_place.name == 'Повар' and timetable.position.args['is_called'] is False:
                         row['oklad'] = 1300
-                    elif timetable.employee.job_place.name == 'Су-Шеф' and not timetable.position.args['is_called']:
+                    elif timetable.employee.job_place.name == 'Су-Шеф' and timetable.position.args['is_called'] is False:
                         row['oklad'] = 1400
-                    elif timetable.employee.job_place.name == 'Тех. служащий':
+                    elif timetable.employee.job_place.name == 'Тех. служащий' and timetable.position.args['is_called'] is False:
                         row['oklad'] = 800
                     else:
                         row['oklad'] = timetable.oklad
