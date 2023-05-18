@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from core.time import today_date
 from core import validators
 
@@ -38,3 +40,23 @@ class PurchaserService:
             sum=expense_sum,
             comment=comment
         )
+
+    def get_money_data(self) -> dict[str, int]:
+        data = {
+            "ip_luginin": 0,
+            "ip_moskvichev": 0,
+            "nal": 0,
+            "bn": 0
+        }
+        for expense in Expense.objects.filter(date_at=today_date(), writer__contains="акупщик"):
+            if 'угинин' in expense.storage.entity:
+                data['ip_luginin'] += expense.sum
+            elif 'осквичев' in expense.storage.entity:
+                data['ip_moskvichev'] += expense.sum
+
+            if expense.expense_source.name == settings.PAYMENT_TYPE_BN:
+                data['bn'] += expense.sum
+            elif expense.expense_source.name == settings.PAYMENT_TYPE_NAL:
+                data['nal'] += expense.sum
+
+        return data

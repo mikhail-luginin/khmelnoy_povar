@@ -33,7 +33,8 @@ class ExpenseCreateView(BaseView):
         context.update({
             "storages": StorageService().storages_all(),
             "receivers": CatalogService().get_catalog_by_catalog_type_name_contains(settings.PURCHASER_CATEGORY),
-            "types": CatalogService().get_catalog_by_catalog_type_name_contains(settings.EXPENSE_SOURCE_CATEGORY)
+            "types": CatalogService().get_catalog_by_catalog_type_name_contains(settings.EXPENSE_SOURCE_CATEGORY),
+            "data": PurchaserService().get_money_data()
         })
 
         return context
