@@ -33,7 +33,12 @@ class TimetableService:
         timetable.premium = money_data['premium']
 
         fine = Fine.objects.filter(employee_id=employee_id, date_at=date_at).aggregate(Sum("sum"))['sum__sum']
-        timetable.fine = int(fine)
+
+        if fine:
+            timetable.fine = int(fine)
+        else:
+            timetable.fine = 0
+
         timetable.save()
 
     def edit(self, timetable_id: int | None, date_at: str | None, employee_id: int | None,
@@ -61,7 +66,12 @@ class TimetableService:
             timetable.premium = money_data['premium']
 
             fine = Fine.objects.filter(employee_id=employee_id, date_at=date_at).aggregate(Sum("sum"))['sum__sum']
-            timetable.fine = int(fine)
+
+            if fine:
+                timetable.fine = int(fine)
+            else:
+                timetable.fine = 0
+
             timetable.save()
         else:
             raise self.model.DoesNotExist('Запись с указанным идентификатором не найдена.')
