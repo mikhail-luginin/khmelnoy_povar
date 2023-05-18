@@ -119,9 +119,9 @@ class CardSerializer(serializers.ModelSerializer):
 
 
 class StatementSerializer(serializers.ModelSerializer):
-    linked = serializers.CharField(source='linked.name')
-    payer_name = serializers.CharField(source='payer.name')
-    recipient_name = serializers.CharField(source='recipient.name')
+    linked = serializers.CharField(source='linked.name', allow_null=True, default='Не привязана')
+    payer_name = serializers.CharField(source='payer.name', allow_null=True, default='Не привязан')
+    recipient_name = serializers.CharField(source='recipient.name', allow_null=True, default='Не привязан')
 
     class Meta:
         model = Statement
@@ -140,7 +140,7 @@ class FineSerializer(serializers.ModelSerializer):
 class ExpenseSerializer(serializers.ModelSerializer):
     storage_name = serializers.CharField(source='storage.name')
     expense_type_name = serializers.CharField(source='expense_type.name', allow_null=True, default='Не указана')
-    expense_source_name = serializers.CharField(source='expense_source.name')
+    expense_source_name = serializers.CharField(source='expense_source.name', allow_null=True, default='Не указан')
 
     class Meta:
         model = Expense
