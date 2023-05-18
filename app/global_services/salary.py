@@ -148,7 +148,10 @@ class SalaryService:
                 row['premium'] = salary.premium
                 data['issued_sum'] = salary.oklad + salary.percent + salary.premium
             else:
-                if (timetable.position.args['is_usil'] or timetable.position.args['is_called']) and not timetable.position.args['is_trainee']:
+                if (timetable.position.args['is_usil']
+                        or timetable.position.args['is_called']
+                        or 'овар' in timetable.position.name
+                        or 'служащий' in timetable.position.name) and not timetable.position.args['is_trainee']:
                     if timetable.employee.job_place.name == 'Повар':
                         row['oklad'] = 1300
                     elif timetable.employee.job_place.name == 'Су-Шеф':
