@@ -1,4 +1,4 @@
-function run_datatable(table_id, ajax_url, url, ajax_columns = null, has_delete = true, has_update = false) {
+function run_datatable(table_id, ajax_url, url, ajax_columns = null, has_delete = true, has_update = false, has_dismiss=false) {
     let table = $('#' + table_id).DataTable({
         language: {
             "url": "//cdn.datatables.net/plug-ins/1.11.1/i18n/ru.json"
@@ -21,6 +21,10 @@ function run_datatable(table_id, ajax_url, url, ajax_columns = null, has_delete 
                     }
                     if (has_update === true) {
                         actions += '<a href="' + url + '/update?id=' + row.id + '"><i class="fa fa-cloud-upload"></i></a>'
+                    }
+                    if (has_dismiss === true) {
+                        if(row.status === 'Активный') { actions += '<a href="' + url + '/dismiss?id=' + row.id + '"><i class="fa fa-user-minus"></i></a>' }
+                        else { actions += '<a href="' + url + '/return?id=' + row.id + '"<i class="fa fa-user-circle"></i</a>' }
                     }
                     return actions
                 }
