@@ -15,19 +15,33 @@ class Storage(models.Model):
 
 
 class Category(models.Model):
+    CATEGORY_CHOICES = [
+        (0, 'Не привязано'),
+        (1, 'Привязано')
+    ]
+
     category_id = models.CharField(max_length=64)
     name = models.CharField(max_length=64)
-    args = models.JSONField(null=True)
+    is_income = models.BooleanField(default=False, choices=CATEGORY_CHOICES)
+    is_sales = models.BooleanField(default=False, choices=CATEGORY_CHOICES)
+    is_remains = models.BooleanField(default=False, choices=CATEGORY_CHOICES)
 
+    def __str__(self):
+        return self.name
 
 class Supplier(models.Model):
+    SUPPLIERS_CHOICES = [
+        (0, 'Не привязан'),
+        (1, 'Привязан')
+    ]
+
     supplier_id = models.CharField(max_length=64)
     code = models.CharField(max_length=8)
     name = models.CharField(max_length=64)
     deleted = models.BooleanField()
     category = models.ManyToManyField(to=Category)
     friendly_name = models.CharField(max_length=32, null=True)
-    is_revise = models.PositiveSmallIntegerField(null=True)
+    is_revise = models.PositiveSmallIntegerField(default=0, choices=SUPPLIERS_CHOICES)
 
     objects = managers.SupplierManager()
 
@@ -49,10 +63,14 @@ class Product(models.Model):
 
 
 class PaymentType(models.Model):
+    PAYMENT_TYPE_CHOICES = [
+        (0, 'Неактивен'),
+        (1, 'Активен')
+    ]
     payment_id = models.CharField(max_length=64)
     code = models.CharField(max_length=8, null=True)
     name = models.CharField(max_length=64)
-    is_active = models.PositiveSmallIntegerField()
+    is_active = models.PositiveSmallIntegerField(choices=PAYMENT_TYPE_CHOICES)
 
 
 class Discount(models.Model):

@@ -1,6 +1,8 @@
 from apps.iiko.models import Supplier
 from apps.iiko.services.api import IikoService
 
+from core.validators import validate_field
+
 from typing import List
 
 import xml.etree.ElementTree as ET
@@ -42,6 +44,21 @@ class SupplierService:
                 supplier.delete()
 
         return True
+
+    def supplier_edit(self, row_id: str | None, friendly_name: str | None, category: List | None, is_revise: str | None):
+        validate_field(row_id, 'идентификатор')
+        validate_field(category, 'категория')
+
+        row = self.model.objects.filter(id=row_id)
+
+        if row.exists():
+            row = row.first()
+            row.friendly_name = friendly_name
+            row.category.set(category)
+            row.is_revise = 0 if not is_revise else int(is_revise)
+            row.save()
+        else:
+            raise self.model.DoesNotExist(f'Запись в справочнике с идентификатором {row.id} не найдена.')
 
     def suppliers_all(self) -> List[model]:
         return self.model.objects.all()
