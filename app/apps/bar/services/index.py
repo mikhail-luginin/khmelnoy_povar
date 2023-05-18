@@ -69,21 +69,13 @@ class HomePageService:
                     error = True
                     continue
 
-                timetable = Timetable(
+                Timetable.objects.create(
                     date_at=today_date(),
                     storage=storage,
                     employee=employee,
-                    position=position
+                    position=position,
+                    oklad=position.args['oklad']
                 )
-                timetable.oklad = position.args['oklad']
-
-                if 'Повар' in position.name:
-                    if 'Су-Шеф' in employee.job_place.name:
-                        timetable.oklad = employee.job_place.oklad
-                    elif 'Повар' in employee.job_place.name:
-                        timetable.oklad = employee.job_place.oklad
-
-                timetable.save()
 
         if self.validate_today_morning_cashbox(storage) is False:
             sum_cash_morning = request.POST.get('sum_cash_morning')
