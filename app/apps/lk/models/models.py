@@ -46,6 +46,12 @@ class Position(models.Model):
 
 
 class Employee(models.Model):
+    STATUS_CHOICES = [
+        (1, 'Кандидат'),
+        (2, 'Стажер'),
+        (3, 'Сотрудник')
+    ]
+
     code = models.CharField(max_length=64)
     photo = models.IntegerField(default=0)
     fio = models.CharField(max_length=64)
@@ -56,6 +62,7 @@ class Employee(models.Model):
     phone = models.CharField(max_length=11)
     is_deleted = models.PositiveSmallIntegerField(default=0)
     dismiss_date = models.DateField(null=True)
+    status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=3)
 
     objects = managers.EmployeeManager()
 

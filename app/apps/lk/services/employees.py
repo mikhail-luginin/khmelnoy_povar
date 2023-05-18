@@ -31,6 +31,7 @@ class EmployeeService:
         job_id = request.POST.get('job-id')
         storage_id = request.POST.get('storage-id')
         phone = request.POST.get('phone')
+        status = request.POST.get('status')
 
         if self.model.objects.filter(phone__contains=phone[1:9]).exists():
             messages.error(request, 'Данный сотрудник уже добавлен в базу.')
@@ -43,7 +44,8 @@ class EmployeeService:
             birth_date=birth_date,
             address=address,
             job_place=positions.JobsService().job_get(id=job_id),
-            phone=phone
+            phone=phone,
+            status=status
         )
         row.storage = StorageService().storage_get(id=storage_id) if storage_id is not None else StorageService().storage_get(
             code=request.GET.get('code'))
@@ -55,13 +57,14 @@ class EmployeeService:
 
     def employee_edit(self, employee_id: int | None, first_name: str | None, last_name: str | None,
                       birth_date: str | None, address: str | None, job_place_id: int | None,
-                      storage_id: int | None, phone: str | None) -> None:
+                      storage_id: int | None, phone: str | None, status: int | None) -> None:
         validators.validate_field(employee_id, 'идентификатор записи')
         validators.validate_field(first_name, 'имя')
         validators.validate_field(last_name, 'фамилия')
         validators.validate_field(phone, 'телефон')
         validators.validate_field(job_place_id, 'должность')
         validators.validate_field(storage_id, 'заведение')
+        validators.validate_field(status, 'статус')
 
         employee = self.model.objects.filter(id=employee_id)
         if employee.exists():
@@ -71,6 +74,7 @@ class EmployeeService:
             employee.address = address
             employee.job_place_id = job_place_id
             employee.storage_id = storage_id
+            employee.status = status
 
             similar_employee = self.model.objects.filter(phone=phone).exclude(id=employee_id)
             if similar_employee.exists():

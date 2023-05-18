@@ -731,11 +731,12 @@ class EditEmployeeView(ObjectEditMixin):
         job_place_id = request.POST.get('job_place_id')
         storage_id = request.POST.get('storage_id')
         phone = request.POST.get('phone')
+        status = request.POST.get('status')
 
         try:
             EmployeeService().employee_edit(employee_id=employee_id, first_name=first_name, last_name=last_name,
                                             birth_date=birth_date, address=address, job_place_id=job_place_id,
-                                            storage_id=storage_id, phone=phone)
+                                            storage_id=storage_id, phone=phone, status=status)
             messages.success(request, 'Сотрудник успешно отредактирован.')
         except Exception as error:
             messages.error(request, error)

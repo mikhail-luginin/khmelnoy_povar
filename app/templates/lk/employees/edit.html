@@ -49,6 +49,15 @@
                         <label class="form-label">Номер телефона</label>
                         <input type="tel" inputmode="numeric" name="phone" class="form-control" placeholder="Введите номер телефона" autocomplete="off" value="{{ row.phone }}"/>
                     </div>
+                    <div class="mb-4">
+                        <label class="form-label">Статус</label>
+                        <select class="form-select" placeholder="Выберите статус" name="status">
+                            <option></option>
+                            <option value="1" {% if row.status == 1 %}selected{% endif %}>Кандидат</option>
+                            <option value="2" {% if row.status == 2 %}selected{% endif %}>Стажер</option>
+                            <option value="3" {% if row.status == 3 %}selected{% endif %}>Сотрудник</option>
+                        </select>
+                    </div>
                     <div class="mb-1">
                         <button type="submit" class="btn btn-success w-100">Добавить</button>
                     </div>
