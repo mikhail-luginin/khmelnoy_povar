@@ -372,7 +372,7 @@ class EditTimetableView(ObjectEditMixin):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context['storages'] = StorageService().storages_all()
-        context['employees'] = EmployeeService().employees_all(True)
+        context['employees'] = EmployeeService().employees_all(False)
         context['positions'] = JobsService().positions_all()
 
         return context
@@ -566,7 +566,7 @@ class CreatePaysView(ObjectCreateMixin):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context['storages'] = StorageService().storages_all()
-        context['employees'] = EmployeeService().employees_all(True)
+        context['employees'] = EmployeeService().employees_all(False)
         context['pays'] = CatalogService().get_catalog_by_catalog_type_name_in_list(
             [settings.PAYIN_CATEGORY, settings.PAYOUT_CATEGORY])
 
@@ -597,7 +597,7 @@ class EditPaysView(ObjectEditMixin):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context['storages'] = StorageService().storages_all()
-        context['employees'] = EmployeeService().employees_all(True)
+        context['employees'] = EmployeeService().employees_all(False)
         context['pays'] = CatalogService().get_catalog_by_catalog_type_name_in_list(
             [settings.PAYIN_CATEGORY, settings.PAYOUT_CATEGORY])
 
@@ -667,7 +667,7 @@ class EditFinesView(ObjectEditMixin):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context['storages'] = StorageService().storages_all()
-        context['employees'] = EmployeeService().employees_all(True)
+        context['employees'] = EmployeeService().employees_all(False)
         context['reasons'] = CatalogService().get_catalog_by_type(settings.FINE_REASON_CATEGORY)
 
         return context
