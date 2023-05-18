@@ -148,11 +148,15 @@ class SalaryService:
                 row['premium'] = salary.premium
                 data['issued_sum'] = salary.oklad + salary.percent + salary.premium
             else:
-                if (timetable.position.args['is_usil']
-                        or timetable.position.args['is_called']
-                        or 'Повар' in timetable.position.name
-                        or 'служащий' in timetable.position.name) and not timetable.position.args['is_trainee']:
-                    row['oklad'] = timetable.oklad
+                if (timetable.position.args['is_usil'] or timetable.position.args['is_called']) and not timetable.position.args['is_trainee']:
+                    if timetable.employee.job_place.name == 'Повар':
+                        row['oklad'] = 1300
+                    elif timetable.employee.job_place.name == 'Су-Шеф':
+                        row['oklad'] = 1400
+                    elif timetable.employee.job_place.name == 'Тех. служащий':
+                        row['oklad'] = 800
+                    else:
+                        row['oklad'] = timetable.oklad
                 else:
                     row['oklad'] = 0
                 row['percent'] = percent if timetable.position.args['has_percent'] is True else 0
