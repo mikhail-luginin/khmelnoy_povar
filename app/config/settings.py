@@ -162,7 +162,7 @@ TOVAR_WARE_CATEGORY = 'Посуда'
 PAYMENT_TYPE_NAL = 'Наличные'
 PAYMENT_TYPE_BN = 'Бизнес-карта'
 
-PURCHASER_CATEGORY = 'Закупщик'
+PURCHASER_CATEGORY = 'Расходы.Закупщик'
 SALARY_CATEGORY = 'Зарплата'
 
 REDIS_HOST = os.environ.get('REDIS_HOST')
