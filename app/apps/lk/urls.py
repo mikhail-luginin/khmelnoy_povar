@@ -66,6 +66,7 @@ urlpatterns = [
     path('employees', EmployeesView.as_view(), name="employees"),
     path('employees/create', CreateEmployeeView.as_view(), name="create_employee"),
     path('employees/edit', EditEmployeeView.as_view(), name="edit_employee"),
+    path('employees/delete', DeleteEmployeeView.as_view(), name="employee_delete"),
     path('employees/dismiss', DissmissEmployeeView.as_view(), name="dismiss_employee"),
     path('employees/return', ReturnToWorkEmployeeView.as_view(), name="return_employee"),
 

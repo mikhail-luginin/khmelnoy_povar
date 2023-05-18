@@ -1,5 +1,6 @@
 import secrets
 
+from core.exceptions import EmployeeCanNotBeDeletedError
 from core.time import today_date
 from core import validators
 from apps.lk.models import Employee
@@ -78,6 +79,21 @@ class EmployeeService:
             else:
                 employee.phone = phone
                 employee.save()
+        else:
+            raise self.model.DoesNotExist('Запись с указанным идентификатором не найдена.')
+
+    def employee_delete(self, row_id: str | None):
+        validators.validate_field(row_id, 'идентификатор')
+
+        row = self.model.objects.filter(id=row_id)
+
+        if row.exists():
+            row = row.first()
+
+            if row.is_deleted == 1:
+                row.delete()
+            else:
+                raise EmployeeCanNotBeDeletedError("Нельзя удалить сотрудника, если он не уволен")
         else:
             raise self.model.DoesNotExist('Запись с указанным идентификатором не найдена.')
 

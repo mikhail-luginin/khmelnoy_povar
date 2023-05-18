@@ -783,6 +783,16 @@ class EditEmployeeView(ObjectEditMixin):
 
         return redirect('/lk/employees')
 
+class DeleteEmployeeView(ObjectDeleteMixin):
+    def get(self,request):
+        row_id = request.GET.get('id')
+        try:
+            EmployeeService().employee_delete(row_id)
+            messages.success(request, 'Сотрудник успешно удален :)')
+        except exceptions.EmployeeCanNotBeDeletedError as error:
+            messages.error(request, error)
+
+        return redirect('/lk/employees')
 
 class DissmissEmployeeView(BaseLkView):
 

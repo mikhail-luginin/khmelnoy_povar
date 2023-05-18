@@ -8,3 +8,9 @@ class FieldCannotBeEmptyError(Exception):
     """
         Поле не может быть пустым.
     """
+
+
+class EmployeeCanNotBeDeletedError(Exception):
+    """
+        Если сотрудник не уволен.
+    """
