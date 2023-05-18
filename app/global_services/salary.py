@@ -32,7 +32,10 @@ class SalaryService:
 
             if timetable_object.position.args['has_premium']:
                 total_day = today_money['total_day']
-                if timetable_object.date_at.year >= 2023 and timetable_object.date_at.month >= 5:
+                date = str(timetable_object.date_at).split('-')
+                year = int(date[0])
+                month = int(date[1])
+                if year >= 2023 and month >= 5:
                     if 80000 <= total_day < 100000:
                         premium += 500
                     elif 100000 <= total_day < 120000:
