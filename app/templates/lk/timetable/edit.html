@@ -17,7 +17,7 @@
                         <label class="form-label">Сотрудник</label>
                         <select type="text" placeholder="Выберите сотрудника" class="form-select" name="employee_id">
                             {% for employee in employees %}
-                                <option value="{{ employee.id }}" {% if row.employee.id == employee.id %}selected{% endif %}>{{ employee.fio }}</option>
+                                <option value="{{ employee.id }}" {% if row.employee_id == employee.id %}selected{% endif %}>{{ employee.fio }}</option>
                             {% endfor %}
                         </select>
                     </div>
