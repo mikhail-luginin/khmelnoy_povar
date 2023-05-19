@@ -19,6 +19,6 @@ RUN pip install --no-cache-dir -r /temp/requirements.txt
 RUN adduser --disabled-password app-user
 
 COPY app/media /app/media
-RUN chown -R app-user: /app/media/
+RUN chmod -R 777 /app/media/
 
 USER app-user
