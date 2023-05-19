@@ -13,8 +13,7 @@ EXPOSE 8000
 
 RUN apk add mariadb-dev
 RUN apk add --update --no-cache --virtual .tmp-build-deps gcc libc-dev linux-headers
-RUN apt-get update && \
-    apt-get install -y shadow-utils
+RUN apt-get update
 
 
 RUN pip install --no-cache-dir -r /temp/requirements.txt
