@@ -12,12 +12,12 @@ WORKDIR /app
 EXPOSE 8000
 
 RUN apk add mariadb-dev
-RUN apk add --update --no-cache --virtual .tmp-build-deps gcc libc-dev linux-headers passwd
+RUN apk add --update --no-cache --virtual .tmp-build-deps gcc libc-dev linux-headers
 
 RUN pip install --no-cache-dir -r /temp/requirements.txt
 
-RUN adduser --disabled-password app-user
+RUN adduser --disabled-password appuser
 
-RUN usermod -a -G app-user www-data
+RUN chown appuser:appuser -R /app/
 
-USER app-user
+USER appuser
