@@ -50,7 +50,7 @@
                                 let storageCard = $("#list-group_" + storageId);
                                 storageCard.html('')
                                 stoplist.forEach(function(item) {
-                                   storageCard.append('<a class="list-group-item">' + item + '</a>');
+                                   storageCard.append('<a class="list-group-item">' + item["product_name"] + ' (' + item["date_at"] + ')</a>');
                                 });
                             })
                         }
