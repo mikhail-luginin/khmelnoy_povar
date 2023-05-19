@@ -13,6 +13,7 @@ from apps.iiko.services.supplier import SupplierService
 from apps.iiko.services.category import CategoryService
 from apps.iiko.services.payment_type import PaymentTypeService
 from apps.iiko.services.stoplist import StoplistService
+from apps.iiko.services.terminal import TerminalService
 
 
 @login_required
@@ -197,3 +198,13 @@ class StopListUpdateView(BaseLkView):
             response = {"status": False}
 
         return JsonResponse(response, status=200)
+
+
+class TerminalsView(BaseLkView):
+    template_name = 'iiko/terminals.html'
+
+
+def terminals_update_view(request):
+    TerminalService().update()
+    messages.success(request, 'Терминалы успешно обновлены.')
+    return redirect('/iiko/terminals')

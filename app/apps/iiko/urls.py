@@ -24,5 +24,7 @@ urlpatterns = [
     path('storages/update', update_storages_view, name="storages_update"),
 
     path('stoplist', StopListView.as_view()),
-    path('stoplist/update', StopListUpdateView.as_view(), name="stoplist_update")
+    path('stoplist/update', StopListUpdateView.as_view(), name="stoplist_update"),
+
+    path('terminals/update', terminals_update_view, name="terminals_update")
 ]
