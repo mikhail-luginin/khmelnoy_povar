@@ -12,6 +12,7 @@ class Storage(models.Model):
     district = models.CharField(max_length=8)
     is_hide = models.PositiveSmallIntegerField()
     is_office = models.PositiveSmallIntegerField()
+    terminal_ids = models.JSONField(null=True, default=list)
 
 
 class Category(models.Model):
@@ -28,6 +29,7 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class Supplier(models.Model):
     SUPPLIERS_CHOICES = [

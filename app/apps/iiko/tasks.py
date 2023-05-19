@@ -1,47 +1,30 @@
 from django.conf import settings
 
 from apps.bar.models import TovarRequest
+from apps.iiko.services.storage import StorageService
 from config.celery import app
 
 from core.telegram import send_message_to_telegram
-from core.time import today_datetime, today_date
 
-from apps.iiko.models import Storage, Product, StopList
+from apps.iiko.models import Product, StopList
 from apps.iiko.services.api import IikoService
 
 import datetime
-import json
 
 
 @app.task
 def iiko_stoplist_items():
-    json_data = IikoService().get_cashshifts(today_date(), today_date())
-    dict_data = json.loads(json_data)
-    dictionary = dict()
-    for row in dict_data:
-        point_of_sale = row["pointOfSaleId"]
-        try:
-            storage_name = Storage.objects.get(point_of_sale=point_of_sale).name
-        except Storage.DoesNotExist:
-            continue
-        session_number = row["sessionNumber"]
-        dictionary[session_number] = storage_name
-
-    sessions = dictionary
-
     for row in IikoService().get_stop_list_events():
-        storage_name = sessions.get(int(row["session"].split('.')[0]))
-        if storage_name:
+        terminal = row.get('terminal')
+        storage = None
+
+        for st in StorageService().storages_all():
+            if terminal in st.terminal_ids and not storage:
+                storage = st
+
+        if storage:
             date_string = row['date'].split('.')[0]
             date = datetime.datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S')
-
-            try:
-                storage = Storage.objects.get(name=storage_name)
-            except Storage.DoesNotExist:
-                send_message_to_telegram(settings.TELEGRAM_CHAT_ID_FOR_ERRORS,
-                                         f'[CeleryTask: stoplist add ({today_datetime()})] '
-                                         f'Заведение с наименованием {storage_name} не найдено.')
-                continue
 
             product_id = row['productId']
 
