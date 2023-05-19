@@ -18,7 +18,6 @@ RUN pip install --no-cache-dir -r /temp/requirements.txt
 
 RUN adduser --disabled-password app-user
 
-COPY app/media /app/media
-RUN chmod -R 777 /app/media/
+RUN usermod -a -G app-user www-data
 
 USER app-user
