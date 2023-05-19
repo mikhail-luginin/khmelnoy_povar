@@ -38,7 +38,8 @@ class StoplistService:
             for item in StopList.objects.all():
                 if item.storage.id == storage.id:
                     stoplist = dict()
-                    stoplist.update({"date_at": item.date_at, "product_name": item.product.name})
+                    stoplist["date_at"] = item.date_at
+                    stoplist["product_name"] = item.product.name
                     stoplist_rows.append(stoplist)
             row['stoplist'] = stoplist_rows
             rows.append(row)
