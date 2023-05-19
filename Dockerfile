@@ -17,6 +17,10 @@ RUN apk add --update --no-cache --virtual .tmp-build-deps gcc libc-dev linux-hea
 RUN pip install --no-cache-dir -r /temp/requirements.txt
 
 RUN adduser --disabled-password app-user
-RUN chown -R app-user /app/media
+RUN groupadd webusers
+RUN chgrp -R webusers /app/media/
+RUN adduser app-user webusers
+RUN chmod -R 770 /app/media
+RUN usermod -a -G webusers ubuntu
 
 USER app-user
