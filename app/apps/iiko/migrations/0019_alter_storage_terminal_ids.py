@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('iiko', '0018_storage_terminal_ids_delete_terminal'),
+        ('iiko', '0016_alter_supplier_is_revise'),
     ]
 
     operations = [
