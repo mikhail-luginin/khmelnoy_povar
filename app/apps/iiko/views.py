@@ -200,10 +200,6 @@ class StopListUpdateView(BaseLkView):
         return JsonResponse(response, status=200)
 
 
-class TerminalsView(BaseLkView):
-    template_name = 'iiko/terminals.html'
-
-
 def terminals_update_view(request):
     TerminalService().update()
     messages.success(request, 'Терминалы успешно обновлены.')
