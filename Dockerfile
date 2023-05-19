@@ -12,7 +12,7 @@ WORKDIR /app
 EXPOSE 8000
 
 RUN apk add mariadb-dev
-RUN apk add --update --no-cache --virtual .tmp-build-deps gcc libc-dev linux-headers
+RUN apk add --update --no-cache --virtual .tmp-build-deps gcc libc-dev linux-headers passwd
 
 RUN pip install --no-cache-dir -r /temp/requirements.txt
 
