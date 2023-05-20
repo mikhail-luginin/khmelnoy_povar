@@ -41,6 +41,8 @@ def get_main_barmen(date_at: str, storage: Storage) -> Employee | None:
         return Timetable.objects.get(date_at=date_at, storage=storage, position=get_position_main_id(False, 'Бармен')).employee
     except Timetable.DoesNotExist:
         return Timetable.objects.get(date_at=date_at, storage=storage, position=get_position_main_id(True, 'Бармен')).employee
+    except Timetable.MultipleObjectsReturned:
+        return Timetable.objects.filter(date_at=date_at, storage=storage, position=get_position_main_id(True, 'Бармен')).first().employee
 
 
 def get_full_information_of_day(date_at: str, storage: Storage) -> dict:
