@@ -3,15 +3,13 @@
 {% block title %}Редактирование роли{% endblock %}
 {% block page_title %}Редактирование роли{% endblock %}
 
-{% load data_converting %}
-
 {% block body %}
     <div class="container-xl">
         <div class="card rounded-3">
             <div class="card-header card-header-light rounded-top-3"><h3 class="card-title">Редактирование роли {{ row.name }}</h3>
             </div>
             <div class="card-body">
-                <form action="{% url 'Admin:edit_role' %}?id={{ row.id }}" method="post">
+                <form action="{% url 'Admin:role_edit' %}?id={{ row.id }}" method="post">
                     {% csrf_token %}
                     <div class="mb-4">
                         <label class="form-label">Наименование</label>
@@ -23,21 +21,21 @@
                         <div class="row">
                             <div class="col-6">
                                 <label class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="can-all" {% if row.can_all is True %}checked{% endif %}>
+                                    <input class="form-check-input" type="checkbox" name="can-all" {% if row.can_all %}checked{% endif %}>
                                     <span class="form-check-label">Все (доступ ко всему)</span>
                                 </label>
                                 <label class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="can-create" {% if row.can_create is True %}checked{% endif %}>
+                                    <input class="form-check-input" type="checkbox" name="can-create" {% if row.can_create %}checked{% endif %}>
                                     <span class="form-check-label">Создавать</span>
                                 </label>
                             </div>
                             <div class="col-6">
                                 <label class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="can-edit" {% if row.can_edit is True %}checked{% endif %}>
+                                    <input class="form-check-input" type="checkbox" name="can-edit" {% if row.can_edit %}checked{% endif %}>
                                     <span class="form-check-label">Редактировать</span>
                                 </label>
                                 <label class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="can-delete" {% if row.can_delete is True %}checked{% endif %}>
+                                    <input class="form-check-input" type="checkbox" name="can-delete" {% if row.can_delete %}checked{% endif %}>
                                     <span class="form-check-label">Удалять</span>
                                 </label>
                             </div>
@@ -47,7 +45,7 @@
                         <label class="form-label">Страницы</label>
                         <select class="form-select" name="can-view" multiple>
                             {% for page in pages %}
-                                <option value="{{ page.id }}" {% for can_view in row.can_view %}{% if page.id == can_view|convert_int %}selected{% endif %}{% endfor %}>{{ page.text }}</option>
+                                <option value="{{ page.id }}" {% if page in row.can_view.all %}selected{% endif %}>{{ page.text }}</option>
                             {% endfor %}
                         </select>
                     </div>

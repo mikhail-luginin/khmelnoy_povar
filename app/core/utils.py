@@ -5,9 +5,9 @@ from django.http import Http404
 from django.shortcuts import render, redirect
 from django.views import View
 
+from apps.lk.models import Navbar
 from .exceptions import FieldNotFoundError
 from .permissions import CanViewMixin, AccessMixin
-from .time import today_datetime
 from .logs import create_log
 from .profile import get_profile, get_navbar
 
@@ -17,8 +17,8 @@ class BaseLkView(LoginRequiredMixin, CanViewMixin, View):
     template_name = None
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.id is not None:
-            if not self.can_view(request) and request.path != '/lk/' and 'admin' not in request.path:
+        if request.user.id:
+            if not self.can_view(request) and request.path != '/lk/':
                 raise Http404()
 
         return super().dispatch(request, *args, **kwargs)
@@ -27,7 +27,7 @@ class BaseLkView(LoginRequiredMixin, CanViewMixin, View):
         context = dict()
 
         context['profile'] = get_profile(request)
-        context['navbar'] = get_navbar(request.user.id)
+        context['navbar'] = Navbar.objects.all()
 
         context.update(**kwargs)
 
@@ -47,7 +47,7 @@ class ObjectCreateMixin(AccessMixin, BaseLkView):
         return render(request, self.template_name, self.get_context_data(request))
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.id is not None:
+        if request.user.id:
             if not self.has_access(request.user.id):
                 raise PermissionDenied()
 
@@ -60,7 +60,7 @@ class ObjectDeleteMixin(AccessMixin, BaseLkView):
     can_delete = 1
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.id is not None:
+        if request.user.id:
             if not self.has_access(request.user.id):
                 raise PermissionDenied()
 
@@ -90,7 +90,7 @@ class ObjectEditMixin(AccessMixin, BaseLkView):
         row = self.model.objects.filter(id=row_id)
         if row.exists():
             return row.first()
-        raise FieldNotFoundError(f'Запись в справочнике с идентификатором {row.id} не найдена.')
+        raise FieldNotFoundError(f'Запись с указанным идентификатором не найдена.')
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)

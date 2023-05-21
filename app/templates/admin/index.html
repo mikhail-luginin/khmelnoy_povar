@@ -30,8 +30,9 @@
                                     <td>{{ role.can_create }}</td>
                                     <td>{{ role.can_edit }}</td>
                                     <td>{{ role.can_delete }}</td>
-                                    <td>{% for page in role.can_view.all %}{{ page }}, {% endfor %}</td>
-                                    <td>{{ role.actions|safe }}</td>
+                                    <td>{% for page in role.can_view.all %}{{ page.text }}, {% endfor %}</td>
+                                    <td><a href="{% url 'Admin:role_edit' %}?id={{ role.id }}"><i class="fa fa-edit"></i></a>
+                                        <a onclick="delete_confirm('{{ role.id }}', 'Вы действительно хотите удалить роль {{ role.name }}?', '{% url 'Admin:role_delete' %}')"><i class="fa fa-xmark-circle"></i></a></td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -51,18 +52,19 @@
                             <th>Имя пользователя</th>
                             <th>ФИ</th>
                             <th>Почта</th>
-                            <th>Роли</th>
+                            <th>Роль</th>
                             <th></th>
                         </tr>
                         </thead>
                         <tbody>
-                            {% for user in users %}
+                            {% for profile in users %}
                                 <tr>
-                                    <td>{{ user.username }}</td>
-                                    <td>{{ user.flnames }}</td>
-                                    <td>{{ user.email }}</td>
-                                    <td></td>
-                                    <td>{{ user.actions|safe }}</td>
+                                    <td>{{ profile.user.username }}</td>
+                                    <td>{{ profile.user.first_name }} {{ profile.user.last_name }}</td>
+                                    <td>{{ profile.user.email }}</td>
+                                    <td>{{ profile.role.name }}</td>
+                                    <td><a href="{% url 'Admin:user_edit' %}?id={{ profile.id }}"><i class="fa fa-edit"></i></a>
+                                        <a href="#" onclick="delete_confirm('{{ profile.user.id }}', 'Вы действительно хотите удалить пользователя {{ profile.user.username }}?', '{% url 'Admin:user_delete' %}')"><i class="fa fa-user-xmark"></i></a></td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -84,10 +86,12 @@
                         </tr>
                         </thead>
                         <tbody>
-                            {% for page in navbar_all %}
+                            {% for page in pages %}
                                 <tr>
                                     <td>{{ page.text }}</td>
                                     <td>{{ page.link }}</td>
+                                    <td><a href="{% url 'Admin:page_edit' %}?id={{ page.id }}"><i class="fa fa-edit"></i></a>
+                                        <a href="#" onclick="delete_confirm('{{ page.id }}', 'Вы действительно хотите удалить страницу {{ page.text }}?', '{% url 'Admin:page_delete' %}')"><i class="fa fa-xmark-circle"></i></a></td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -101,7 +105,7 @@
                     <div class="card rounded-3">
                         <div class="card-header card-header-light rounded-top-3"><h3 class="card-title">Создание роли</h3></div>
                         <div class="card-body">
-                            <form action="{% url 'Admin:create_role' %}" method="post">
+                            <form action="{% url 'Admin:role_create' %}" method="post">
                                 {% csrf_token %}
                                 <div class="mb-3">
                                     <label class="form-label">Наименование</label>
@@ -136,7 +140,7 @@
                                 <div class="mb-3">
                                     <label class="form-label">Страницы</label>
                                     <select class="form-select" name="can-view" multiple>
-                                        {% for page in navbar_all %}
+                                        {% for page in pages %}
                                             <option value="{{ page.id }}">{{ page.text }}</option>
                                         {% endfor %}
                                     </select>
@@ -152,7 +156,7 @@
                     <div class="card rounded-3">
                         <div class="card-header card-header-light rounded-top-3"><h3 class="card-title">Создать страницу</h3></div>
                         <div class="card-body">
-                            <form id="create-page-form" method="post">
+                            <form action="{% url 'Admin:page_create' %}" method="post">
                                 {% csrf_token %}
                                 <div class="mb-3">
                                     <label class="form-label">Ссылка на страницу (etc. /lk/money)</label>
@@ -186,7 +190,7 @@
                 <div class="card rounded-3">
                     <div class="card-header card-header-light rounded-top-3"><h3 class="card-title">Создание пользователя</h3></div>
                     <div class="card-body">
-                        <form id="create-user-form" method="post">
+                        <form action="{% url 'Admin:user_create' %}" method="post">
                             {% csrf_token %}
                             <div class="mb-3">
                                 <label class="form-label">Имя пользователя</label>
@@ -216,7 +220,7 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Роль</label>
-                                <select class="form-select" name="roles" multiple>
+                                <select class="form-select" name="role">
                                     {% for role in roles %}
                                         <option value="{{ role.id }}">{{ role.name }}</option>
                                     {% endfor %}

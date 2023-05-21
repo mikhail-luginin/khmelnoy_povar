@@ -16,7 +16,6 @@ DEBUG = bool(int(os.environ.get('DEBUG')))
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(' ')
 
 DJANGO_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -29,7 +28,8 @@ LOCAL_APPS = [
     'apps.iiko.apps.IikoConfig',
     'apps.repairer.apps.RepairerConfig',
     'apps.api.apps.ApiConfig',
-    'apps.purchaser.apps.PurchaserConfig'
+    'apps.purchaser.apps.PurchaserConfig',
+    'apps.admin.apps.AdminConfig'
 ]
 THIRD_PARTY_APPS = [
     'rest_framework'
