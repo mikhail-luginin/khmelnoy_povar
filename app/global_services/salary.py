@@ -31,7 +31,7 @@ class SalaryService:
                 percent += round(today_money['sum_for_percent'] * (percent_num / 100))
 
             if timetable_object.position.args['has_premium']:
-                total_day = today_money['total_day']
+                total_day = today_money['total_day'] if timetable_object.employee.job_place.name != 'Бармен' else today_money['sum_for_percent']
                 date = str(timetable_object.date_at).split('-')
                 year = int(date[0])
                 month = int(date[1])
