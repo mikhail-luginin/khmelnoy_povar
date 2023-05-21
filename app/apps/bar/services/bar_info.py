@@ -29,18 +29,17 @@ def get_position_main_id(is_called: bool, job_name: str) -> int:
 
 
 def get_main_barmen(date_at: str, storage: Storage) -> Employee | None:
-    if Timetable.objects.filter(date_at=date_at,
+    qs = Timetable.objects.filter(date_at=date_at,
                                 storage=storage,
                                 position_id__in=[
                                     get_position_main_id(False, 'Бармен'),
                                     get_position_main_id(True, 'Бармен')
-                                ]).exists() is False:
+                                ])
+    if qs.exists():
+        row = qs.first()
+        return row.employee
+    else:
         return None
-
-    return Timetable.objects.filter(date_at=date_at,
-                                    storage=storage,
-                                    position_id__in=[get_position_main_id(True, 'Бармен'),
-                                                     get_position_main_id(False, 'Бармен')]).first().employee
 
 
 def get_full_information_of_day(date_at: str, storage: Storage) -> dict:
