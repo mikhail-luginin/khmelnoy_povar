@@ -41,14 +41,14 @@
                     <span class="avatar avatar-sm"></span>
                     <div class="d-none d-xl-block ps-2">
                         <div>{{ request.user.first_name }} {{ request.user.last_name }}</div>
-                        <div class="mt-1 small text-muted">{{ profile.roles }}</div>
+                        <div class="mt-1 small text-muted">{{ profile.role.name }}</div>
                     </div>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <a href="#" class="dropdown-item">Профиль</a>
                     {% if request.user.is_superuser == 1 %}
                         <div class="dropdown-divider"></div>
-{#                        <a href="{% url 'Admin:index' %}" class="dropdown-item">Админ-панель</a>#}
+                        <a href="{% url 'Admin:index' %}" class="dropdown-item">Админ-панель</a>
                     {% endif %}
                     <div class="dropdown-divider"></div>
                     <a href="{% url 'logout' %}" class="dropdown-item">Выйти</a>
@@ -132,7 +132,7 @@
                             <div class="dropdown-menu-columns">
                                 <div class="dropdown-menu-column">
                                     {% for item in navbar %}
-                                        {% if item.app_name == 'lk' %}
+                                        {% if item.app_name == 'lk' and item in profile.role.can_view.all %}
                                             <a class="dropdown-item" href="{{ item.link }}">
                                                 {{ item.text }}
                                             </a>
