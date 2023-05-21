@@ -6,7 +6,7 @@ from core.time import today_date, get_current_time
 from .bar_info import get_main_barmen
 
 from apps.bar.models import Timetable, Position, Money
-from apps.lk.models import Employee
+from apps.lk.models import Employee, JobPlace
 
 from apps.iiko.services.storage import StorageService
 
@@ -69,12 +69,14 @@ class HomePageService:
                     error = True
                     continue
 
+                oklad = employee.job_place.gain_shift_oklad if position.args['is_usil'] else employee.job_place.main_shift_oklad
+
                 Timetable.objects.create(
                     date_at=today_date(),
                     storage=storage,
                     employee=employee,
                     position=position,
-                    oklad=position.args['oklad']
+                    oklad=oklad
                 )
 
         if self.validate_today_morning_cashbox(storage) is False:
