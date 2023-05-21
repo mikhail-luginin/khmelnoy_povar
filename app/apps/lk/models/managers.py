@@ -10,7 +10,7 @@ class RoleManager(models.Manager):
 class ProfileManager(models.Manager):
 
     def get_queryset(self):
-        return super().get_queryset().select_related('user').prefetch_related('roles')
+        return super().get_queryset().select_related('user', 'role')
 
 
 class PositionManager(models.Manager):
