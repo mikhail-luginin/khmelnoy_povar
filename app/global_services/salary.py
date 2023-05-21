@@ -154,6 +154,8 @@ class SalaryService:
                         or 'служащий' in timetable.position.name) and not timetable.position.args['is_trainee']:
                     if 'служащий' in timetable.position.name and not timetable.position.args['is_called']:
                         row['oklad'] = 800
+                    elif 'овар' in timetable.position.name and not timetable.position.args['is_called']:
+                        row['oklad'] = timetable.employee.job_place.gain_shift_oklad
                     else:
                         row['oklad'] = timetable.oklad
                 else:
