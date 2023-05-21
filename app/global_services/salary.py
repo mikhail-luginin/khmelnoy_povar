@@ -152,7 +152,10 @@ class SalaryService:
                         or timetable.position.args['is_called']
                         or 'овар' in timetable.position.name
                         or 'служащий' in timetable.position.name) and not timetable.position.args['is_trainee']:
-                    row['oklad'] = timetable.oklad
+                    if 'служащий' in timetable.position.name and not timetable.position.args['is_called']:
+                        row['oklad'] = 800
+                    else:
+                        row['oklad'] = timetable.oklad
                 else:
                     row['oklad'] = 0
                 row['percent'] = percent if timetable.position.args['has_percent'] is True else 0
