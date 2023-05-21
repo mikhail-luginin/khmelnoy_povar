@@ -23,7 +23,7 @@ def get_bar_settings() -> Setting:
 def get_position_main_id(is_called: bool, job_name: str) -> int:
     job = JobPlace.objects.get(name=job_name)
     for position in Position.objects.all():
-        if position.args['is_usil'] is False and position.args['is_trainee'] is False and position.args['is_called'] is is_called:
+        if not position.args['is_usil'] and not position.args['is_trainee'] and position.args['is_called'] is is_called:
             if job in position.linked_jobs.all():
                 return position.id
 
@@ -37,12 +37,10 @@ def get_main_barmen(date_at: str, storage: Storage) -> Employee | None:
                                 ]).exists() is False:
         return None
 
-    try:
-        return Timetable.objects.get(date_at=date_at, storage=storage, position=get_position_main_id(False, 'Бармен')).employee
-    except Timetable.DoesNotExist:
-        return Timetable.objects.get(date_at=date_at, storage=storage, position=get_position_main_id(True, 'Бармен')).employee
-    except Timetable.MultipleObjectsReturned:
-        return Timetable.objects.filter(date_at=date_at, storage=storage, position=get_position_main_id(True, 'Бармен')).first().employee
+    return Timetable.objects.filter(date_at=date_at,
+                                    storage=storage,
+                                    position_id__in=[get_position_main_id(True, 'Бармен'),
+                                                     get_position_main_id(False, 'Бармен')]).first().employee
 
 
 def get_full_information_of_day(date_at: str, storage: Storage) -> dict:
