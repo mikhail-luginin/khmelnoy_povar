@@ -31,7 +31,7 @@ class SalaryService:
                 percent += round(today_money['sum_for_percent'] * (percent_num / 100))
 
             if timetable_object.position.args['has_premium']:
-                total_day = today_money['total_day']
+                total_day = today_money['total_day'] if timetable_object.employee.job_place.name != 'Бармен' else today_money['sum_for_percent']
                 date = str(timetable_object.date_at).split('-')
                 year = int(date[0])
                 month = int(date[1])
@@ -148,16 +148,14 @@ class SalaryService:
                 row['premium'] = salary.premium
                 data['issued_sum'] += salary.oklad + salary.percent + salary.premium
             else:
-                if (timetable.position.args['is_usil']
-                        or timetable.position.args['is_called']
+                if (timetable.position.args['is_called']
+                        or timetable.position.args['is_usil']
                         or 'овар' in timetable.position.name
                         or 'служащий' in timetable.position.name) and not timetable.position.args['is_trainee']:
-                    if timetable.employee.job_place.name == 'Повар' and timetable.position.args['is_called'] is False:
-                        row['oklad'] = 1300
-                    elif timetable.employee.job_place.name == 'Су-Шеф' and timetable.position.args['is_called'] is False:
-                        row['oklad'] = 1400
-                    elif timetable.employee.job_place.name == 'Тех. служащий' and timetable.position.args['is_called'] is False:
+                    if 'служащий' in timetable.position.name and not timetable.position.args['is_called']:
                         row['oklad'] = 800
+                    elif 'овар' in timetable.position.name and not timetable.position.args['is_called']:
+                        row['oklad'] = timetable.employee.job_place.gain_shift_oklad
                     else:
                         row['oklad'] = timetable.oklad
                 else:

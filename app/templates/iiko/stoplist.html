@@ -13,7 +13,7 @@
                     <div class="data-card" style="">
                         <div class="list-group list-group-flush" id="list-group_{{ row.storage_id }}">
                             {% for item in row.stoplist %}
-                                <a class="list-group-item">{{ item }}</a>
+                                <a class="list-group-item">{{ item.product_name }} ({{ item.date_at|date:'F d G:i' }})</a>
                             {% endfor %}
                         </div>
                     </div>
@@ -50,7 +50,7 @@
                                 let storageCard = $("#list-group_" + storageId);
                                 storageCard.html('')
                                 stoplist.forEach(function(item) {
-                                   storageCard.append('<a class="list-group-item">' + item + '</a>');
+                                   storageCard.append('<a class="list-group-item">' + item["product_name"] + ' (' + item["date_at"] + ')</a>');
                                 });
                             })
                         }
