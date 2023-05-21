@@ -80,9 +80,6 @@ class HomePageService:
         if self.validate_today_morning_cashbox(storage) is False:
             sum_cash_morning = request.POST.get('sum_cash_morning')
             if sum_cash_morning:
-                if not get_main_barmen(today_date(), storage):
-                    messages.error(request, 'Основной бармен не указан.')
-                    return redirect('/bar?code=' + storage.code)
                 Money.objects.create(date_at=today_date(), storage=storage,
                                      sum_cash_morning=sum_cash_morning)
 

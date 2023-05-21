@@ -65,7 +65,7 @@ class ExpensesPageService:
             expense_sum = request.POST.get(f'sum[{row.id}]')
             if len(expense_sum) > 0:
                 Expense.objects.create(
-                    writer=barmen.fio if barmen else 'Основной бармен не указан',
+                    writer=storage.name + ' CRM',
                     date_at=today_date(),
                     storage=storage,
                     expense_type=row,
