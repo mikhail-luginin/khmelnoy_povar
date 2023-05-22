@@ -17,6 +17,7 @@ from .services.employees import EmployeeService
 from .services.expenses import ExpenseService
 from .services.pays import PaysService
 from .services.fines import FineService
+from .services.index_page import IndexPageService
 
 from apps.iiko.services.storage import StorageService
 
@@ -30,6 +31,14 @@ from .tasks import calculate_percent_premium_for_all
 
 class IndexView(BaseLkView):
     template_name = 'lk/index.html'
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context.update({
+            "employees_data": IndexPageService().employees_by_storages()
+        })
+
+        return context
 
 
 class CatalogView(BaseLkView):

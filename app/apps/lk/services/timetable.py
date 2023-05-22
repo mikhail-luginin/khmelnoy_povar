@@ -65,3 +65,6 @@ class TimetableService:
             timetable.save()
         else:
             raise self.model.DoesNotExist('Запись с указанным идентификатором не найдена.')
+
+    def is_employee_work_on_date(self, employee_id: int, date_at: str) -> bool:
+        return self.model.objects.filter(employee_id=employee_id, date_at=date_at).exists()

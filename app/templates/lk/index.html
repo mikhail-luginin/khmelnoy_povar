@@ -5,4 +5,20 @@
 {% block page_title %}Главная{% endblock %}
 
 {% block body %}
+    <div class="container-xl">
+        <div class="row">
+            {% for data in employees_data %}
+                <div class="col-3">
+                    <div class="card rounded-3">
+                        <div class="card-header card-header-light">{{ data.storage.name }}</div>
+                        <div class="card-body">
+                            {% for row in data.employees %}
+                                <p {% if row.work_now %}class="text-success"{% endif %}>{{ row.employee.fio }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}
