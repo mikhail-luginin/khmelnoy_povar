@@ -28,8 +28,7 @@
                     </div>
                     <div class="mb-4">
                     <label class="form-label">Тип расчета</label>
-                        <select class="form-select" name="expense_type" multiple>
-                        <option value="">Выберите или оставьте пустым</option>
+                        <select class="form-select" name="expense_type" multiple placeholder="Выберите или оставьте пустым">
                             <option></option>
                             {% for type in expense_type %}
                                 <option value="{{ type.id }}" {% if type in row.expense_type.all %}selected{% endif %}>{{ type.name }}</option>
@@ -38,9 +37,8 @@
                     </div>
                     <div class="mb-4">
                         <label class="form-label">Заведение</label>
-                        <select class="form-select" name="storage_id" multiple>
+                        <select class="form-select" name="storage_id" multiple placeholder="Выберите или оставьте пустым">
                             <option></option>
-                            <option value="">Выберите или оставьте пустым</option>
                             {% for storage in storages %}
                                 <option value="{{ storage.id }}" {% if storage in row.storages.all %}selected{% endif %}>{{ storage.name }}</option>
                             {% endfor %}
