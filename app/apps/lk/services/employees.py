@@ -18,7 +18,7 @@ class EmployeeService:
     model = Employee
 
     def employees_all(self, is_deleted: bool, **kwargs) -> List[model]:
-        return self.model.objects.all() if is_deleted is False else self.model.objects.filter(is_deleted=1, **kwargs)
+        return self.model.objects.filter(is_deleted=0, **kwargs) if is_deleted is False else self.model.objects.filter(is_deleted=1, **kwargs)
 
     def employee_get(self, employee_id) -> model:
         return self.model.objects.get(id=employee_id)
