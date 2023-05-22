@@ -12,24 +12,35 @@
                     <div class="card rounded-3 mb-4">
                         <div class="card-header card-header-light"><b>{{ data.storage.name }}</b></div>
                         <div class="list-group list-group-flush">
-                            <div class="list-group-header sticky-top"><b>Бармены</b></div>
                             {% for row in data.barmens %}
-                                <a class="list-group-item list-group-item-action {% if row.work_now %}bg-success-lt{% elif row.employee.status == 2 %}bg-danger-lt{% elif row.employee.status == 2 and row.work_now %}bg-primary-lt{% endif %}">{{ row.employee.fio }}</a>
-                            {% endfor %}
-                            <div class="list-group-header sticky-top"><b>Повара</b></div>
-                            {% for row in data.cookers %}
-                                <a class="list-group-item list-group-item-action {% if row.work_now %}bg-success-lt{% elif row.employee.status == 2 %}bg-danger-lt{% elif row.employee.status == 2 and row.work_now %}bg-primary-lt{% endif %}">
+                                <a class="list-group-item list-group-item-action {% if row.work_now %}text-success{% elif row.employee.status == 2 %}text-danger{% endif %}">
                                     <div class="text-truncate">
-                                        {{ row.employee.fio }}
+                                        <i class="fa fa-beer-mug-empty"></i> {{ row.employee.fio }}
                                     </div>
                                     <div class="text-muted">
                                         {% if row.work_now %}{{ row.work_now.position.name }}{% endif %}
                                     </div>
                                 </a>
                             {% endfor %}
-                            <div class="list-group-header sticky-top"><b>Тех. служащие</b></div>
+                            {% for row in data.cookers %}
+                                <a class="list-group-item list-group-item-action {% if row.work_now %}text-success{% elif row.employee.status == 2 %}text-danger{% endif %}">
+                                    <div class="text-truncate">
+                                        <i class="fa fa-bell-concierge"></i> {{ row.employee.fio }}
+                                    </div>
+                                    <div class="text-muted">
+                                        {% if row.work_now %}{{ row.work_now.position.name }}{% endif %}
+                                    </div>
+                                </a>
+                            {% endfor %}
                             {% for row in data.teh %}
-                                <a class="list-group-item list-group-item-action {% if row.work_now %}bg-success-lt{% elif row.employee.status == 2 %}bg-danger-lt{% elif row.employee.status == 2 and row.work_now %}bg-primary-lt{% endif %}">{{ row.employee.fio }}</a>
+                                <a class="list-group-item list-group-item-action {% if row.work_now %}text-success{% elif row.employee.status == 2 %}text-danger{% endif %}">
+                                    <div class="text-truncate">
+                                        <i class="fa fa-broom"></i> {{ row.employee.fio }}
+                                    </div>
+                                    <div class="text-muted">
+                                        {% if row.work_now %}{{ row.work_now.position.name }}{% endif %}
+                                    </div>
+                                </a>
                             {% endfor %}
                         </div>
                     </div>
