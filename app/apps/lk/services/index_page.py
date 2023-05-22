@@ -21,7 +21,8 @@ class IndexPageService:
             for employee in EmployeeService().employees_all(False, storage=storage):
                 data = {
                     "employee": employee,
-                    "work_now": TimetableService().is_employee_work_on_date(employee_id=employee.id, date_at=today_date())
+                    "work_now": TimetableService().is_employee_work_on_date(employee_id=employee.id, date_at=today_date(),
+                                                                            get_object=True)
                 }
 
                 match employee.job_place.name:

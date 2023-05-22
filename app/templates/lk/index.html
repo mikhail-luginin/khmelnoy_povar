@@ -9,20 +9,27 @@
         <div class="row">
             {% for data in employees_data %}
                 <div class="col-3 columns_w_data">
-                    <div class="card rounded-3">
-                        <div class="card-header card-header-light">{{ data.storage.name }}</div>
+                    <div class="card rounded-3 mb-4">
+                        <div class="card-header card-header-light"><b>{{ data.storage.name }}</b></div>
                         <div class="list-group list-group-flush">
                             <div class="list-group-header sticky-top"><b>Бармены</b></div>
                             {% for row in data.barmens %}
-                                <a class="list-group-item list-group-item-action {% if row.work_now %}bg-success-lt{% elif row.employee.status == 2 %}bg-danger-lt{% elif row.employee.status == 2 and row.work_now %}bg-primary-lt{% endif %}"><b>{{ row.employee.fio }}</b></a>
+                                <a class="list-group-item list-group-item-action {% if row.work_now %}bg-success-lt{% elif row.employee.status == 2 %}bg-danger-lt{% elif row.employee.status == 2 and row.work_now %}bg-primary-lt{% endif %}">{{ row.employee.fio }}</a>
                             {% endfor %}
                             <div class="list-group-header sticky-top"><b>Повара</b></div>
-                            {% for row in job.cookers %}
-                                <a class="list-group-item list-group-item-action">{{ row.employee.fio }}</a>
+                            {% for row in data.cookers %}
+                                <a class="list-group-item list-group-item-action {% if row.work_now %}bg-success-lt{% elif row.employee.status == 2 %}bg-danger-lt{% elif row.employee.status == 2 and row.work_now %}bg-primary-lt{% endif %}">
+                                    <div class="text-truncate">
+                                        {{ row.employee.fio }}
+                                    </div>
+                                    <div class="text-muted">
+                                        {% if row.work_now %}{{ row.work_now.position.name }}{% endif %}
+                                    </div>
+                                </a>
                             {% endfor %}
                             <div class="list-group-header sticky-top"><b>Тех. служащие</b></div>
-                            {% for row in job.teh %}
-                                <a class="list-group-item list-group-item-action">{{ row.employee.fio }}</a>
+                            {% for row in data.teh %}
+                                <a class="list-group-item list-group-item-action {% if row.work_now %}bg-success-lt{% elif row.employee.status == 2 %}bg-danger-lt{% elif row.employee.status == 2 and row.work_now %}bg-primary-lt{% endif %}">{{ row.employee.fio }}</a>
                             {% endfor %}
                         </div>
                     </div>
