@@ -230,12 +230,14 @@ class InventoryMixin(BaseView):
             for product in item.findall('product'):
                 name = product.find('name').text
                 code = product.find('code').text
+                if code:
+                    code = int(code)
             expected_amount = item.find('expectedAmount').text
-            count = request.POST.get(code) if request.POST.get(code) != '' else '0'
+            count = request.POST.get(str(code))
             difference = int(count) - int(round(float(expected_amount)))
             row[name] = {'fact': count, 'iiko': int(round(float(expected_amount))), 'difference': difference}
             if difference < 0:
-                message_body += f'{name}: [факт: {count}, iiko: {int(round(float(expected_amount)))}, difference: {difference}]\n'
+                message_body += f'{name}: [разница: {difference}]\n'
         if message_body != '':
             message = message_header + message_body
             send_message_to_telegram(chat_id='-619967297', message=message)

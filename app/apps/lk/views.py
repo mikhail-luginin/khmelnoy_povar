@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.http import HttpResponse
 from django.shortcuts import redirect
 
 from core.utils import BaseLkView, ObjectEditMixin, ObjectCreateMixin, ObjectDeleteMixin
@@ -12,6 +13,9 @@ from .services.bank import StatementUpdateService, CardService
 from .services.money import MoneyService
 from .services.employees import EmployeeService
 from .services.expenses import ExpenseService
+from .services.pays import PaysService
+from .services.fines import FineService
+from .services.index_page import IndexPageService
 
 from apps.iiko.services.storage import StorageService
 
@@ -23,6 +27,14 @@ from .services.timetable import TimetableService
 
 class IndexView(BaseLkView):
     template_name = 'lk/index.html'
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context.update({
+            "employees_data": IndexPageService().employees_by_storages()
+        })
+
+        return context
 
 
 class CatalogView(BaseLkView):
@@ -129,7 +141,18 @@ class PositionDeleteView(ObjectDeleteMixin):
 class JobAddView(BaseLkView):
 
     def post(self, request):
-        return JobsService().job_create(request)
+        job_name = request.POST.get('job-name')
+        job_gain_oklad = request.POST.get('job-gain-oklad')
+        job_main_oklad = request.POST.get('job-main-oklad')
+
+        try:
+            JobsService().job_create(job_name=job_name, job_gain_oklad=job_gain_oklad,
+                                     job_main_oklad=job_main_oklad)
+            messages.success(request, 'Должность успешно создана.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/positions')
 
 
 class BankView(BaseLkView):

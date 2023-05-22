@@ -5,4 +5,58 @@
 {% block page_title %}Главная{% endblock %}
 
 {% block body %}
+    <div class="container-xl">
+        <div class="row">
+            {% for data in employees_data %}
+                <div class="col-3 columns_w_data">
+                    <div class="card rounded-3 mb-4">
+                        <div class="card-header card-header-light"><b>{{ data.storage.name }}</b> ({{ date }})</div>
+                        <div class="list-group list-group-flush">
+                            {% for row in data.barmens %}
+                                <a class="list-group-item list-group-item-action {% if row.employee.status == 2 %}text-danger{% elif row.work_now %}{% if row.work_now.position.args.is_called %}text-primary{% else %}text-success{% endif %}{% endif %}">
+                                    <div class="text-truncate">
+                                        <i class="fa fa-beer-mug-empty"></i> {{ row.employee.fio }}
+                                    </div>
+                                    <div class="text-muted">
+                                        {% if row.work_now %}{% if row.work_now.position.args.is_called %}{{ row.work_now.position.name }} ({{ row.work_now.storage.district }}){% else %}{{ row.work_now.position.name }}{% endif %}{% endif %}
+                                    </div>
+                                </a>
+                            {% endfor %}
+                            {% for row in data.cookers %}
+                                <a class="list-group-item list-group-item-action {% if row.employee.status == 2 %}text-danger{% elif row.work_now %}{% if row.work_now.position.args.is_called %}text-primary{% else %}text-success{% endif %}{% endif %}">
+                                    <div class="text-truncate">
+                                        <i class="fa fa-bell-concierge"></i> {{ row.employee.fio }}
+                                    </div>
+                                    <div class="text-muted">
+                                        {% if row.work_now %}{% if row.work_now.position.args.is_called %}{{ row.work_now.position.name }} ({{ row.work_now.storage.district }}){% else %}{{ row.work_now.position.name }}{% endif %}{% endif %}
+                                    </div>
+                                </a>
+                            {% endfor %}
+                            {% for row in data.teh %}
+                                <a class="list-group-item list-group-item-action {% if row.employee.status == 2 %}text-danger{% elif row.work_now %}{% if row.work_now.position.args.is_called %}text-primary{% else %}text-success{% endif %}{% endif %}">
+                                    <div class="text-truncate">
+                                        <i class="fa fa-broom"></i> {{ row.employee.fio }}
+                                    </div>
+                                    <div class="text-muted">
+                                        {% if row.work_now %}{% if row.work_now.position.args.is_called %}{{ row.work_now.position.name }} ({{ row.work_now.storage.district }}){% else %}{{ row.work_now.position.name }}{% endif %}{% endif %}
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(document).ready(function () {
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i
+                .test(navigator.userAgent)) {
+                $('.columns_w_data').attr('class', 'col-12')
+            }
+        })
+    </script>
 {% endblock %}

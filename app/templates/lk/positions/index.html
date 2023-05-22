@@ -54,7 +54,8 @@
                     <thead>
                     <tr>
                         <th>Должность</th>
-                        <th>Оклад</th>
+                        <th>Оклад в основную</th>
+                        <th>Оклад в усиление</th>
                         <th></th>
                     </tr>
                     </thead>
@@ -182,8 +183,12 @@
                                        placeholder="Введите наименование должности" required>
                             </div>
                             <div class="col">
-                                <label class="form-label">Оклад</label>
-                                <input type="tel" inputmode="numeric" class="form-control" name="job-oklad">
+                                <label class="form-label">Оклад в усиление</label>
+                                <input type="tel" inputmode="numeric" class="form-control" name="job-gain-oklad">
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Оклад в основную</label>
+                                <input type="tel" inputmode="numeric" class="form-control" name="job-main-oklad">
                             </div>
                         </div>
                     </div>
@@ -205,7 +210,7 @@
                 return false;
             } else document.getElementById('position-add-ctrl-alert').setAttribute('style', '')
             var table = run_datatable('table', '/api/positions', '/lk/positions', [{data: 'name'}, {data: 'oklad'}])
-            var table2 = run_datatable('table2', '/api/jobplaces', '/lk/jobs', [{data: 'name'}, {data: 'oklad'}])
+            var table2 = run_datatable('table2', '/api/jobplaces', '/lk/jobs', [{data: 'name'}, {data: 'main_shift_oklad'}, {data: 'gain_shift_oklad'}])
         });
     </script>
 {% endblock %}

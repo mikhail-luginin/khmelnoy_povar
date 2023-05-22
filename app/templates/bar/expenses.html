@@ -11,7 +11,7 @@
                     {% for row in rows %}
                     <tr
                         onclick="delete_confirm('{{ row.id }}', 'Вы действительно хотите удалить этот расход?<br><br>({{ row.expense_type.name }} - {{ row.sum }})', '/bar/expenses/delete')">
-                        <td>{{ row.expense_type.name }} ({{ row.expense_source.name }})<br><span class="text-secondary">{{ row.comment }}</span></td>
+                        <td>{% if row.expense_source.name == 'Наличные' %}<i class="fa fa-money-bill"></i>{% elif row.expense_source.name == 'Бизнес-карта' %}<i class="fa fa-credit-card"></i>{% endif %} {{ row.expense_type.name }} ({{ row.expense_source.name }})<br><span class="text-secondary">{{ row.comment }}</span></td>
                         <td>{{ row.sum }}</td>
                     </tr>
                     {% endfor %}
@@ -70,8 +70,8 @@
                 <thead>
                     <tr>
                         <th>Тип</th>
-                        <th>Сумма</th>
                         <th>Комментарий</th>
+                        <th>Сумма</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -79,8 +79,8 @@
                     <tr
                         onclick="delete_confirm('{{ row.id }}', 'Вы действительно хотите удалить эту запись?', '/bar/pays/delete')">
                         <td>{{ row.get_type_display }}</td>
-                        <td>{{ row.sum }}</td>
                         <td>{{ row.comment }}</td>
+                        <td>{{ row.sum }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -98,7 +98,7 @@
                                 placeholder="Сумма">
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mb-2">
                         <div class="col-4">Закупщик</div>
                         <div class="col-4">
                             <input class="form-control date-at" name="purchaser_comment" placeholder="Дата">

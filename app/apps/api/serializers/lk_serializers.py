@@ -46,13 +46,18 @@ class PositionSerializer(serializers.ModelSerializer):
 class EmployeeSerializer(serializers.ModelSerializer):
     job = serializers.CharField(source='job_place.name')
     storage_name = serializers.CharField(source='storage.name')
-    status = serializers.SerializerMethodField()
+    active_status = serializers.SerializerMethodField()
+    status = serializers.CharField(source='get_status_display')
+    employee_fio = serializers.SerializerMethodField()
 
-    def get_status(self, obj):
+    def get_active_status(self, obj):
         if obj.is_deleted == 0:
             return 'Активный'
         else:
             return f'Уволен ({obj.dismiss_date})'
+
+    def get_employee_fio(self, obj):
+        return f'<a href="/bar/employee?employee_code={obj.code}">{obj.fio}</a>'
 
     class Meta:
         model = Employee

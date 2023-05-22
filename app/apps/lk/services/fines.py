@@ -1,3 +1,4 @@
+from apps.bar.models import Timetable
 from core import validators
 
 from apps.lk.models import Fine
@@ -25,6 +26,12 @@ class FineService:
             reason_id=reason_id
         )
 
+        timetable = Timetable.objects.filter(date_at=date_at, employee_id=employee_id)
+        if timetable.exists():
+            timetable = timetable.first()
+            timetable.fine += fine_sum
+            timetable.save()
+
     def edit(self, fine_id: int | None, date_at: str | None,
              employee_id: int | None, fine_sum: int | None, reason_id: int | None) -> None:
         validators.validate_field(fine_id, 'идентификатор записи')
@@ -41,5 +48,11 @@ class FineService:
             fine.sum = fine_sum
             fine.reason_id = reason_id
             fine.save()
+
+            timetable = Timetable.objects.filter(date_at=date_at, employee_id=employee_id)
+            if timetable.exists():
+                timetable = timetable.first()
+                timetable.fine += fine_sum
+                timetable.save()
         else:
             raise self.model.DoesNotExist('Запись с указанным идентификатором не найдена.')

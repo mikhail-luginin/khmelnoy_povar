@@ -41,10 +41,10 @@ class IikoService:
         return self._iiko_request('/resto/api/v2/entities/list', '&rootType=PaymentType').text
 
     def get_suppliers(self):
-        return self._iiko_request('/resto/api/suppliers')
+        return self._iiko_request('/resto/api/suppliers').text
 
     def get_categories(self):
-        return self._iiko_request('/resto/api/v2/entities/products/category/list')
+        return self._iiko_request('/resto/api/v2/entities/products/category/list').text
 
     def get_cashshifts(self, date_from: str, date_to: str) -> str:
         return self._iiko_request('/resto/api/v2/cashshifts/list',
