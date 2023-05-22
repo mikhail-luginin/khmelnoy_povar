@@ -10,6 +10,7 @@ from .exceptions import FieldNotFoundError
 from .permissions import CanViewMixin, AccessMixin
 from .logs import create_log
 from .profile import get_profile, get_navbar
+from .time import today_date
 
 
 class BaseLkView(LoginRequiredMixin, CanViewMixin, View):
@@ -28,6 +29,7 @@ class BaseLkView(LoginRequiredMixin, CanViewMixin, View):
 
         context['profile'] = get_profile(request)
         context['navbar'] = Navbar.objects.all()
+        context['date'] = today_date()
 
         context.update(**kwargs)
 
