@@ -1,10 +1,14 @@
-window.confirm = (message) => {
+window.confirm = (message, btn_text=false) => {
         var PromiseConfirm = $('#PromiseConfirm').modal({
             keyboard: false,
             backdrop: 'static'
         }).modal('show');
         let confirm = false;
-        $('#confirm-delete1').on('click', e => {
+        let confirm_button_selector = $('#confirm-delete1')
+        if(btn_text !== false) {
+            confirm_button_selector.html(btn_text)
+        }
+        confirm_button_selector.on('click', e => {
             confirm = true;
         });
         $('#confirm-text').html(message)
