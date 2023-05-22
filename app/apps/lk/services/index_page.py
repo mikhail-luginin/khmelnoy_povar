@@ -13,7 +13,9 @@ class IndexPageService:
         for storage in storages:
             row = {
                 "storage": storage,
-                "employees": []
+                "barmens": [],
+                "cookers": [],
+                "teh": []
             }
 
             for employee in EmployeeService().employees_all(False, storage=storage):
@@ -21,7 +23,17 @@ class IndexPageService:
                     "employee": employee,
                     "work_now": TimetableService().is_employee_work_on_date(employee_id=employee.id, date_at=today_date())
                 }
-                row['employees'].append(data)
+
+                match employee.job_place.name:
+                    case 'Бармен':
+                        key = 'barmens'
+                    case 'Повар' | 'Су-Шеф':
+                        key = 'cookers'
+                    case 'Тех. служащий':
+                        key = 'teh'
+                    case _:
+                        continue
+                row[key].append(data)
 
             rows.append(row)
 

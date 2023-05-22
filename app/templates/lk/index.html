@@ -8,12 +8,21 @@
     <div class="container-xl">
         <div class="row">
             {% for data in employees_data %}
-                <div class="col-3">
+                <div class="col-3 columns_w_data">
                     <div class="card rounded-3">
                         <div class="card-header card-header-light">{{ data.storage.name }}</div>
-                        <div class="card-body">
-                            {% for row in data.employees %}
-                                <p {% if row.work_now %}class="text-success"{% endif %}>{{ row.employee.fio }}</p>
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-header sticky-top"><b>Бармены</b></div>
+                            {% for row in data.barmens %}
+                                <a class="list-group-item list-group-item-action {% if row.work_now %}bg-success-lt{% elif row.employee.status == 2 %}bg-danger-lt{% elif row.employee.status == 2 and row.work_now %}bg-primary-lt{% endif %}"><b>{{ row.employee.fio }}</b></a>
+                            {% endfor %}
+                            <div class="list-group-header sticky-top"><b>Повара</b></div>
+                            {% for row in job.cookers %}
+                                <a class="list-group-item list-group-item-action">{{ row.employee.fio }}</a>
+                            {% endfor %}
+                            <div class="list-group-header sticky-top"><b>Тех. служащие</b></div>
+                            {% for row in job.teh %}
+                                <a class="list-group-item list-group-item-action">{{ row.employee.fio }}</a>
                             {% endfor %}
                         </div>
                     </div>
@@ -21,4 +30,15 @@
             {% endfor %}
         </div>
     </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(document).ready(function () {
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i
+                .test(navigator.userAgent)) {
+                $('.columns_w_data').attr('class', 'col-12')
+            }
+        })
+    </script>
 {% endblock %}
