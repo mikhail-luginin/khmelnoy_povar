@@ -50,7 +50,8 @@ class Employee(models.Model):
     STATUS_CHOICES = [
         (1, 'Кандидат'),
         (2, 'Стажер'),
-        (3, 'Сотрудник')
+        (3, 'Сотрудник'),
+        (4, 'Резерв')
     ]
 
     code = models.CharField(max_length=64)
