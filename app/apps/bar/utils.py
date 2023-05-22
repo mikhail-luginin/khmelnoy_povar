@@ -232,11 +232,11 @@ class InventoryMixin(BaseView):
                 code = product.find('code').text
             expected_amount = item.find('expectedAmount').text
             count = request.POST.get(code)
-            if count:
-                difference = int(count) - int(round(float(expected_amount)))
-                row[name] = {'fact': count, 'iiko': int(round(float(expected_amount))), 'difference': difference}
-                if difference < 0:
-                    message_body += f'{name}: [разница: {difference}]\n'
+            send_message_to_telegram(chat_id=settings.TELEGRAM_CHAT_ID_FOR_ERRORS, message=f'{count}')
+            difference = int(count) - int(round(float(expected_amount)))
+            row[name] = {'fact': count, 'iiko': int(round(float(expected_amount))), 'difference': difference}
+            if difference < 0:
+                message_body += f'{name}: [разница: {difference}]\n'
         if message_body != '':
             message = message_header + message_body
             send_message_to_telegram(chat_id='-619967297', message=message)
