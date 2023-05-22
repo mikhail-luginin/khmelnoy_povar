@@ -17,7 +17,7 @@ class BaseLkView(LoginRequiredMixin, CanViewMixin, View):
     template_name = None
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.id:
+        if request.user.id and not request.user.is_superuser:
             if not self.can_view(request) and request.path != '/lk/':
                 raise Http404()
 
@@ -47,7 +47,7 @@ class ObjectCreateMixin(AccessMixin, BaseLkView):
         return render(request, self.template_name, self.get_context_data(request))
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.id:
+        if request.user.id and not request.user.is_superuser:
             if not self.has_access(request.user.id):
                 raise PermissionDenied()
 
@@ -60,7 +60,7 @@ class ObjectDeleteMixin(AccessMixin, BaseLkView):
     can_delete = 1
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.id:
+        if request.user.id and not request.user.is_superuser:
             if not self.has_access(request.user.id):
                 raise PermissionDenied()
 
@@ -108,7 +108,7 @@ class ObjectEditMixin(AccessMixin, BaseLkView):
         return render(request, self.template_name, context)
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.id is not None:
+        if request.user.id and not request.user.is_superuser:
             if not self.has_access(request.user.id):
                 raise PermissionDenied()
 
