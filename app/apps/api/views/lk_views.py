@@ -37,6 +37,14 @@ class EmployeeViewSet(ModelViewSetMixin):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
 
+    def get_queryset(self):
+        is_deleted = self.request.query_params.get('is_deleted')
+
+        if is_deleted:
+            return Employee.objects.filter(is_deleted=int(is_deleted))
+        else:
+            return self.queryset
+
 
 class CatalogTypeViewSet(ModelViewSetMixin):
     queryset = CatalogType.objects.all()
