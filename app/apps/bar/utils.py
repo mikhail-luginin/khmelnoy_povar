@@ -230,6 +230,7 @@ class InventoryMixin(BaseView):
             for product in item.findall('product'):
                 name = product.find('name').text
                 code = product.find('code').text
+                print(code)
             expected_amount = item.find('expectedAmount').text
             count = request.POST.get(code)
             send_message_to_telegram(chat_id=settings.TELEGRAM_CHAT_ID_FOR_ERRORS, message=f'{count}')
