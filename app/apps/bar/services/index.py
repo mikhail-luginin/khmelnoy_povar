@@ -15,6 +15,8 @@ from django.contrib import messages
 
 from typing import List
 
+from ...lk.services.timetable import TimetableService
+
 
 class HomePageService:
 
@@ -61,15 +63,17 @@ class HomePageService:
                     error = True
                     continue
 
-                check_employee_on_work = Timetable.objects.filter(date_at=today_date(),
-                                                                  storage=storage,
-                                                                  employee=employee).exists()
+                check_employee_on_work = TimetableService().is_employee_work_on_date(date_at=today_date(),
+                                                                                     employee_id=employee_id)
                 if check_employee_on_work:
                     messages.error(request, 'Данный сотрудник уже работает :(')
                     error = True
                     continue
 
                 oklad = employee.job_place.gain_shift_oklad if position.args['is_usil'] else employee.job_place.main_shift_oklad
+
+                if position.args['is_trainee']:
+                    oklad = 500
 
                 Timetable.objects.create(
                     date_at=today_date(),
