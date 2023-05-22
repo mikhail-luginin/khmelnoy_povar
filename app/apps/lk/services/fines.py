@@ -1,3 +1,5 @@
+from core import validators
+
 from apps.lk.models import Fine
 
 from typing import List
@@ -8,3 +10,36 @@ class FineService:
 
     def fines_all(self) -> List[model]:
         return self.model.objects.all()
+
+    def create(self, date_at: str | None, employee_id: int | None,
+               fine_sum: int | None, reason_id: int | None) -> None:
+        validators.validate_field(date_at, 'дата')
+        validators.validate_field(employee_id, 'сотрудник')
+        validators.validate_field(fine_sum, 'сумма')
+        validators.validate_field(reason_id, 'причина')
+
+        self.model.objects.create(
+            date_at=date_at,
+            employee_id=employee_id,
+            sum=fine_sum,
+            reason_id=reason_id
+        )
+
+    def edit(self, fine_id: int | None, date_at: str | None,
+             employee_id: int | None, fine_sum: int | None, reason_id: int | None) -> None:
+        validators.validate_field(fine_id, 'идентификатор записи')
+        validators.validate_field(date_at, 'дата')
+        validators.validate_field(employee_id, 'сотрудник')
+        validators.validate_field(fine_sum, 'сумма')
+        validators.validate_field(reason_id, 'причина')
+
+        fine = self.model.objects.filter(id=fine_id)
+        if fine.exists():
+            fine = fine.first()
+            fine.date_at = date_at
+            fine.employee_id = employee_id
+            fine.sum = fine_sum
+            fine.reason_id = reason_id
+            fine.save()
+        else:
+            raise self.model.DoesNotExist('Запись с указанным идентификатором не найдена.')

@@ -9,7 +9,7 @@
             <div class="card-header card-header-light rounded-top-3">
                 <h3 class="card-title">Типы оплат</h3>
                 <div class="card-actions">
-                    <a class="btn btn-primary" id="update">
+                    <a href="{% url 'IIKO:paymenttypes_update' %}" class="btn btn-primary" id="update">
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-cloud-upload"
                              width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
                              fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -47,33 +47,10 @@
 {% block scripts %}
     <script>
         $(document).ready(function () {
-            var table = run_datatable('table', '/api/payment-types', [
+            run_datatable('table', '/api/payment-types', '/iiko/paymenttypes', [
                 {data: 'name'},
-                {data: 'is_active'}])
-            $('#update').click(function () {
-                $.ajax({
-                    data: $(this).serialize(),
-                    type: $(this).attr('method'),
-                    url: "{% url 'IIKO:paymenttypes_update' %}",
-                    success: function (response) {
-                        if (response.status === true) {
-                            table.destroy()
-                            table = run_datatable('table', '/iiko/api/paymenttypes', [
-                                {data: 'name'},
-                                {data: 'is_active'},
-                                {data: 'actions'}])
-                            notification(true, response.message)
-                        } else {
-                            notification(false)
-                        }
-                    },
-                    error: function (response) {
-                        notification(false)
-                    }
-                });
-                return false;
-
-            });
+                {data: 'is_active'}],
+                has_delete=false)
         })
     </script>
 {% endblock %}

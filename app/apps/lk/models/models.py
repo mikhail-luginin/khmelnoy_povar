@@ -1,9 +1,9 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 from . import managers
 
 from apps.iiko.models import Storage
-from django.contrib.auth.models import User
 
 
 class Navbar(models.Model):
@@ -25,7 +25,7 @@ class Role(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    roles = models.ManyToManyField(Role)
+    role = models.ForeignKey(to=Role, on_delete=models.SET_NULL, null=True)
     tg_id = models.CharField(max_length=32, null=True)
 
     objects = managers.ProfileManager()
@@ -33,7 +33,8 @@ class Profile(models.Model):
 
 class JobPlace(models.Model):
     name = models.CharField(max_length=32)
-    oklad = models.IntegerField(null=True)
+    main_shift_oklad = models.IntegerField(default=0)
+    gain_shift_oklad = models.IntegerField(default=0)
 
 
 class Position(models.Model):
@@ -46,6 +47,12 @@ class Position(models.Model):
 
 
 class Employee(models.Model):
+    STATUS_CHOICES = [
+        (1, 'Кандидат'),
+        (2, 'Стажер'),
+        (3, 'Сотрудник')
+    ]
+
     code = models.CharField(max_length=64)
     photo = models.IntegerField(default=0)
     fio = models.CharField(max_length=64)
@@ -56,6 +63,7 @@ class Employee(models.Model):
     phone = models.CharField(max_length=11)
     is_deleted = models.PositiveSmallIntegerField(default=0)
     dismiss_date = models.DateField(null=True)
+    status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=3)
 
     objects = managers.EmployeeManager()
 

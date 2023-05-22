@@ -3,6 +3,9 @@
 {% block body %}
     <div class="container-xl">
         <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">
+                Сумма к выдаче: {{ data.total_sum }} руб.
+            </div>
             <div class="card-table">
                 <table class="table table-vcenter mb-0">
                     <thead>
@@ -13,7 +16,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for row in rows %}
+                    {% for row in data.rows %}
                         <tr>
                             <td>{{ row.employee.fio }}</td>
                             <td>{{ row.sum }}</td>

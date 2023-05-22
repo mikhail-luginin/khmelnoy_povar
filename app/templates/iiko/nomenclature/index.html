@@ -9,7 +9,7 @@
             <div class="card-header card-header-light rounded-top-3">
                 <h3 class="card-title">Номенклатура</h3>
                 <div class="card-actions">
-                    <a class="btn btn-primary" id="update_nomenclature">
+                    <a href="{% url 'IIKO:nomenclature_update' %}" class="btn btn-primary" id="update_nomenclature">
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-cloud-upload"
                              width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
                              fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -57,43 +57,16 @@
 {% block scripts %}
     <script>
         $(document).ready(function () {
-            let table = run_datatable('table', '/api/products', [
+            run_datatable('table', '/api/products','/iiko/nomenclature', [
                 {data: 'name'},
                 {data: 'type'},
                 {data: 'main_unit'},
-                {data: 'category'},
-                {data: 'supplier'},
+                {data: 'category_name'},
+                {data: 'supplier_name'},
                 {data: 'minimal'},
-                {data: 'for_order'}])
-            $('#update_nomenclature').click(function () {
-                $.ajax({
-                    data: $(this).serialize(),
-                    type: $(this).attr('method'),
-                    url: "{% url 'IIKO:nomenclature_update' %}",
-                    success: function (response) {
-                        if (response.status === true) {
-                            table.destroy()
-                            table = run_datatable('table', '/iiko/api/nomenclature', [
-                                {data: 'name'},
-                                {data: 'type'},
-                                {data: 'main_unit'},
-                                {data: 'category'},
-                                {data: 'supplier'},
-                                {data: 'minimal'},
-                                {data: 'for_order'},
-                                {data: 'actions'}])
-                            notification(true, 'Номенклатура успешно обновлена :)')
-                        } else {
-                            notification(false)
-                        }
-                    },
-                    error: function (response) {
-                        notification(false)
-                    }
-                });
-                return false;
+                {data: 'for_order'}],
+                has_delete=false)
 
-            });
         })
     </script>
 {% endblock %}

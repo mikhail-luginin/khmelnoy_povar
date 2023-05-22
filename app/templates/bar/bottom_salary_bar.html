@@ -1,0 +1,7 @@
+<br> <br><div id="footer-bar" class="footer-bar-5 rounded-3">
+    <a href="{% url 'Bar:salary' %}?code={{ code }}" {% if request.path == '/bar/salary' %}class="active-nav"{% endif %}class="active-nav"><i class="fa fa-money-bill"></i><span>Аванс</span><strong></strong></a>
+    <a href="{% url 'Bar:data_log_timetable' %}?code={{ code }}" {% if request.path == '/bar/salary/asdd' %}class="active-nav"{% endif %}class="active-nav"><i class="fa fa-receipt"></i><span>Начислено</span><strong></strong></a>
+    <a href="{% url 'Bar:salary_calculation' %}?code={{ code }}" {% if request.path == '/bar/salary/calculation' %}class="active-nav"{% endif %}><i class="fa fa-credit-card"></i><span>Расчет</span><strong></strong></a>
+    <a href="{% url 'Bar:salary_for_retired_employees' %}?code={{ code }}" {% if request.path == '/bar/salary/retired_employees' %}class="active-nav"{% endif %}><i class="fa-solid fa-layer-group"></i><span>Уволенные</span><strong></strong></a>
+    <a href="{% url 'Bar:fines' %}?code={{ code }}" {% if request.path == '/bar/fines' %}class="active-nav"{% endif %}><i class="fa fa-money-check-dollar"></i><span>Штрафы</span><strong></strong></a>
+</div>

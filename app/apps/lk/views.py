@@ -7,22 +7,18 @@ from core.utils import BaseLkView, ObjectEditMixin, ObjectCreateMixin, ObjectDel
 
 from .services import bars
 from .services.catalog import CatalogService
-from .services.partner import PartnerService
 from .services.positions import JobsService
-from .services.bank import StatementUpdateService
-from .services.cards.services import CardService
+from .services.bank import StatementUpdateService, CardService
 from .services.money import MoneyService
 from .services.employees import EmployeeService
 from .services.expenses import ExpenseService
-from .services.timetable import TimetableService
 
 from apps.iiko.services.storage import StorageService
 
-from .services.cards.exceptions import CardNotFoundException, CardUniqueException, CardNameIsNoneException, \
-    FieldNotFoundError
-from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee, Partner
+from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee
 from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest
 from apps.iiko.models import Product, Supplier
+from .services.timetable import TimetableService
 
 
 class IndexView(BaseLkView):
@@ -149,35 +145,6 @@ class BankPartnersView(BaseLkView):
     template_name = 'lk/partners/index.html'
 
 
-class BankPartnersEditView(ObjectEditMixin):
-    template_name = 'lk/partners/edit.html'
-    model = Partner
-    success_url = 'lk/bank/partners'
-
-    def get_context_data(self, request, **kwargs) -> dict:
-        context = super().get_context_data(request, **kwargs)
-        context['storages'] = StorageService().storages_all()
-        context['expense_type'] = CatalogService().get_catalog()
-
-        return context
-
-    def post(self, request):
-        row_id = request.GET.get('id')
-        friendly_name = request.POST.get('friendly_name')
-        expense_type = request.POST.getlist('expense_type')
-        storage_id = request.POST.getlist('storage_id')
-
-        try:
-            PartnerService().partner_edit(row_id=row_id, friendly_name=friendly_name, expense_type=expense_type, storage_id=storage_id)
-            messages.success(request, 'Контрагент успешно отредактирован :)')
-            url = '/lk/bank/partners'
-        except (FieldNotFoundError, Partner.DoesNotExist) as error:
-            messages.error(request, error)
-            url = '/lk/bank/partners/edit'
-
-        return redirect(url)
-
-
 class BankCardsView(BaseLkView):
     template_name = 'lk/cards/index.html'
 
@@ -201,19 +168,8 @@ class BankCardCreateView(ObjectCreateMixin):
         return context
 
     def post(self, request):
-        name = request.POST.get('name')
-        num = request.POST.get('num')
-        storage_id = request.POST.get('storage_id')
+        return CardService().card_create(request)
 
-        try:
-            CardService().card_create(name=name, num=num, storage_id=storage_id)
-            messages.success(request, 'Карта успешно создана и привязана к уже созданным с ней записям.')
-            url = '/lk/bank/cards'
-        except (CardNotFoundException, CardNameIsNoneException, CardUniqueException) as error:
-            messages.error(request, error)
-            url = '/lk/bank/cards/create'
-
-        return redirect(url)
 
 class BankCardEditView(ObjectEditMixin):
     template_name = 'lk/cards/edit.html'
@@ -225,25 +181,6 @@ class BankCardEditView(ObjectEditMixin):
         context['storages'] = StorageService().storages_all()
 
         return context
-
-    def post(self, request):
-        row_id = request.GET.get('id')
-        name = request.POST.get('name')
-        storage_id = request.POST.get('storage_id')
-
-        try:
-            CardService().card_update(row_id=row_id, name=name, storage_id=storage_id)
-            messages.success(request, 'Карта успешно отредактирована.')
-            url = '/lk/bank/cards'
-        except (FieldNotFoundError, CardNameIsNoneException) as error:
-            messages.error(request, error)
-            url = f'/lk/bank/cards/edit?id={request.GET.get("id")}'
-
-        return redirect(url)
-
-class BankCardDeleteView(ObjectDeleteMixin):
-    model= Card
-    success_url = '/lk/bank/cards'
 
 
 class MoneyView(BaseLkView):

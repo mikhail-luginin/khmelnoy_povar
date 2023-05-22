@@ -5,8 +5,9 @@ from django.http import Http404
 from django.shortcuts import render, redirect
 from django.views import View
 
+from apps.lk.models import Navbar
+from .exceptions import FieldNotFoundError
 from .permissions import CanViewMixin, AccessMixin
-from .time import today_datetime
 from .logs import create_log
 from .profile import get_profile, get_navbar
 
@@ -16,8 +17,8 @@ class BaseLkView(LoginRequiredMixin, CanViewMixin, View):
     template_name = None
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.id is not None:
-            if not self.can_view(request) and request.path != '/lk/' and 'admin' not in request.path:
+        if request.user.id and not request.user.is_superuser:
+            if not self.can_view(request) and request.path != '/lk/':
                 raise Http404()
 
         return super().dispatch(request, *args, **kwargs)
@@ -26,7 +27,7 @@ class BaseLkView(LoginRequiredMixin, CanViewMixin, View):
         context = dict()
 
         context['profile'] = get_profile(request)
-        context['navbar'] = get_navbar(request.user.id)
+        context['navbar'] = Navbar.objects.all()
 
         context.update(**kwargs)
 
@@ -45,23 +46,8 @@ class ObjectCreateMixin(AccessMixin, BaseLkView):
     def get(self, request):
         return render(request, self.template_name, self.get_context_data(request))
 
-    def post(self, request):
-        data = dict()
-
-        for k, v in request.POST.items():
-            if k != 'csrfmiddlewaretoken':
-                data[k] = v if v != '' else None
-                if k == 'created_at':
-                    data[k] = today_datetime()
-
-        self.model.objects.create(**data)
-        create_log(request.user.username, request.path, f'Создание записи в модели {str(self.model)}')
-
-        messages.success(request, 'Объект успешно создан :)')
-        return redirect(self.success_url)
-
     def dispatch(self, request, *args, **kwargs):
-        if request.user.id is not None:
+        if request.user.id and not request.user.is_superuser:
             if not self.has_access(request.user.id):
                 raise PermissionDenied()
 
@@ -74,7 +60,7 @@ class ObjectDeleteMixin(AccessMixin, BaseLkView):
     can_delete = 1
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.id is not None:
+        if request.user.id and not request.user.is_superuser:
             if not self.has_access(request.user.id):
                 raise PermissionDenied()
 
@@ -100,39 +86,29 @@ class ObjectEditMixin(AccessMixin, BaseLkView):
     success_url = None
     can_edit = 1
 
+    def _get_row(self, row_id):
+        row = self.model.objects.filter(id=row_id)
+        if row.exists():
+            return row.first()
+        raise FieldNotFoundError(f'Запись с указанным идентификатором не найдена.')
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+
+        context['row'] = self._get_row(request.GET.get('id'))
+        return context
+
     def get(self, request):
-        try:
-            row = self.model.objects.get(id=request.GET.get('id'))
-        except self.model.DoesNotExist:
-            messages.error(request, 'Объект с данным ID не найден :(')
-            return redirect('/' if self.success_url is None else self.success_url)
 
-        context = self.get_context_data(request, row=row)
-
+        try :
+            context = self.get_context_data(request)
+        except FieldNotFoundError as error:
+            messages.error(request, error)
+            return redirect(request.META.get('HTTP_REFERER'))
         return render(request, self.template_name, context)
 
-    def post(self, request):
-        data = dict()
-
-        fio = ''
-        for k, v in request.POST.items():
-            if k != 'csrfmiddlewaretoken':
-                data[k] = v if v != '' else None
-                if k == 'first-name':
-                    fio += v
-                    data.pop('first-name')
-                if k == 'last-name':
-                    fio += v
-                    data.pop('last-name')
-
-        self.model.objects.filter(id=request.GET.get('id')).update(**data)
-        create_log(request.user.username, request.path, f'Редактирование записи в модели {str(self.model)}')
-
-        messages.success(request, 'Данные объекта успешно обновлены :)')
-        return redirect(self.success_url)
-
     def dispatch(self, request, *args, **kwargs):
-        if request.user.id is not None:
+        if request.user.id and not request.user.is_superuser:
             if not self.has_access(request.user.id):
                 raise PermissionDenied()
 

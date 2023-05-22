@@ -41,5 +41,11 @@ urlpatterns = [
 
     path('malfunctions', views.MalfunctionsView.as_view(), name="malfunctions"),
 
+    path('fines', views.FinesView.as_view(), name="fines"),
+
+    path('data_logs/timetable', views.TimetableDataLogView.as_view(), name="data_log_timetable"),
+    path('data_logs/arrivals', views.ArrivalsDataLogView.as_view(), name="data_log_arrivals"),
+    path('data_logs/end_day', views.EndDayDataLogView.as_view(), name="data_log_end_day"),
+
     path('end_day', views.EndDayView.as_view(), name="end_day")
 ]

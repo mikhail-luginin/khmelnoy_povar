@@ -6,9 +6,12 @@ from apps.lk.models import Profile, Role, Navbar
 class AdministatorAccessMixin:
 
     def has_access(self, user_id: int) -> bool:
-        user = User.objects.get(id=user_id)
-
-        return user.is_superuser == 1
+        user = User.objects.filter(id=user_id)
+        if user.exists():
+            user = user.first()
+            return user.is_superuser == 1
+        else:
+            return False
 
 
 class AccessMixin:
@@ -17,35 +20,21 @@ class AccessMixin:
     can_delete = None
 
     def has_access(self, user_id: int) -> bool:
-        if User.objects.get(id=user_id).is_superuser == 1:
-            return True
+        profile = Profile.objects.filter(user_id=user_id)
+        if profile.exists():
+            profile = profile.first()
+            user = profile.user
+            role = profile.role
 
-        try:
-            user = Profile.objects.get(user_id=user_id)
-        except Profile.DoesNotExist:
-            Profile.objects.create(user_id=user_id)
-            return False
-
-        for user_role in user.roles:
-            try:
-                role = Role.objects.get(id=user_role.id)
-            except Role.DoesNotExist:
-                return False
-
-            if role.can_all:
+            if user.is_superuser:
                 return True
-            else:
-                if self.can_create:
-                    if role.can_create:
-                        return True
 
-                if self.can_edit:
-                    if role.can_edit:
-                        return True
-
-                if self.can_delete:
-                    if role.can_delete:
-                        return True
+            if self.can_create:
+                return role.can_create
+            if self.can_edit:
+                return role.can_edit
+            if self.can_delete:
+                return role.can_delete
 
         return False
 
@@ -53,24 +42,23 @@ class AccessMixin:
 class CanViewMixin:
 
     def can_view(self, request) -> bool:
-        if request.user.is_superuser == 1:
-            return True
+        profile = Profile.objects.filter(user_id=request.user.id)
+        if profile.exists():
+            profile = profile.first()
+            user = profile.user
+            role = profile.role
 
-        try:
-            user = Profile.objects.get(user_id=request.user.id)
-        except Profile.DoesNotExist:
-            Profile.objects.create(user_id=request.user.id)
-            return False
+            page_url = request.path
 
-        for item in user.roles.all():
-            try:
-                page = Navbar.objects.get(link='/' + request.path.split('/')[1] + '/' + request.path.split('/')[2])
-            except Navbar.DoesNotExist:
-                return False
+            if 'create' in page_url:
+                page_url = page_url.replace('/create', '')
+            elif 'edit' in page_url:
+                page_url = page_url.replace('/edit', '')
+            elif 'delete' in page_url:
+                page_url = page_url.replace('/delete', '')
 
-            if page in item.can_view:
-                return True
+            for page in role.can_view.all():
+                if page.link == page_url:
+                    return True
 
         return False
-
-# ToDo: Remake this module and admin app

@@ -1,3 +1,5 @@
+from django.db.models import Sum
+
 from apps.bar.models import Pays
 from apps.bar.services.bar_info import get_main_barmen
 
@@ -14,13 +16,34 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from django.conf import settings
 
-from typing import List
-
 
 class ExpensesPageService:
 
-    def get_expenses_today(self, storage: Storage) -> List[Expense]:
-        return Expense.objects.filter(storage=storage, date_at=today_date())
+    def get_expenses_today(self, storage: Storage) -> list[Expense]:
+        return Expense.objects \
+            .filter(storage=storage, date_at=today_date()) \
+            .exclude(expense_type__name=settings.SALARY_CATEGORY) \
+            .exclude(writer__contains='акупщик')
+
+    def get_sum_expenses_today(self, storage: Storage) -> dict[str, int]:
+        data = {
+            "bn": Expense.objects
+                  .filter(storage=storage,
+                          date_at=today_date(),
+                          expense_source__name=settings.PAYMENT_TYPE_BN)
+                  .exclude(expense_type__name=settings.SALARY_CATEGORY)
+                  .exclude(writer__contains='акупщик')
+                  .aggregate(total_sum=Sum('sum'))['total_sum'] or 0,
+            "nal": Expense.objects
+                  .filter(storage=storage,
+                          date_at=today_date(),
+                          expense_source__name=settings.PAYMENT_TYPE_NAL)
+                  .exclude(expense_type__name=settings.SALARY_CATEGORY)
+                  .exclude(writer__contains='акупщик')
+                  .aggregate(total_sum=Sum('sum'))['total_sum'] or 0
+        }
+
+        return data
 
     def create_expense(self, request) -> redirect:
         code = request.GET.get('code')
@@ -42,7 +65,7 @@ class ExpensesPageService:
             expense_sum = request.POST.get(f'sum[{row.id}]')
             if len(expense_sum) > 0:
                 Expense.objects.create(
-                    writer=barmen.fio if barmen else 'Основной бармен не указан',
+                    writer=storage.name + ' CRM',
                     date_at=today_date(),
                     storage=storage,
                     expense_type=row,
@@ -63,39 +86,23 @@ class ExpensesPageService:
 
         storage = StorageService().storage_get(code=code)
 
-        payin_sum = request.POST.get('payin_sum')
-        payin_comment = request.POST.get('payin_comment')
-
-        payout_sum = request.POST.get('payout_sum')
-        payout_comment = request.POST.get('payout_comment')
+        oil_sum = request.POST.get('oil_sum')
+        oil_comment = request.POST.get('oil_comment')
 
         purchaser_sum = request.POST.get('purchaser_sum')
         purchaser_comment = request.POST.get('purchaser_comment')
 
-        if len(payin_sum) > 0:
-            if not payin_comment:
+        if len(oil_sum) > 0:
+            if not oil_comment:
                 messages.error(request, 'Комментарий к внесению не указан.')
                 return redirect(redirect_url)
 
             Pays.objects.create(
                 date_at=today_date(),
                 storage=storage,
-                type=1,
-                sum=payin_sum,
-                comment=payin_comment
-            )
-
-        if len(payout_sum) > 0:
-            if not payout_comment:
-                messages.error(request, 'Комментарий к изъятию не указан.')
-                return redirect(redirect_url)
-
-            Pays.objects.create(
-                date_at=today_date(),
-                storage=storage,
-                type=2,
-                sum=payout_sum,
-                comment=payout_comment
+                type=5,
+                sum=oil_sum,
+                comment=oil_comment
             )
 
         if len(purchaser_sum) > 0:

@@ -13,7 +13,7 @@ def get_total_expenses_by_date_and_storage(storage: Storage, date_at: str, is_bn
         storage=storage,
         date_at=date_at,
         expense_source=source
-    ).aggregate(total_sum=Sum('sum'))['total_sum'] or 0
+    ).exclude(expense_type__name=settings.SALARY_CATEGORY).exclude(writer__contains='акупщик').aggregate(total_sum=Sum('sum'))['total_sum'] or 0
 
 
 def get_total_salary_by_date_and_storage(storage: Storage, date_at: str, payslip_type: int) -> int:
@@ -34,7 +34,7 @@ def get_total_payin_by_date_and_storage(storage: Storage, date_at: str) -> int:
     return Pays.objects.filter(
         storage=storage,
         date_at=date_at,
-        type=1
+        type=5
     ).aggregate(Sum('sum'))['sum__sum'] or 0
 
 
@@ -44,5 +44,5 @@ def get_total_payout_by_date_and_storage(storage: Storage, date_at: str) -> int:
     return Pays.objects.filter(
         storage=storage,
         date_at=date_at,
-        type=2
+        type__in=[4, 6]
     ).aggregate(Sum('sum'))['sum__sum'] or 0

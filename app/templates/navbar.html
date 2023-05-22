@@ -38,17 +38,17 @@
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown"
                    aria-label="Open user menu">
-                    <span class="avatar avatar-sm" style="background-image: url(/assets/img/111.png)"></span>
+                    <span class="avatar avatar-sm"></span>
                     <div class="d-none d-xl-block ps-2">
                         <div>{{ request.user.first_name }} {{ request.user.last_name }}</div>
-                        <div class="mt-1 small text-muted">{{ profile.roles }}</div>
+                        <div class="mt-1 small text-muted">{{ profile.role.name }}</div>
                     </div>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <a href="#" class="dropdown-item">Профиль</a>
                     {% if request.user.is_superuser == 1 %}
                         <div class="dropdown-divider"></div>
-{#                        <a href="{% url 'Admin:index' %}" class="dropdown-item">Админ-панель</a>#}
+                        <a href="{% url 'Admin:index' %}" class="dropdown-item">Админ-панель</a>
                     {% endif %}
                     <div class="dropdown-divider"></div>
                     <a href="{% url 'logout' %}" class="dropdown-item">Выйти</a>
@@ -96,6 +96,9 @@
                                     <a class="dropdown-item" href="{% url 'Repairer:index' %}">
                                         Хоз. мастер
                                     </a>
+                                    <a class="dropdown-item" href="{% url 'Purchaser:index' %}">
+                                        Закупщик
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -129,10 +132,16 @@
                             <div class="dropdown-menu-columns">
                                 <div class="dropdown-menu-column">
                                     {% for item in navbar %}
+                                        {% if item.app_name == 'lk' and item in profile.role.can_view.all and not request.user.is_superuser %}
+                                            <a class="dropdown-item" href="{{ item.link }}">
+                                                {{ item.text }}
+                                            </a>
+                                        {% else %}
                                         {% if item.app_name == 'lk' %}
                                             <a class="dropdown-item" href="{{ item.link }}">
                                                 {{ item.text }}
                                             </a>
+                                        {% endif %}
                                         {% endif %}
                                     {% endfor %}
                                 </div>
@@ -159,10 +168,16 @@
                             <div class="dropdown-menu-columns">
                                 <div class="dropdown-menu-column">
                                     {% for item in navbar %}
-                                        {% if item.app_name == 'iiko' %}
+                                        {% if item.app_name == 'iiko' and item in profile.role.can_view.all and not request.user.is_superuser %}
                                             <a class="dropdown-item" href="{{ item.link }}">
                                                 {{ item.text }}
                                             </a>
+                                        {% else %}
+                                            {% if item.app_name == 'iiko' %}
+                                            <a class="dropdown-item" href="{{ item.link }}">
+                                                {{ item.text }}
+                                            </a>
+                                            {% endif %}
                                         {% endif %}
                                     {% endfor %}
                                 </div>

@@ -32,13 +32,16 @@ class StoplistService:
 
         for storage in Storage.objects.filter(is_office=0):
             row = dict()
-            stoplist = []
+            stoplist_rows = []
             row['storage_id'] = storage.id
-            row['storage'] = storage.district
+            row['storage'] = storage.name
             for item in StopList.objects.all():
                 if item.storage.id == storage.id:
-                    stoplist.append(item.product.name)
-            row['stoplist'] = stoplist
+                    stoplist = dict()
+                    stoplist["date_at"] = item.date_at
+                    stoplist["product_name"] = item.product.name
+                    stoplist_rows.append(stoplist)
+            row['stoplist'] = stoplist_rows
             rows.append(row)
 
         return rows

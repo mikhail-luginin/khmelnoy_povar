@@ -14,17 +14,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
     <title>Бар {{ bar.name }}</title>
     <!-- CSS files -->
-    <link rel="stylesheet" type="text/css" href="/assets/libs/DataTables/datatables.min.css"/>
-    <link href="/assets/css/tabler.min.css" rel="stylesheet"/>
-    <link href="/assets/css/tabler-flags.min.css?1674944402" rel="stylesheet"/>
-    <link href="/assets/css/tabler-payments.min.css?1674944402" rel="stylesheet"/>
-    <link href="/assets/css/tabler-vendors.min.css?1674944402" rel="stylesheet"/>
-    <link href="/assets/css/demo.min.css?1674944402" rel="stylesheet"/>
-    <link href="/assets/css/bottom_menu.css" rel="stylesheet"/>
-    <link href="/assets/css/webfont/tabler-icons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/assets/css/fontawesome/css/all.min.css"/>
-    <link rel="icon"
-          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👨‍🍳</text></svg>">
+    {% include 'css_imports.html' %}
     <style>
         @import url('https://rsms.me/inter/inter.css');
 
@@ -47,16 +37,373 @@
             z-index: 12391;
         }
 
+        .header-logo {
+            color: transparent !important
+        }
+
+        .header-logo span {
+            display: none;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            z-index: 9999;
+            transition: all 350ms ease;
+            background-color: #fff;
+            border-bottom: solid 1px rgba(0, 0, 0, .03);
+            box-shadow: 0 4px 18px 0 rgba(0, 0, 0, .08)
+        }
+
+        .header .header-title {
+            position: absolute;
+            height: 50px;
+            line-height: 50px;
+            margin-top: calc((constant(safe-area-inset-top)) * .8) !important;
+            margin-top: calc((env(safe-area-inset-top)) * .8) !important;
+            font-size: 14px;
+            color: #000;
+            font-weight: 600;
+            z-index: 1;
+            font-family: Inter, sans-serif
+        }
+
+        .header .header-logo {
+            background-repeat: no-repeat;
+            background-position: center center;
+            height: 100%;
+            position: absolute;
+            z-index: 1;
+            left: 50%;
+            margin-top: calc((constant(safe-area-inset-top)) * .8) !important;
+            margin-top: calc((env(safe-area-inset-top)) * .8) !important
+        }
+
+        .header .header-icon {
+            position: absolute;
+            height: 50px;
+            width: 45px;
+            text-align: center;
+            line-height: 49px;
+            font-size: 12px;
+            color: #1f1f1f;
+            border: none;
+            -webkit-appearance: none;
+            appearance: none;
+            background-color: transparent !important
+        }
+
+        .header .dropdown-menu {
+            z-index: 99
+        }
+
+        .header-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            z-index: 99;
+            transition: all 350ms ease
+        }
+
+        .header-nav .header-title {
+            position: absolute;
+            height: 50px;
+            line-height: 50px;
+            font-size: 14px;
+            color: #000;
+            font-weight: 600;
+            z-index: 1;
+            font-family: Inter, sans-serif
+        }
+
+        .header-nav .header-logo {
+            background-repeat: no-repeat;
+            background-position: center center;
+            height: 100%;
+            position: absolute;
+            z-index: 1;
+            left: 50%
+        }
+
+        .header-nav .header-icon {
+            position: absolute;
+            height: 50px;
+            width: 45px;
+            text-align: center;
+            line-height: 49px;
+            font-size: 12px;
+            color: #1f1f1f;
+            border: none;
+            -webkit-appearance: none;
+            appearance: none;
+            background-color: transparent !important
+        }
+
+        .footer .footer-logo {
+            background-repeat: no-repeat;
+            background-position: center center;
+            height: 100%;
+            position: absolute;
+            z-index: 1;
+            left: 50%
+        }
+
+        .header-auto-show {
+            opacity: 0;
+            transition: all 350ms ease
+        }
+
+        .header-active {
+            opacity: 1;
+            transition: all 350ms ease
+        }
+
+        .header-always-show .header {
+            margin-top: 0 !important
+        }
+
+        .header-static {
+            position: relative !important
+        }
+
+        .header-transparent {
+            background-color: transparent !important;
+            box-shadow: none !important;
+            border: none !important
+        }
+
+        .header-clear {
+            padding-top: 50px;
+            padding-top: calc(50px + (constant(safe-area-inset-top)) * .8) !important;
+            padding-top: calc(50px + (env(safe-area-inset-top)) * .8) !important
+        }
+
+        .header-clear-small {
+            padding-top: 20px;
+            padding-top: calc(20px + (constant(safe-area-inset-top)) * .8) !important;
+            padding-top: calc(20px + (env(safe-area-inset-top)) * .8) !important
+        }
+
+        .header-clear-medium {
+            padding-top: 70px;
+            padding-top: calc(70px + (constant(safe-area-inset-top)) * .8) !important;
+            padding-top: calc(70px + (env(safe-area-inset-top)) * .8) !important
+        }
+
+        .header-clear-large {
+            padding-top: 85px;
+            padding-top: calc(85px + (constant(safe-area-inset-top)) * .8) !important;
+            padding-top: calc(85px + (env(safe-area-inset-top)) * .8) !important
+        }
+
+        .header-icon {
+            margin-top: calc((constant(safe-area-inset-top)) * .8) !important;
+            margin-top: calc((env(safe-area-inset-top)) * .8) !important
+        }
+
+        .header-icon .badge {
+            position: absolute;
+            margin-left: -5px;
+            color: #fff !important;
+            width: 16px;
+            text-align: center;
+            line-height: 16px;
+            padding: 0;
+            padding-left: 1px !important;
+            border-radius: 18px;
+            margin-top: 7px;
+            font-size: 11px
+        }
+
+        .header-transparent-light {
+            background-color: transparent;
+            box-shadow: none !important
+        }
+
+        .header-transparent-light a {
+            color: #fff
+        }
+
+        .header-transparent-dark {
+            background-color: transparent;
+            box-shadow: none !important
+        }
+
+        .header-transparent-dark a {
+            color: #000
+        }
+
+        .header-logo-center .header-icon-1 {
+            left: 0
+        }
+
+        .header-logo-center .header-icon-2 {
+            left: 45px
+        }
+
+        .header-logo-center .header-icon-3 {
+            right: 45px
+        }
+
+        .header-logo-center .header-icon-4 {
+            right: 0
+        }
+
+        .header-logo-center .header-title {
+            width: 150px;
+            left: 50%;
+            margin-left: -75px;
+            text-align: center
+        }
+
+        .header-logo-center .header-logo {
+            background-position: center center;
+            width: 150px !important;
+            left: 50%;
+            margin-left: -75px;
+            text-align: center
+        }
+
+        .header-logo-left .header-icon-1 {
+            right: 0
+        }
+
+        .header-logo-left .header-icon-2 {
+            right: 45px
+        }
+
+        .header-logo-left .header-icon-3 {
+            right: 90px
+        }
+
+        .header-logo-left .header-icon-4 {
+            right: 135px
+        }
+
+        .header-logo-left .header-logo {
+            left: 0 !important;
+            margin-left: 0 !important
+        }
+
+        .header-logo-left .header-title {
+            left: 15px !important;
+            margin-left: 0 !important
+        }
+
+        .header-logo-right .header-icon-1 {
+            left: 0
+        }
+
+        .header-logo-right .header-icon-2 {
+            left: 45px
+        }
+
+        .header-logo-right .header-icon-3 {
+            left: 90px
+        }
+
+        .header-logo-right .header-icon-4 {
+            left: 135px
+        }
+
+        .header-logo-right .header-logo {
+            left: auto !important;
+            right: 20px !important;
+            margin-left: 0 !important
+        }
+
+        .header-logo-right .header-title {
+            left: auto !important;
+            right: 20px !important;
+            margin-left: 0 !important
+        }
+
+        .header-logo-app .header-icon-1 {
+            left: 3px
+        }
+
+        .header-logo-app .header-icon-2 {
+            right: 2px
+        }
+
+        .header-logo-app .header-icon-3 {
+            right: 45px
+        }
+
+        .header-logo-app .header-icon-4 {
+            right: 90px
+        }
+
+        .header-logo-app .header-logo {
+            left: 0 !important;
+            margin-left: 40px !important
+        }
+
+        .header-logo-app .header-title {
+            left: 0 !important;
+            margin-left: 55px !important
+        }
+
+        .footer-logo span {
+            display: none
+        }
+
+        .header-demo {
+            z-index: 98 !important;
+            position: relative
+        }
+
+        .header-search {
+            overflow: hidden
+        }
+
+        .header-search .search-box {
+            margin-top: calc(env(safe-area-inset-top) - 10px)
+        }
+
+        .header-search * {
+            transition: transform .3s ease
+        }
+
+        .header-search-active .header-icon,
+        .header-search-active .header-title {
+            transform: translateY(-80px)
+        }
+
+        .header-search .search-box,
+        .header-search input {
+            transform: translateY(80px);
+            border: 0
+        }
+
+        .header-search-active .search-box,
+        .header-search-active input {
+            transform: translateY(0)
+        }
+
+        .header-auto-show {
+            pointer-events: none
+        }
+
+        .header-auto-show.header-active {
+            pointer-events: all
+        }
+
     </style>
     {% block stylesheets %}{% endblock %}
 </head>
 <body>
-<script src="/assets/js/demo-theme.min.js?1674944402"></script>
 <div class="page page-center preloader" id="preloader">
     <div class="container container-slim py-4">
         <div class="text-center">
             <div class="mb-3">
-                <a href="/" class="navbar-brand navbar-brand-autodark"><img src="/assets/img/preloader.png" alt="" class="rounded"></a>
+                <a class="navbar-brand navbar-brand-autodark"><img src="/assets/img/preloader.png" alt=""
+                                                                   class="rounded"></a>
             </div>
             <div class="progress progress-sm">
                 <div class="progress-bar progress-bar-indeterminate"></div>
@@ -67,277 +414,32 @@
 <div class="page">
     <div class="page-wrapper">
         <div class="page-body">
-            {% block page_title %}<center><big><b>{{ bar.name }} ({{ date }})</b></big></center>{% endblock %}
+            <div class="container-xl">
+                {% block page_title %}
+                    <div class="header header-fixed header-logo-center">
+                        <a href="#" class="header-title">{{ bar.name }}</a>
+                        {% if request.path != '/bar/' %}
+                            <a href="{% url 'Bar:index' %}?code={{ code }}" data-back-button="" class="header-icon header-icon-1"><i
+                                    class="fas fa-arrow-left"></i></a>
+                        {% endif %}
+                    </div><br>
+                {% endblock %}
+                <br><center><big><b>{% block page_name %}{% endblock %}</b></big></center>
+            </div>
             <br>
             {% block body %}{% endblock %}
-            <div class="modal modal-blur fade" id="notification-success" tabindex="-1" aria-hidden="true"
-                 style="display: none;">
-                <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        <div class="modal-status bg-success"></div>
-                        <div class="modal-body text-center py-4">
-                            <!-- Download SVG icon from http://tabler-icons.io/i/circle-check -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-green icon-lg" width="24"
-                                 height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
-                                 stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
-                                <path d="M9 12l2 2l4 -4"></path>
-                            </svg>
-                            <h3>Успешно!</h3>
-                            <div class="text-muted" id="notification-success-text"></div>
-                        </div>
-                        <div class="modal-footer">
-                            <div class="w-100">
-                                <div class="row">
-                                    <div class="col"><a href="#" class="btn btn-success w-100" data-bs-dismiss="modal">
-                                        ОК
-                                    </a></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal modal-blur fade" id="PromiseConfirm" tabindex="-1" role="dialog" aria-hidden="true">
-                <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        <div class="modal-status bg-danger"></div>
-                        <div class="modal-body text-center py-4">
-                            <!-- Download SVG icon from http://tabler-icons.io/i/alert-triangle -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-danger icon-lg" width="24"
-                                 height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
-                                 stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                <path d="M12 9v2m0 4v.01"></path>
-                                <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75"></path>
-                            </svg>
-                            <h3>Вы уверены?</h3>
-                            <div class="text-muted" id="confirm-text">Вы уверены, что хотите удалить эту запись?</div>
-                        </div>
-                        <div class="modal-footer">
-                            <div class="w-100">
-                                <div class="row">
-                                    <div class="col"><a href="#" class="btn w-100" data-bs-dismiss="modal">
-                                        Отмена
-                                    </a></div>
-                                    <div class="col">
-                                        <button id="confirm-delete1" class="btn btn-danger w-100"
-                                                data-bs-dismiss="modal">
-                                            Удалить
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal modal-blur fade" id="notification-error" tabindex="-1" aria-hidden="true"
-                 style="display: none;">
-                <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        <div class="modal-status bg-danger"></div>
-                        <div class="modal-body text-center py-4">
-                            <!-- Download SVG icon from http://tabler-icons.io/i/alert-triangle -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-danger icon-lg" width="24"
-                                 height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
-                                 stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                <path d="M12 9v2m0 4v.01"></path>
-                                <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75"></path>
-                            </svg>
-                            <h3>Упс..</h3>
-                            <div class="text-muted" id="notification-error-text">Произошла неизвестная ошибка.<br><br>Сообщить
-                                о ней Вы можете данному телеграмм боту: <b>@LugininSupportRobot</b></div>
-                        </div>
-                        <div class="modal-footer">
-                            <div class="w-100">
-                                <div class="row">
-                                    <div class="col">
-                                        <button id="confirm-delete" class="btn btn-danger w-100"
-                                                data-bs-dismiss="modal">
-                                            ОК
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% for message in messages %}
-                {% if message.level == 40 %}
-                    <div class="modal modal-blur fade" id="django-message-error" tabindex="-1" aria-hidden="true"
-                         style="display: none;">
-                        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-                            <div class="modal-content">
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                <div class="modal-status bg-danger"></div>
-                                <div class="modal-body text-center py-4">
-                                    <!-- Download SVG icon from http://tabler-icons.io/i/alert-triangle -->
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-danger icon-lg"
-                                         width="24"
-                                         height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                         fill="none"
-                                         stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                        <path d="M12 9v2m0 4v.01"></path>
-                                        <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75"></path>
-                                    </svg>
-                                    <h3>Упс..</h3>
-                                    <div class="text-muted" id="notification-error-text">{{ message }}</div>
-                                </div>
-                                <div class="modal-footer">
-                                    <div class="w-100">
-                                        <div class="row">
-                                            <div class="col">
-                                                <button id="confirm-delete" class="btn btn-danger w-100"
-                                                        data-bs-dismiss="modal">
-                                                    ОК
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
-                {% if message.level == 20 %}
-                    <div class="modal modal-blur fade" id="django-message-info" tabindex="-1" aria-hidden="true"
-                         style="display: none;">
-                        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-                            <div class="modal-content">
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                <div class="modal-status bg-primary"></div>
-                                <div class="modal-body text-center py-4">
-                                    <!-- Download SVG icon from http://tabler-icons.io/i/circle-check -->
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-primary icon-lg"
-                                         width="24"
-                                         height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                         fill="none"
-                                         stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                        <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
-                                        <path d="M12 8l.01 0"></path>
-                                        <path d="M11 12l1 0l0 4l1 0"></path>
-                                    </svg>
-                                    <h3 id="info-alert-header">Информация</h3>
-                                    <div class="text-muted" id="info-alert-text">{{ message }}</div>
-                                </div>
-                                <div class="modal-footer">
-                                    <div class="w-100">
-                                        <div class="row">
-                                            <div class="col"><a href="#" class="btn btn-primary w-100"
-                                                                data-bs-dismiss="modal">
-                                                ОК
-                                            </a></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
-                {% if message.level == 25 %}
-                    <div class="modal modal-blur fade" id="django-message-success" tabindex="-1" aria-hidden="true"
-                         style="display: none;">
-                        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-                            <div class="modal-content">
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                <div class="modal-status bg-success"></div>
-                                <div class="modal-body text-center py-4">
-                                    <!-- Download SVG icon from http://tabler-icons.io/i/circle-check -->
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-green icon-lg"
-                                         width="24"
-                                         height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                         fill="none"
-                                         stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                        <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
-                                        <path d="M9 12l2 2l4 -4"></path>
-                                    </svg>
-                                    <h3>Успешно!</h3>
-                                    <div class="text-muted" id="notification-success-text">{{ message }}</div>
-                                </div>
-                                <div class="modal-footer">
-                                    <div class="w-100">
-                                        <div class="row">
-                                            <div class="col"><a href="#" class="btn btn-success w-100"
-                                                                data-bs-dismiss="modal">
-                                                ОК
-                                            </a></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
-            {% endfor %}
+            {% include 'notifications.html' %}
             {% block notifications %}{% endblock %}
-            {% block bottom_menu %}{% include 'bar/bottom_menu.html' %}{% endblock %}
+            {% block bottom_menu %}{% if 'salary' in request.path %}{% include 'bar/bottom_salary_bar.html' %}{% else %}{% include 'bar/bottom_menu.html' %}{% endif %}{% endblock %}
         </div>
     </div>
 </div>
-<script src="/assets/libs/litepicker/dist/litepicker.js" defer></script>
-<script src="/assets/libs/tom-select/dist/js/tom-select.base.min.js" defer></script>
-<script src="/assets/libs/DataTables/datatables.min.js"></script>
-<script src="/assets/js/tabler.min.js?1674944402" defer></script>
-<script src="/assets/js/demo.min.js?1674944402" defer></script>
-<script src="/assets/js/notifications.js"></script>
-<script src="/assets/js/datatables_custom_funcs.js"></script>
-<script src="/assets/js/functions.js"></script>
+{% include 'js_imports.html' %}
 <script>
     $(window).on('load', function () {
         $('#preloader').fadeOut().end().delay().fadeOut('slow');
     });
-    const navItems = document.getElementsByClassName('nav-item');
-
-    for (let i = 0; i < navItems.length; i++) {
-        navItems[i].addEventListener('click', () => {
-            for (let j = 0; j < navItems.length; j++)
-                navItems[j].classList.remove('active');
-
-            navItems[i].classList.add('active');
-        });
-    }
     $(document).ready(function () {
-        document.querySelectorAll('.form-select').forEach((el) => {
-            let settings = {
-                copyClassesToDropdown: false,
-                dropdownClass: 'dropdown-menu ts-dropdown',
-                optionClass: 'dropdown-item',
-                controlInput: '<input>',
-                render: {
-                    item: function (data, escape) {
-                        if (data.customProperties) {
-                            return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
-                        }
-                        return '<div>' + escape(data.text) + '</div>';
-                    },
-                    option: function (data, escape) {
-                        if (data.customProperties) {
-                            return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
-                        }
-                        return '<div>' + escape(data.text) + '</div>';
-                    },
-                },
-            };
-            new TomSelect(el, settings);
-        });
-        document.querySelectorAll('.date-at').forEach((el) => {
-            new Litepicker({
-                element: el
-            });
-        });
         if (document.getElementById('django-message-error') !== null) {
             $('#django-message-error').modal('show')
         }
@@ -347,6 +449,13 @@
         if (document.getElementById('django-message-info') !== null) {
             $('#django-message-info').modal('show')
         }
+        $('.date-at').datepicker({
+            format: 'yyyy-mm-dd',
+            weekStart: 1,
+            clearBtn: true,
+            language: 'ru',
+            todayHighlight: true
+        });
     })
 </script>
 {% block scripts %}{% endblock %}

@@ -11,6 +11,10 @@ class StorageSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    is_income = serializers.CharField(source='get_is_income_display')
+    is_sales = serializers.CharField(source='get_is_sales_display')
+    is_remains = serializers.CharField(source='get_is_remains_display')
+
 
     class Meta:
         model = Category
@@ -18,6 +22,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class SupplierSerializer(serializers.ModelSerializer):
+    category = serializers.StringRelatedField(many=True)
+    is_revise = serializers.CharField(source='get_is_revise_display')
 
     class Meta:
         model = Supplier
@@ -25,6 +31,8 @@ class SupplierSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    category_name = serializers.CharField(default='Не привязана', source='category.name')
+    supplier_name = serializers.CharField(default='Не привязан', source='supplier.name')
 
     class Meta:
         model = Product
@@ -32,6 +40,8 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class PaymentTypeSerializer(serializers.ModelSerializer):
+    is_active = serializers.CharField(source='get_is_active_display')
+
     class Meta:
         model = PaymentType
         fields = '__all__'

@@ -16,6 +16,8 @@ RUN apk add --update --no-cache --virtual .tmp-build-deps gcc libc-dev linux-hea
 
 RUN pip install --no-cache-dir -r /temp/requirements.txt
 
-RUN adduser --disabled-password app-user
+RUN adduser --disabled-password appuser
 
-USER app-user
+RUN chown appuser:appuser -R /app/
+
+USER appuser

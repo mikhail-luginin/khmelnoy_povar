@@ -42,4 +42,4 @@ class StorageService:
         return self.model.objects.filter(is_office=0)
 
     def storage_get(self, **kwargs) -> model:
-        return self.model.objects.get(**kwargs)
+        return self.model.objects.filter(**kwargs).first()

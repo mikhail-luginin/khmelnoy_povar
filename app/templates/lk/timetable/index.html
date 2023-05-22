@@ -9,6 +9,7 @@
             <div class="card-header card-header-light rounded-top-3">
                 <h3 class="card-title">График</h3>
                 <div class="card-actions">
+                    <a href="#" id="update_timetable" class="btn btn-tabler">Обновить проценты и премии</a>
                     <a href="{% url 'LK:create_timetable' %}" class="btn btn-tabler">Создать запись</a>
                 </div>
             </div>
@@ -72,5 +73,17 @@
             {data: 'premium'},
             {data: 'fine'}
         ])
+        $(document).ready(function() {
+            $('#update_timetable').click(function() {
+                $.ajax({
+                    url: '{% url 'LK:update_timetable' %}',
+                    method: 'get',
+                    success: function (response) {
+                        notification(true, 'Обновление успешно началось. ' +
+                                           'По завершению Вы получите уведомление в указанный в Вашем профиле телеграмм.')
+                    }
+                });
+            })
+        })
     </script>
 {% endblock %}

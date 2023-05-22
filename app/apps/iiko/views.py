@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import redirect
 
+from core.exceptions import FieldNotFoundError, FieldCannotBeEmptyError
 from core.utils import ObjectEditMixin, BaseLkView
 
 from apps.iiko.models import Product, Supplier, Category, PaymentType
@@ -12,14 +13,13 @@ from apps.iiko.services.supplier import SupplierService
 from apps.iiko.services.category import CategoryService
 from apps.iiko.services.payment_type import PaymentTypeService
 from apps.iiko.services.stoplist import StoplistService
+from apps.iiko.services.terminal import TerminalService
 
 
 @login_required
 def update_nomenclature_view(request):
-    if ProductService().update():
-        messages.success(request, 'Номенклатура успешно обновлена.')
-    else:
-        messages.error(request, 'Произошла ошибка при обновлении номенклатуры.')
+    ProductService().update()
+    messages.success(request, 'Номенклатура успешно обновлена.')
     return redirect('/iiko/nomenclature')
 
 
@@ -72,8 +72,29 @@ class NomenclatureEditView(ObjectEditMixin):
         context = super().get_context_data(request)
         context['suppliers'] = SupplierService().suppliers_all()
         context['categories'] = CategoryService().categories_all()
-
+        context['row'] = Product.objects.filter(id=request.GET.get('id')).first()
         return context
+
+    def post(self, request):
+        row_id = request.GET.get('id')
+        minimal = request.POST.get('minimal')
+        for_order = request.POST.get('for_order')
+        category_id = request.POST.get('category_id')
+        supplier_id = request.POST.get('supplier_id')
+
+        try:
+            ProductService().nomenclature_edit(row_id=row_id, minimal=minimal, for_order=for_order,
+                                             category_id=category_id, supplier_id=supplier_id)
+            messages.success(request, 'Продукт успешно отредактирован :)')
+            url = '/iiko/nomenclature'
+        except FieldNotFoundError as error:
+            url = f'/iiko/nomenclature/edit?id={row_id}'
+            messages.error(request, error)
+        except ValueError:
+            url = f'/iiko/nomenclature/edit?id={row_id}'
+            messages.error(request, 'В полях "Мин. кол-во" и "Для заказа" должны быть только цифры.')
+
+        return redirect(url)
 
 
 class SuppliersView(BaseLkView):
@@ -91,6 +112,23 @@ class SupplierEditView(ObjectEditMixin):
 
         return context
 
+    def post(self, request):
+        row_id = request.GET.get('id')
+        friendly_name = request.POST.get('friendly_name')
+        category = request.POST.getlist('category_id')
+        is_revise = request.POST.get('is_revise')
+
+        try:
+            SupplierService().supplier_edit(row_id=row_id, friendly_name=friendly_name,
+                                            category=category, is_revise=is_revise)
+            messages.success(request, 'Поставщик успешно отредактирован :)')
+            url = '/iiko/suppliers'
+        except (FieldNotFoundError, FieldCannotBeEmptyError) as error:
+            messages.error(request, error)
+            url = f'/iiko/suppliers/edit?id={row_id}'
+
+        return redirect(url)
+
 
 class CategoriesView(BaseLkView):
     template_name = 'iiko/categories/index.html'
@@ -102,8 +140,21 @@ class CategoryEditView(ObjectEditMixin):
     success_url = '/iiko/categories'
 
     def post(self, request):
-        return CategoryService().category_edit(request, self.success_url)
+        row_id = request.GET.get('id')
+        is_income = request.POST.get('is_income')
+        is_sales = request.POST.get('is_sales')
+        is_remains = request.POST.get('is_remains')
 
+        try:
+            CategoryService().category_edit(row_id=row_id, is_income=is_income,
+                                            is_sales=is_sales, is_remains=is_remains)
+            messages.success(request, 'Категория успешно отредактирована :)')
+            url = '/iiko/categories'
+        except FieldNotFoundError as error:
+            messages.error(request, error)
+            url = f'/iiko/categories/edit?id={row_id}'
+
+        return redirect(url)
 
 class PaymentTypesView(BaseLkView):
     template_name = 'iiko/paymenttypes/index.html'
@@ -114,6 +165,19 @@ class PaymentTypeEdit(ObjectEditMixin):
     template_name = 'iiko/paymenttypes/edit.html'
     success_url = '/iiko/paymenttypes'
 
+    def post(self, request):
+        row_id = request.GET.get('id')
+        is_active = request.POST.get('is_active')
+
+        try:
+            PaymentTypeService().paymenttype_edit(row_id=row_id, is_active=is_active)
+            messages.success(request, f'Тип оплаты успешно отредактирован :)')
+            url = '/iiko/paymenttypes'
+        except FieldNotFoundError as error:
+            messages.success(request, error)
+            url = f'/iiko/paymenttypes/edit?id={row_id}'
+
+        return redirect(url)
 
 class StopListView(BaseLkView):
     template_name = 'iiko/stoplist.html'
@@ -134,3 +198,9 @@ class StopListUpdateView(BaseLkView):
             response = {"status": False}
 
         return JsonResponse(response, status=200)
+
+
+def terminals_update_view(request):
+    TerminalService().update()
+    messages.success(request, 'Терминалы успешно обновлены.')
+    return redirect('/iiko/terminals')

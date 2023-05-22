@@ -6,7 +6,7 @@ from core.time import today_date, get_current_time
 from .bar_info import get_main_barmen
 
 from apps.bar.models import Timetable, Position, Money
-from apps.lk.models import Employee
+from apps.lk.models import Employee, JobPlace
 
 from apps.iiko.services.storage import StorageService
 
@@ -29,11 +29,19 @@ class HomePageService:
         for position in Position.objects.all().order_by('-priority_id'):
             row = dict()
 
-            row['id'] = position.id
-            row['name'] = position.name
-            row['employees'] = [employee for employee in employees if employee.job_place in position.linked_jobs.all()]
-            row['priority_id'] = position.priority_id
-            row['args'] = position.args
+            if position.args['is_trainee']:
+                row['id'] = position.id
+                row['name'] = position.name
+                row['employees'] = [employee for employee in employees if employee.status == 2]
+                row['priority_id'] = position.priority_id
+                row['args'] = position.args
+            else:
+                row['id'] = position.id
+                row['name'] = position.name
+                row['employees'] = [employee for employee in employees if
+                                    employee.job_place in position.linked_jobs.all() if employee.status == 3]
+                row['priority_id'] = position.priority_id
+                row['args'] = position.args
 
             rows.append(row)
 
@@ -61,24 +69,19 @@ class HomePageService:
                     error = True
                     continue
 
+                oklad = employee.job_place.gain_shift_oklad if position.args['is_usil'] else employee.job_place.main_shift_oklad
+
                 Timetable.objects.create(
                     date_at=today_date(),
                     storage=storage,
                     employee=employee,
                     position=position,
-                    oklad=position.args['oklad']
+                    oklad=oklad
                 )
-
-                # today_main_barmen = get_main_barmen(today_date(), storage)
-                # username_for_logs = 'Бармен не указан' if not today_main_barmen else today_main_barmen.fio
-                # create_log(username_for_logs, request.path, 'Добавление сотрудника', comment=f'{storage.name} | {employee.fio}', is_bar=True)
 
         if self.validate_today_morning_cashbox(storage) is False:
             sum_cash_morning = request.POST.get('sum_cash_morning')
             if sum_cash_morning:
-                if not get_main_barmen(today_date(), storage):
-                    messages.error(request, 'Основной бармен не указан.')
-                    return redirect('/bar?code=' + storage.code)
                 Money.objects.create(date_at=today_date(), storage=storage,
                                      sum_cash_morning=sum_cash_morning)
 

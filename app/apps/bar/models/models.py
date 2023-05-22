@@ -50,7 +50,7 @@ class Salary(models.Model):
         return self.oklad + self.percent + self.premium
 
     def get_month_name(self):
-        from ...lk.services.functions import get_months
+        from core.time import get_months
 
         return get_months(self.month)
 
@@ -112,7 +112,9 @@ class Pays(models.Model):
     PAYS_TYPES = [
         (1, 'Внесение'),
         (2, 'Изъятие'),
-        (4, 'Закупщик')
+        (4, 'Закупщик'),
+        (5, 'Масло'),
+        (6, 'Данил')
     ]
 
     date_at = models.DateField()

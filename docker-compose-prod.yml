@@ -7,24 +7,21 @@ services:
       - "80:80"
     volumes:
       - ./app:/app
-      - ./app/assets:/app/static
     env_file:
       - ./app/.env
     command: >
       sh -c "python manage.py migrate
-             gunicorn --bind 0.0.0.0:80 config.wsgi"
+             gunicorn --bind 0.0.0.0:80 config.wsgi -w 20 --timeout 120"
 
   nginx:
     image: nginx:1.19.8-alpine
-    restart: always
+    restart: on-failure
     depends_on:
       - app
     ports:
       - "8080:8080"
     env_file:
       - ./app/.env
-    volumes:
-      - ./app/assets:/static
 
   redis:
     image: redis:7.0.5-alpine

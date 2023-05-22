@@ -1,5 +1,6 @@
 from django.shortcuts import redirect
-from django.contrib import messages
+
+from core import validators
 
 from apps.lk.models import Position, JobPlace
 
@@ -13,27 +14,24 @@ class JobsService:
     def positions_all(self) -> List[position_model]:
         return self.position_model.objects.all()
 
-    def position_create(self, request) -> redirect:
-        position_name = request.POST.get('position-name')
-        position_oklad = request.POST.get('position-oklad')
-        position_all_storages = True if request.POST.get('position-all-storages') is not None else False
-        position_is_usil = True if request.POST.get('position-is-usil') is not None else False
-        position_is_called = True if request.POST.get('position-is-calling') is not None else False
-        position_is_trainee = True if request.POST.get('position-is-trainee') is not None else False
-        position_has_percent = True if request.POST.get('position-has-percent') is not None else False
-        position_has_premium = True if request.POST.get('position-has-premium') is not None else False
-        position_job_ids = request.POST.getlist('job_id')
+    def position_create(self, position_oklad: int | None, position_is_usil: bool, position_all_storages: bool,
+                        position_is_called: bool, position_is_trainee: bool, position_has_percent: bool,
+                        position_has_premium: bool, position_name: str | None, priority_id: int | None,
+                        position_job_ids: list | None) -> None:
+        validators.validate_field(position_oklad, 'оклад')
+        validators.validate_field(position_name, 'наименование позиции')
+        validators.validate_field(priority_id, 'приоритетный ID')
+        validators.validate_field(position_job_ids, 'должности')
 
-        priority_id = request.POST.get('priority-id')
-
-        args = dict()
-        args['oklad'] = position_oklad
-        args['all_storages'] = position_all_storages
-        args['is_usil'] = position_is_usil
-        args['is_called'] = position_is_called
-        args['is_trainee'] = position_is_trainee
-        args['has_percent'] = position_has_percent
-        args['has_premium'] = position_has_premium
+        args = {
+            "oklad": position_oklad,
+            "all_storages": position_all_storages,
+            "is_usil": position_is_usil,
+            "is_called": position_is_called,
+            "is_trainee": position_is_trainee,
+            "has_percent": position_has_percent,
+            "has_premium": position_has_premium
+        }
 
         row = self.position_model.objects.create(
             name=position_name,
@@ -42,67 +40,47 @@ class JobsService:
         )
 
         row.linked_jobs.set(position_job_ids)
-
-        messages.success(request, 'Позиция успешно добавлена :)')
-        return redirect('/lk/positions')
-
-    def position_edit(self, request) -> redirect:
-        position_id = request.GET.get('id')
-
-        if not position_id:
-            messages.error(request, 'ID записи не указан.')
-            return redirect(request.META.get('HTTP_REFERER'))
-
-        row = self.position_model.objects.get(id=position_id)
-
-        position_name = request.POST.get('position-name')
-        row.name = position_name
-
-        position_oklad = request.POST.get('position-oklad')
-        row.args["oklad"] = position_oklad
-
-        position_all_storages = True if request.POST.get('position-all-storages') else False
-        row.args["all_storages"] = position_all_storages
-
-        position_is_usil = True if request.POST.get('position-is-usil') else False
-        row.args["is_usil"] = position_is_usil
-
-        position_is_called = True if request.POST.get('position-is-calling') else False
-        row.args["is_called"] = position_is_called
-
-        position_is_trainee = True if request.POST.get('position-is-trainee') else False
-        row.args["is_trainee"] = position_is_trainee
-
-        position_has_percent = True if request.POST.get('position-has-percent') else False
-        row.args["has_percent"] = position_has_percent
-
-        position_has_premium = True if request.POST.get('position-has-premium') else False
-        row.args["has_premium"] = position_has_premium
-
-        priority_id = request.POST.get('priority-id')
-        row.priority_id = priority_id
-
-        position_job_ids = request.POST.getlist('job_id')
-        row.linked_jobs.set(position_job_ids)
         row.save()
 
-        messages.success(request, 'Позиция успешно обновлена.')
-        return redirect('/lk/positions')
+    def position_edit(self, position_id: int | None,
+                      position_oklad: int | None, position_is_usil: bool, position_all_storages: bool,
+                      position_is_called: bool, position_is_trainee: bool, position_has_percent: bool,
+                      position_has_premium: bool, position_name: str | None, priority_id: int | None,
+                      position_job_ids: list | None) -> redirect:
+        validators.validate_field(position_id, 'идентификатор позиции')
+        validators.validate_field(position_oklad, 'оклад')
+        validators.validate_field(position_name, 'наименование позиции')
+        validators.validate_field(priority_id, 'приоритетный ID')
+        validators.validate_field(position_job_ids, 'должности')
+
+        row = self.position_model.objects.filter(id=position_id)
+        if row.exists():
+            row = row.first()
+            row.name = position_name
+            row.args["oklad"] = position_oklad
+            row.args["all_storages"] = position_all_storages
+            row.args["is_usil"] = position_is_usil
+            row.args["is_called"] = position_is_called
+            row.args["is_trainee"] = position_is_trainee
+            row.args["has_percent"] = position_has_percent
+            row.args["has_premium"] = position_has_premium
+            row.priority_id = priority_id
+            row.linked_jobs.set(position_job_ids)
+            row.save()
+        else:
+            raise self.position_model.DoesNotExist('Позиция с указанным идентификатором не найдена.')
 
     def jobs_all(self) -> List[jobs_model]:
         return self.jobs_model.objects.all()
 
-    def job_create(self, request) -> redirect:
-        job_name = request.POST.get('job-name')
-        job_oklad = None if request.POST.get('job-oklad') == '' else request.POST.get('job-oklad')
+    def job_create(self, job_name: str | None, job_oklad: int | None) -> None:
+        validators.validate_field(job_name, 'наименование должности')
+        validators.validate_field(job_oklad, 'оклад должности')
 
         self.jobs_model.objects.create(
             name=job_name,
             oklad=job_oklad
         )
 
-        messages.success(request, 'Должность успешно добавлена :)')
-        return redirect('/lk/jobs')
-
     def job_get(self, **kwargs) -> jobs_model:
-        return self.jobs_model.objects.get(**kwargs)
+        return self.jobs_model.objects.filter(**kwargs).first()

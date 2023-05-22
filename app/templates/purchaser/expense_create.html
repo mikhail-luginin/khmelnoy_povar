@@ -1,0 +1,55 @@
+{% extends 'purchaser/base.html' %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-body">
+                <form action="{% url 'Purchaser:expense_create' %}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label">Дата</label>
+                        <input class="form-control date-at" name="date_at" id="date_at" value="{{ date_at }}" placeholder="Выберите двту">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Заведение</label>
+                        <select class="form-select" name="storage_id" placeholder="Выберите заведение">
+                            <option></option>
+                            {% for storage in storages %}
+                                <option value="{{ storage.id }}">{{ storage.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Получатель платежа</label>
+                        <select class="form-select" name="payment_receiver_id" placeholder="Выберите получателя платежа">
+                            <option></option>
+                            {% for receiver in receivers %}
+                                <option value="{{ receiver.id }}">{{ receiver.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Источник расхода</label>
+                        <select class="form-select" name="expense_source_id" placeholder="Выберите источник оплаты">
+                            <option></option>
+                            {% for type in types %}
+                                <option value="{{ type.id }}">{{ type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Сумма</label>
+                        <input type="tel" inputmode="numeric" class="form-control" name="expense_sum" placeholder="Введите сумму расхода">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Комментарий</label>
+                        <input class="form-control" name="comment" placeholder="Введите комментарий">
+                    </div>
+                    <div class="mb-1">
+                        <button type="submit" class="btn btn-tabler w-100">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

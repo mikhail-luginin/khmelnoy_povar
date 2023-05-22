@@ -1,0 +1,55 @@
+{% extends 'bar_base.html' %}
+
+{% block page_name %}
+    Дата: {{ date }}
+{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3 mb-2">
+            <div class="card-header card-header-light rounded-top-3">График</div>
+            <div class="card-table table-responsive">
+                <table class="table table-sm table-striped nowrap w-100">
+                    <thead>
+                        <tr>
+                            <th>Сотрудник</th>
+                            <th>Оклад</th>
+                            <th>Процент</th>
+                            <th>Премия</th>
+                            <th>Штраф</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                            <tr>
+                                <td>{{ row.employee.fio }} ({{ row.position.name }})</td>
+                                <td>{{ row.oklad }}</td>
+                                <td>{{ row.percent }}</td>
+                                <td>{{ row.premium }}</td>
+                                <td>{{ row.fine }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card rounded-3">
+            <div class="card-body">
+                <div class="row">
+                    {% if is_current %}
+                        <div class="col-6">
+                            <a href="{% url 'Bar:data_log_timetable' %}?code={{ code }}&date={{ previous }}" class="btn btn-tabler w-100">Предыдущий день</a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'Bar:data_log_timetable' %}?code={{ code }}&date={{ next }}" class="btn btn-tabler w-100">Следующий день</a>
+                        </div>
+                    {% else %}
+                        <div class="col-12">
+                            <a href="{% url 'Bar:data_log_timetable' %}?code={{ code }}&date={{ previous }}" class="btn btn-tabler w-100">Предыдущий день</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

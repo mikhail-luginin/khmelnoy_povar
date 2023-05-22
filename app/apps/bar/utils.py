@@ -1,3 +1,5 @@
+import datetime
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
@@ -10,17 +12,19 @@ from apps.bar.models import TovarRequest, Arrival
 
 from .services.bar_info import get_bar, get_main_barmen
 
-from apps.iiko.models import Product, Category
+from apps.iiko.models import Product, Category, Storage
 from apps.iiko.services.api import IikoService
 from apps.iiko.services.storage import StorageService
 
-from core.time import today_date
+from core.time import today_date, monthdelta, get_current_time, get_months
 from core.logs import create_log
 from core.payment_types import get_bn_category, get_nal_category
 import xml.etree.ElementTree as ET
 
 from apps.lk.models import Expense, Catalog
 from apps.lk.services.catalog import CatalogService
+
+from typing import List
 
 
 class BaseView(View):
@@ -237,3 +241,53 @@ class InventoryMixin(BaseView):
             send_message_to_telegram(chat_id='-619967297', message=message)
 
         return render(request, 'bar/inventory_table.html', self.get_context_data(request, rows=row))
+
+
+class DataLogsMixin(BaseView):
+    model = None
+    type = None  # type = 1 по дням, type = 2 по месяцам
+
+    def _prepare_context(self, obj: str | None) -> dict:
+        context = dict()
+
+        if obj and obj != '0':
+            obj = int(obj)
+            context['obj'] = obj
+            context['previous'] = obj - 1
+            context['next'] = obj + 1
+            context['is_current'] = True
+        else:
+            context['previous'] = -1
+            context['is_current'] = False
+
+        return context
+
+    def _prepare_rows(self, storage: Storage, obj: int | None) -> tuple[list, str]:
+        current_date = get_current_time()
+
+        filter_args = None
+        match self.type:
+            case 1:
+                day = (current_date + datetime.timedelta(days=obj)) if obj else current_date.day
+                filter_args = {"date_at__day": day if type(day) is int else day.day, "date_at__month": day.month if obj else current_date.month}
+            case 2:
+                obj = monthdelta(current_date, obj).month if obj else current_date.month
+                filter_args = {"date_at__month": obj}
+
+        day = filter_args.get('date_at__day')
+        month = filter_args.get('date_at__month')
+
+        date = f"{get_months(month) if month else get_months(current_date.month)} {day if day else current_date.day}"
+
+        return [row for row in self.model.objects.filter(**filter_args, storage=storage)], date
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context.update(self._prepare_context(obj=request.GET.get('date')))
+
+        prepare_rows = self._prepare_rows(storage=context.get('bar'), obj=context.get('obj'))
+
+        if type(prepare_rows) is tuple:
+            context['rows'] = prepare_rows[0]
+            context['date'] = prepare_rows[1]
+        return context

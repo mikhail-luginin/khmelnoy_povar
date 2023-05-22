@@ -1,4 +1,5 @@
 from django.conf import settings
+from requests import Response
 
 from core import time
 
@@ -10,79 +11,47 @@ import requests
 
 import xml.etree.ElementTree as ET
 
-from core.telegram import send_message_to_telegram
-
 
 class IikoService:
 
     def _iiko_connect(self) -> str:
-        url = settings.IIKO_API_URL + '/resto/api/auth?login=' + settings.IIKO_API_LOGIN + '&pass=' + settings.IIKO_API_PASSWORD
+        url = f'{settings.IIKO_API_URL}/resto/api/auth?login={settings.IIKO_API_LOGIN}&pass={settings.IIKO_API_PASSWORD}'
         response = requests.get(url)
-        return response.text
+        token = response.text
+        return token
 
-    def _iiko_disconnect(self, token: str):
-        url = settings.IIKO_API_URL + '/resto/api/auth?key=' + token
+    def _iiko_disconnect(self, token: str) -> None:
+        url = settings.IIKO_API_URL + '/resto/api/logout?key=' + token
         requests.get(url)
 
-    def get_nomenclature(self):
+    def _iiko_request(self, url: str, get_params: str = '') -> Response:
         token = self._iiko_connect()
 
-        send_text = settings.IIKO_API_URL + '/resto/api/products?includeDeleted=false&key=' + token
-        r = requests.get(send_text)
+        url = f'{settings.IIKO_API_URL}{url}?key={token}{get_params}'
+        response = requests.get(url)
 
         self._iiko_disconnect(token)
 
-        return r.text
+        return response
 
-    def get_payment_types(self):
-        token = self._iiko_connect()
+    def get_nomenclature(self) -> str:
+        return self._iiko_request('/resto/api/products', '&includeDeleted=false').text
 
-        send_text = settings.IIKO_API_URL + '/resto/api/v2/entities/list?rootType=PaymentType&key=' + token
-        r = requests.get(send_text)
-
-        self._iiko_disconnect(token)
-
-        return r.text
+    def get_payment_types(self) -> str:
+        return self._iiko_request('/resto/api/v2/entities/list', '&rootType=PaymentType').text
 
     def get_suppliers(self):
-        token = self._iiko_connect()
-
-        send_text = settings.IIKO_API_URL + '/resto/api/suppliers?key=' + token
-        r = requests.get(send_text)
-
-        self._iiko_disconnect(token)
-
-        return r.text
+        return self._iiko_request('/resto/api/suppliers')
 
     def get_categories(self):
-        token = self._iiko_connect()
-
-        send_text = settings.IIKO_API_URL + '/resto/api/v2/entities/products/category/list?key=' + token
-        r = requests.get(send_text)
-
-        self._iiko_disconnect(token)
-
-        return r.text
+        return self._iiko_request('/resto/api/v2/entities/products/category/list')
 
     def get_cashshifts(self, date_from: str, date_to: str) -> str:
-        token = self._iiko_connect()
-
-        send_text = settings.IIKO_API_URL + '/resto/api/v2/cashshifts/list?openDateFrom=' + date_from + '&openDateTo=' + date_to + '&status=ANY&key=' + token
-        r = requests.get(send_text)
-
-        self._iiko_disconnect(token)
-
-        return r.text
+        return self._iiko_request('/resto/api/v2/cashshifts/list',
+                                  f'&openDateFrom={date_from}&openDateTo={date_to}&status=ANY').text
 
     def get_sales_by_department(self, session_id: str) -> str:
-        token = self._iiko_connect()
-
-        send_text = settings.IIKO_API_URL + '/resto/api/v2/cashshifts/payments/list/' + session_id + '?key=' + token + '&hideAccepted=false'
-        r = requests.get(send_text)
-
-        self._iiko_disconnect(token)
-
-        return r.text
+        return self._iiko_request(f'/resto/api/v2/cashshifts/payments/list/{session_id}', '&hideAccepted=false').text
 
     def check_inventory(self, storage_id: str, category_name: str) -> str:
         token = self._iiko_connect()
@@ -106,32 +75,19 @@ class IikoService:
         return r.text
 
     def get_storages(self) -> str:
-        token = self._iiko_connect()
-
-        send_text = settings.IIKO_API_URL + '/resto/api/corporation/stores?key=' + token
-        r = requests.get(send_text)
-        self._iiko_disconnect(token)
-        return r.text
+        return self._iiko_request('/resto/api/corporation/stores').text
 
     def get_storages_groups(self) -> str:
-        token = self._iiko_connect()
+        return self._iiko_request('/resto/api/corporation/groups').text
 
-        send_text = settings.IIKO_API_URL + '/resto/api/corporation/groups?key=' + token
-        r = requests.get(send_text)
-        self._iiko_disconnect(token)
-        return r.text
-
-    def get_iiko_events(self, from_time: str, to_time: str):
-        token = self._iiko_connect()
-        send_text = settings.IIKO_API_URL + '/resto/api/events?key=' + token + '&from_time=' + time.get_current_time().strftime(
-            '%Y-%m-%d') + 'T' + from_time + '.000&to_time=' + (time.get_current_time() + datetime.timedelta(days=1)).strftime('%Y-%m-%d') + 'T' + to_time + '.000'
-        r = requests.get(send_text)
-        self._iiko_disconnect(token)
-        return r.text
+    def _get_iiko_events(self) -> str:
+        return self._iiko_request('/resto/api/events',
+                                  f'&from_time={time.get_current_time().strftime("%Y-%m-%d")}T09:00:00.000'
+                                  f'&to_time={time.get_current_time() + datetime.timedelta(days=1)}T02:00:00.000').text
 
     def get_stop_list_events(self):
         rows = []
-        xml = ET.fromstring(self.get_iiko_events('11:00:00', '01:00:00'))
+        xml = ET.fromstring(self._get_iiko_events())
         for event in xml.findall('event'):
             if event.find('type').text == 'stopListItemAdded' or event.find('type').text == 'stopListItemRemoved':
                 dictionary = dict()
@@ -143,3 +99,6 @@ class IikoService:
                     dictionary[name] = value
                 rows.append(dictionary)
         return rows
+
+    def get_terminals(self) -> str:
+        return self._iiko_request('/resto/api/corporation/terminals').text

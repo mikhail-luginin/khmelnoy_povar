@@ -3,6 +3,9 @@
 {% block body %}
     <div class="container-xl">
         <div class="card rounded-3 mb-2">
+            <div class="card-header card-header-light rounded-top-3">
+                Сумма к выдаче: {{ data.total_sum }} руб. (выдано: {{ data.issued_sum }} / осталось: {{ data.left_sum }})
+            </div>
             <table class="table card-table table-hover table-vcenter table-striped">
                 <thead>
                     <tr>
@@ -25,7 +28,7 @@
                 Зарплата расчет ({{ data_for_calculate_month_salary.month_name }} / {% if data_for_calculate_month_salary.period == 1 %}С 1 по 15 число{% elif data_for_calculate_month_salary.period == 2 %}С 16 по 31 число{% endif %})
             </div>
             <div class="card-body">
-                {% for row in rows %}
+                {% for row in data.rows %}
                     <form action="{% url 'Bar:salary_calculation' %}?code={{ code }}" method="post">
                         {% csrf_token %}
                         <input type="hidden" name="employee_id" value="{{ row.employee.id }}">

@@ -16,7 +16,6 @@ DEBUG = bool(int(os.environ.get('DEBUG')))
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(' ')
 
 DJANGO_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -28,13 +27,15 @@ LOCAL_APPS = [
     'apps.bar.apps.BarConfig',
     'apps.iiko.apps.IikoConfig',
     'apps.repairer.apps.RepairerConfig',
-    'apps.api.apps.ApiConfig'
+    'apps.api.apps.ApiConfig',
+    'apps.purchaser.apps.PurchaserConfig',
+    'apps.admin.apps.AdminConfig'
 ]
 THIRD_PARTY_APPS = [
     'rest_framework'
 ]
 
-INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
+INSTALLED_APPS = THIRD_PARTY_APPS + DJANGO_APPS + LOCAL_APPS
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
@@ -55,6 +56,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+if DEBUG:
+    MIDDLEWARE.append("django_cprofile_middleware.middleware.ProfilerMiddleware")
+else:
+    MIDDLEWARE.append("core.middleware.Process500")
 
 ROOT_URLCONF = 'config.urls'
 
@@ -124,6 +130,7 @@ LOGOUT_REDIRECT_URL = '/login'
 LOGIN_REDIRECT_URL = '/lk'
 
 STATIC_URL = '/assets/'
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'assets')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'assets')
 
 MEDIA_URL = '/media/'
@@ -154,6 +161,9 @@ TOVAR_WARE_CATEGORY = 'Посуда'
 
 PAYMENT_TYPE_NAL = 'Наличные'
 PAYMENT_TYPE_BN = 'Бизнес-карта'
+
+PURCHASER_CATEGORY = 'Расходы.Закупщик'
+SALARY_CATEGORY = 'Зарплата'
 
 REDIS_HOST = os.environ.get('REDIS_HOST')
 REDIS_PORT = os.environ.get('REDIS_PORT')
