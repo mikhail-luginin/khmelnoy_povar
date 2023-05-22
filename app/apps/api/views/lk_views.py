@@ -37,12 +37,6 @@ class EmployeeViewSet(ModelViewSetMixin):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
 
-    def get_queryset(self):
-        if self.request.query_params:
-            return Employee.objects.filter(**self.request.query_params)
-        else:
-            return self.queryset
-
 
 class CatalogTypeViewSet(ModelViewSetMixin):
     queryset = CatalogType.objects.all()
