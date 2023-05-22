@@ -132,10 +132,16 @@
                             <div class="dropdown-menu-columns">
                                 <div class="dropdown-menu-column">
                                     {% for item in navbar %}
-                                        {% if item.app_name == 'lk' and item in profile.role.can_view.all %}
+                                        {% if item.app_name == 'lk' and item in profile.role.can_view.all and not request.user.is_superuser %}
                                             <a class="dropdown-item" href="{{ item.link }}">
                                                 {{ item.text }}
                                             </a>
+                                        {% else %}
+                                        {% if item.app_name == 'iiko' %}
+                                            <a class="dropdown-item" href="{{ item.link }}">
+                                                {{ item.text }}
+                                            </a>
+                                        {% endif %}
                                         {% endif %}
                                     {% endfor %}
                                 </div>
@@ -162,10 +168,16 @@
                             <div class="dropdown-menu-columns">
                                 <div class="dropdown-menu-column">
                                     {% for item in navbar %}
-                                        {% if item.app_name == 'iiko' %}
+                                        {% if item.app_name == 'iiko' and item in profile.role.can_view.all and not request.user.is_superuser %}
                                             <a class="dropdown-item" href="{{ item.link }}">
                                                 {{ item.text }}
                                             </a>
+                                        {% else %}
+                                            {% if item.app_name == 'iiko' %}
+                                            <a class="dropdown-item" href="{{ item.link }}">
+                                                {{ item.text }}
+                                            </a>
+                                            {% endif %}
                                         {% endif %}
                                     {% endfor %}
                                 </div>
