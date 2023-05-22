@@ -13,3 +13,9 @@ class WrongFieldTypeError(ValueError):
     """
         Введенный тип данных не подходит под поле модели
     """
+
+
+class FieldUniqueError(Exception):
+    """
+        Такое поле уже есть в базе данных
+    """
