@@ -230,10 +230,10 @@ class InventoryMixin(BaseView):
             for product in item.findall('product'):
                 name = product.find('name').text
                 code = product.find('code').text
-                print(code)
+                if code:
+                    code = int(code)
             expected_amount = item.find('expectedAmount').text
-            count = request.POST.get(code)
-            send_message_to_telegram(chat_id=settings.TELEGRAM_CHAT_ID_FOR_ERRORS, message=f'{count}')
+            count = request.POST.get(str(code))
             difference = int(count) - int(round(float(expected_amount)))
             row[name] = {'fact': count, 'iiko': int(round(float(expected_amount))), 'difference': difference}
             if difference < 0:
