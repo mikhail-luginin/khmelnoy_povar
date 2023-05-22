@@ -10,10 +10,10 @@
             {% for data in employees_data %}
                 <div class="col-3 columns_w_data">
                     <div class="card rounded-3 mb-4">
-                        <div class="card-header card-header-light"><b>{{ data.storage.name }}</b></div>
+                        <div class="card-header card-header-light"><b>{{ data.storage.name }}</b> ({{ date }})</div>
                         <div class="list-group list-group-flush">
                             {% for row in data.barmens %}
-                                <a class="list-group-item list-group-item-action {% if row.work_now %}text-success{% elif row.employee.status == 2 %}text-danger{% endif %}">
+                                <a class="list-group-item list-group-item-action {% if row.employee.status == 2 %}text-danger{% elif row.work_now %}{% if row.work_now.position.args.is_called %}text-primary{% else %}text-success{% endif %}{% endif %}">
                                     <div class="text-truncate">
                                         <i class="fa fa-beer-mug-empty"></i> {{ row.employee.fio }}
                                     </div>
@@ -23,7 +23,7 @@
                                 </a>
                             {% endfor %}
                             {% for row in data.cookers %}
-                                <a class="list-group-item list-group-item-action {% if row.work_now %}text-success{% elif row.employee.status == 2 %}text-danger{% endif %}">
+                                <a class="list-group-item list-group-item-action {% if row.employee.status == 2 %}text-danger{% elif row.work_now %}{% if row.work_now.position.args.is_called %}text-primary{% else %}text-success{% endif %}{% endif %}">
                                     <div class="text-truncate">
                                         <i class="fa fa-bell-concierge"></i> {{ row.employee.fio }}
                                     </div>
@@ -33,7 +33,7 @@
                                 </a>
                             {% endfor %}
                             {% for row in data.teh %}
-                                <a class="list-group-item list-group-item-action {% if row.work_now %}text-success{% elif row.employee.status == 2 %}text-danger{% endif %}">
+                                <a class="list-group-item list-group-item-action {% if row.employee.status == 2 %}text-danger{% elif row.work_now %}{% if row.work_now.position.args.is_called %}text-primary{% else %}text-success{% endif %}{% endif %}">
                                     <div class="text-truncate">
                                         <i class="fa fa-broom"></i> {{ row.employee.fio }}
                                     </div>
