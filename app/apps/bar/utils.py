@@ -232,7 +232,7 @@ class InventoryMixin(BaseView):
                 code = product.find('code').text
             expected_amount = item.find('expectedAmount').text
             count = request.POST.get(code)
-            if count and count != '0':
+            if count:
                 difference = int(count) - int(round(float(expected_amount)))
                 row[name] = {'fact': count, 'iiko': int(round(float(expected_amount))), 'difference': difference}
                 if difference < 0:
