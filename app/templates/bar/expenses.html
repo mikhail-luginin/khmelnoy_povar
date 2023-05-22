@@ -11,7 +11,7 @@
                     {% for row in rows %}
                     <tr
                         onclick="delete_confirm('{{ row.id }}', 'Вы действительно хотите удалить этот расход?<br><br>({{ row.expense_type.name }} - {{ row.sum }})', '/bar/expenses/delete')">
-                        <td>{{ row.expense_type.name }} ({{ row.expense_source.name }})<br><span class="text-secondary">{{ row.comment }}</span></td>
+                        <td>{% if row.expense_source.name == 'Наличные' %}<i class="fa fa-money-bill"></i>{% elif row.expense_source.name == 'Бизнес-карта' %}<i class="fa fa-credit-card"></i>{% endif %} {{ row.expense_type.name }} ({{ row.expense_source.name }})<br><span class="text-secondary">{{ row.comment }}</span></td>
                         <td>{{ row.sum }}</td>
                     </tr>
                     {% endfor %}
