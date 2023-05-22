@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.shortcuts import redirect
 
-from .cards.exceptions import FieldNotFoundError
+from core.validators import validate_field
 
 from apps.lk.models import Partner
 
@@ -16,17 +16,10 @@ class PartnerService:
 
     def partner_edit(self, row_id: str | None, friendly_name: str | None, expense_type: list | None, storage_id: list | None):
 
-        if not row_id:
-            raise FieldNotFoundError('Идентификатор записи в справочнике не найдены.')
-
-        if not friendly_name:
-            raise FieldNotFoundError('Имя для отображения в справочнике не найдено.')
-
-        if not expense_type:
-            raise FieldNotFoundError('Типы расхода в справочнике не найдены.')
-
-        if not storage_id:
-            raise FieldNotFoundError('Заведения в справочнике не найдены.')
+        validate_field(row_id, 'идентификатор')
+        validate_field(friendly_name, 'имя для отображения')
+        validate_field(expense_type, 'типы расхода')
+        validate_field(storage_id, 'заведение')
 
         row = self.partner_model.objects.filter(id=row_id)
         if row.exists():
