@@ -76,7 +76,8 @@ class SalaryService:
             row['month_name'] = salary.get_month_name()
             row['period_name'] = salary.get_period_name()
             accrued_month_data.append(row)
-        for fine in Fine.objects.filter(date_at__month=int('0' + str(month)), employee=employee).order_by('-date_at'):
+
+        for fine in Fine.objects.filter(date_at__month=month, employee=employee).order_by('-date_at'):
             row = dict()
             row['date_at'] = fine.date_at
             row['sum'] = fine.sum
