@@ -27,9 +27,9 @@ def add_percent_and_premium_to_timetable(date_at: str, storage_id: int) -> None:
         percent = money_data['percent']
         premium = money_data['premium']
 
-        fine = Fine.objects.filter(date_at=timetable.date_at, employee=timetable.employee).aggregate(Sum('sum'))['sum__sum']
+        fine = Fine.objects.filter(date_at=timetable.date_at, employee=timetable.employee).first().sum
 
         timetable.percent = percent
         timetable.premium = premium
-        timetable.fine = fine if fine else 0
+        timetable.fine = fine
         timetable.save()
