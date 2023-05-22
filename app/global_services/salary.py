@@ -31,11 +31,11 @@ class SalaryService:
                 percent += round(today_money['sum_for_percent'] * (percent_num / 100))
 
             if timetable_object.position.args['has_premium']:
-                total_day = today_money['total_day'] if timetable_object.employee.job_place.name != 'Бармен' else today_money['sum_for_percent']
                 date = str(timetable_object.date_at).split('-')
                 year = int(date[0])
                 month = int(date[1])
                 if year >= 2023 and month >= 5:
+                    total_day = today_money['total_day']
                     if 80000 <= total_day < 100000:
                         premium += 500
                     elif 100000 <= total_day < 120000:
@@ -43,6 +43,8 @@ class SalaryService:
                     elif total_day >= 120000:
                         premium += 2000
                 else:
+                    total_day = today_money['total_day'] if timetable_object.employee.job_place.name != 'Бармен' else \
+                    today_money['sum_for_percent']
                     if 60000 <= total_day < 70000:
                         premium += 200
                     elif 70000 <= total_day < 100000:
