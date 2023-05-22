@@ -16,7 +16,7 @@ class SalaryManager(models.Manager):
 class TimetableManager(models.Manager):
 
     def get_queryset(self):
-        return super().get_queryset().select_related('storage', 'employee', 'position')
+        return super().get_queryset().select_related('storage', 'employee', 'position', 'fine_reason')
 
 
 class TovarRequestManager(models.Manager):

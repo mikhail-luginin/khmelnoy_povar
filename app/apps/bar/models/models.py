@@ -71,6 +71,7 @@ class Timetable(models.Model):
     percent = models.IntegerField(default=0)
     premium = models.IntegerField(default=0)
     fine = models.IntegerField(default=0)
+    fine_reason = models.ForeignKey(to=Catalog, on_delete=models.SET_NULL, null=True)
 
     objects = managers.TimetableManager()
 
