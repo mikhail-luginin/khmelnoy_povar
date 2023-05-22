@@ -9,6 +9,8 @@
             <div class="card-header card-header-light rounded-top-3">
                 Сотрудники
                 <div class="card-actions">
+                    <button class="btn btn-danger" id="only-deleted">Только уволенные</button>
+                    <button class="btn btn-success" id="without-deleted">Без уволенных</button>
                     <a href="{% url 'LK:create_employee' %}" class="btn btn-tabler">Добавить сотрудника</a>
                 </div>
             </div>
@@ -23,7 +25,7 @@
                                 <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                                 <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                                 <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
-                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder="" id="delete_status"></th>
                                 <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                                 <th></th>
                             </tr>
@@ -49,7 +51,7 @@
 
 {% block scripts %}
     <script>
-        run_datatable('employees-table', '/api/employees', '/lk/employees', [
+        table = run_datatable('employees-table', '/api/employees?is_deleted=0', '/lk/employees', [
             {data: 'photo'},
             {data: 'fio'},
             {data: 'birth_date'},
@@ -60,5 +62,36 @@
             {data: 'active_status'},
             {data: 'status'}
         ], has_delete=false, has_update=false, has_dismiss=true)
+
+        $(document).ready(function() {
+            $('#only-deleted').click(function() {
+                table.destroy()
+                table = run_datatable('employees-table', '/api/employees?is_deleted=1', '/lk/employees', [
+                    {data: 'photo'},
+                    {data: 'fio'},
+                    {data: 'birth_date'},
+                    {data: 'address'},
+                    {data: 'job'},
+                    {data: 'storage_name'},
+                    {data: 'phone'},
+                    {data: 'active_status'},
+                    {data: 'status'}
+                ], has_delete=false, has_update=false, has_dismiss=true)
+            })
+            $('#without-deleted').click(function() {
+                table.destroy()
+                table = run_datatable('employees-table', '/api/employees?is_deleted=0', '/lk/employees', [
+                    {data: 'photo'},
+                    {data: 'fio'},
+                    {data: 'birth_date'},
+                    {data: 'address'},
+                    {data: 'job'},
+                    {data: 'storage_name'},
+                    {data: 'phone'},
+                    {data: 'active_status'},
+                    {data: 'status'}
+                ], has_delete=false, has_update=false, has_dismiss=true)
+            })
+        })
     </script>
 {% endblock %}
