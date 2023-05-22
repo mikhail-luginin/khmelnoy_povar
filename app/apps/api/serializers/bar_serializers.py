@@ -69,7 +69,7 @@ class TovarRequestSerializer(serializers.ModelSerializer):
 
 class ArrivalSerializer(serializers.ModelSerializer):
     storage_name = serializers.CharField(source='storage.name')
-    product_name = serializers.CharField(source='product.name')
+    product_name = serializers.CharField(source='product.name', allow_null=True, default="Не найдено")
     supplier_name = serializers.CharField(source='supplier.name', allow_null=True, default='Поставщик не указан')
     payment_type_name = serializers.CharField(source='payment_type.name', allow_null=True, default='Тип оплаты не указан')
     pay_type_name = serializers.SerializerMethodField()
