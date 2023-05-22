@@ -18,7 +18,7 @@
                                         <i class="fa fa-beer-mug-empty"></i> {{ row.employee.fio }}
                                     </div>
                                     <div class="text-muted">
-                                        {% if row.work_now %}{{ row.work_now.position.name }}{% endif %}
+                                        {% if row.work_now %}{% if row.work_now.position.args.is_called %}{{ row.work_now.position.name }} ({{ row.work_now.storage.district }}){% else %}{{ row.work_now.position.name }}{% endif %}{% endif %}
                                     </div>
                                 </a>
                             {% endfor %}
@@ -28,7 +28,7 @@
                                         <i class="fa fa-bell-concierge"></i> {{ row.employee.fio }}
                                     </div>
                                     <div class="text-muted">
-                                        {% if row.work_now %}{{ row.work_now.position.name }}{% endif %}
+                                        {% if row.work_now %}{% if row.work_now.position.args.is_called %}{{ row.work_now.position.name }} ({{ row.work_now.storage.district }}){% else %}{{ row.work_now.position.name }}{% endif %}{% endif %}
                                     </div>
                                 </a>
                             {% endfor %}
@@ -38,7 +38,7 @@
                                         <i class="fa fa-broom"></i> {{ row.employee.fio }}
                                     </div>
                                     <div class="text-muted">
-                                        {% if row.work_now %}{{ row.work_now.position.name }}{% endif %}
+                                        {% if row.work_now %}{% if row.work_now.position.args.is_called %}{{ row.work_now.position.name }} ({{ row.work_now.storage.district }}){% else %}{{ row.work_now.position.name }}{% endif %}{% endif %}
                                     </div>
                                 </a>
                             {% endfor %}
