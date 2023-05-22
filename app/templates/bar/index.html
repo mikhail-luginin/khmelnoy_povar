@@ -23,6 +23,7 @@
                 {% for row in rows %}
                     <tr onclick="delete_confirm('{{ row.id }}', 'Вы действительно хотите удалить сотрудника {{ row.employee.fio }}?', '/bar/timetable/delete')">
                         <td>
+                            <i class="fa fa-{% if row.employee.job_place.name == 'Бармен' %}beer-mug-empty{% elif row.employee.job_place.name == 'Повар' or row.employee.job_place.name == 'Су-Шеф' %}bell-concierge{% elif row.employee.job_place.name == 'Тех. служащий' %}broom{% endif %}"></i>
                             {{ row.employee.fio }}<br>
                             <span class="text-sm text-secondary">{{ row.position.name }}</span>
                         </td>
