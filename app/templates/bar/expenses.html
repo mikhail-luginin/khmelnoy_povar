@@ -70,8 +70,8 @@
                 <thead>
                     <tr>
                         <th>Тип</th>
-                        <th>Сумма</th>
                         <th>Комментарий</th>
+                        <th>Сумма</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -79,8 +79,8 @@
                     <tr
                         onclick="delete_confirm('{{ row.id }}', 'Вы действительно хотите удалить эту запись?', '/bar/pays/delete')">
                         <td>{{ row.get_type_display }}</td>
-                        <td>{{ row.sum }}</td>
                         <td>{{ row.comment }}</td>
+                        <td>{{ row.sum }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -98,7 +98,7 @@
                                 placeholder="Сумма">
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mb-2">
                         <div class="col-4">Закупщик</div>
                         <div class="col-4">
                             <input class="form-control date-at" name="purchaser_comment" placeholder="Дата">
