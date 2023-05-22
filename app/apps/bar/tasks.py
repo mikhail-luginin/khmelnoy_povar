@@ -30,12 +30,9 @@ def add_percent_and_premium_to_timetable(date_at: str, storage_id: int) -> None:
         timetable.percent = percent
         timetable.premium = premium
 
-        try:
-            fine = Fine.objects.get(date_at=timetable.date_at, employee_id=timetable.employee_id)
-        except Fine.DoesNotExist:
-            fine = None
+        fine = 0
+        for row in Fine.objects.filter(date_at=timetable.date_at, employee_id=timetable.employee_id):
+            fine += row.sum
 
-        if fine:
-            timetable.fine = fine.sum
-            timetable.fine_reason_id = fine.reason_id
+        timetable.fine = fine
         timetable.save()
