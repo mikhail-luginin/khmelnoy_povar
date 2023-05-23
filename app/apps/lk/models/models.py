@@ -193,6 +193,7 @@ class ItemDeficit(models.Model):
     storage = models.ForeignKey(to=Storage, on_delete=models.CASCADE)
     item = models.CharField(max_length=128)
     amount = models.CharField(max_length=32)
+    receive_date = models.DateTimeField(null=True)
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES)
 
     objects = managers.ItemDeficitManager()

@@ -1,6 +1,7 @@
 from core import validators
 
 from apps.lk.models import ItemDeficit, Profile
+from core.time import today_datetime
 
 
 class ItemDeficitService:
@@ -51,6 +52,7 @@ class ItemDeficitService:
             if request.status != 2:
                 return False
             else:
+                request.receive_date = today_datetime()
                 request.status = 3
                 request.save()
         else:
