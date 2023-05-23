@@ -17,7 +17,7 @@ class SalaryService:
         validators.validate_field(percent, 'процент')
         validators.validate_field(premium, 'премиум')
 
-        salary = self.model.objects.create(date_at=date_at, salary_type=salary_type, employee_id=employee_id,
+        salary = self.model.objects.create(date_at=date_at, type=salary_type, employee_id=employee_id,
                                            storage_id=storage_id, oklad=oklad, percent=percent, premium=premium)
         if month and period:
             salary.month = month
