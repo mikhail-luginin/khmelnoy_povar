@@ -29,7 +29,7 @@ class FineService:
         timetable = Timetable.objects.filter(date_at=date_at, employee_id=employee_id)
         if timetable.exists():
             timetable = timetable.first()
-            timetable.fine += fine_sum
+            timetable.fine += int(fine_sum)
             timetable.save()
 
     def edit(self, fine_id: int | None, date_at: str | None,
