@@ -1,11 +1,11 @@
 from ..serializers import NavbarSerializer, RoleSerializer, ProfileSerializer, JobPlaceSerializer, PositionSerializer, \
     EmployeeSerializer, CatalogTypeSerializer, CatalogSerializer, TestQuestionSerializer, TestSerializer, \
     TestResultSerializer, TelegramChatSerializer, CardSerializer, PartnerSerializer, StatementSerializer, \
-    FineSerializer, ExpenseSerializer, LogsSerializer
+    FineSerializer, ExpenseSerializer, LogsSerializer, ItemDeficitSerializer
 from ..utils import ModelViewSetMixin
 
 from apps.lk.models import Navbar, Role, Profile, JobPlace, Position, Employee, Catalog, CatalogType, Logs, Expense, \
-    Fine, Statement, Card, Partner, TelegramChat, TestResult, Test, TestQuestion
+    Fine, Statement, Card, Partner, TelegramChat, TestResult, Test, TestQuestion, ItemDeficit
 
 
 class NavbarViewSet(ModelViewSetMixin):
@@ -104,3 +104,16 @@ class ExpenseViewSet(ModelViewSetMixin):
 class LogsViewSet(ModelViewSetMixin):
     queryset = Logs.objects.all()
     serializer_class = LogsSerializer
+
+
+class ItemDeficitViewSet(ModelViewSetMixin):
+    queryset = ItemDeficit.objects.all()
+    serializer_class = ItemDeficitSerializer
+
+    def get_queryset(self):
+        status = self.request.query_params.get('status')
+
+        if status:
+            return ItemDeficit.objects.filter(status=int(status))
+        else:
+            return self.queryset

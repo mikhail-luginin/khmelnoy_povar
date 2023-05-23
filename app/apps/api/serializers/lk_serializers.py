@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from apps.lk.models import Navbar, Role, Profile, JobPlace, Position, Employee, Catalog, CatalogType, Logs, Expense, \
-    Fine, Statement, Card, Partner, TelegramChat, TestResult, Test, TestQuestion
+    Fine, Statement, Card, Partner, TelegramChat, TestResult, Test, TestQuestion, ItemDeficit
 
 
 class NavbarSerializer(serializers.ModelSerializer):
@@ -155,4 +155,14 @@ class LogsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Logs
+        fields = '__all__'
+
+
+class ItemDeficitSerializer(serializers.ModelSerializer):
+    storage_name = serializers.CharField(source='storage.name')
+    owner_fio = serializers.CharField(source='owner.user.username',
+                                      allow_null=True, default='Не привязан')
+
+    class Meta:
+        model = ItemDeficit
         fields = '__all__'

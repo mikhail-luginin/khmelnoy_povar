@@ -1,3 +1,7 @@
+from django.contrib import messages
+from django.shortcuts import redirect
+
+from core import exceptions
 from core.time import today_date, get_months, get_current_time
 from global_services.salary import SalaryService
 
@@ -11,7 +15,7 @@ from .services.fines import get_fines_on_storage_by_month
 from .services.bar_info import get_full_information_of_day
 
 from apps.bar.models import Timetable, TovarRequest, Arrival, Pays, Setting, Salary, Money
-from apps.lk.models import Expense, Fine
+from apps.lk.models import Expense, Fine, ItemDeficit
 
 from apps.lk.services import catalog, positions, employees
 
@@ -20,6 +24,7 @@ from django.conf import settings
 from django.db.models import Sum
 
 from apps.iiko.models import Storage
+from ..lk.services.item_deficit import ItemDeficitService
 
 
 class IndexView(BaseView):
@@ -230,7 +235,8 @@ class FinesView(DataLogsMixin):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context['fines'] = self._prepare_rows(storage=context.get('bar'), obj=request.GET.get('date'))
-        context['month'] = get_months(get_current_time().month + int(request.GET.get('date'))) if request.GET.get('date') else get_months(get_current_time().month)
+        context['month'] = get_months(get_current_time().month + int(request.GET.get('date'))) if request.GET.get(
+            'date') else get_months(get_current_time().month)
         return context
 
 
@@ -250,3 +256,54 @@ class EndDayDataLogView(DataLogsMixin):
     model = Money
     template_name = 'bar/data_logs/end_day.html'
     type = 1
+
+
+class NeedItemsView(BaseView):
+    template_name = 'bar/need_items.html'
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context.update({
+            "need_items": ItemDeficitService().deficit_by_storage(storage_id=context['bar'].id)
+        })
+
+        return context
+
+    def post(self, request):
+        context = self.get_context_data(request)
+        url = f'/bar/need_items?code={request.GET.get("code")}'
+
+        item = request.POST.get('need_item')
+        amount = request.POST.get('amount_need_item')
+
+        storage = context.get('bar')
+        if isinstance(storage, Storage):
+            storage_id = storage.id
+        else:
+            messages.error(request, 'Заведение не найдено. Перезагрузите страницу')
+            return redirect(url)
+
+        try:
+            ItemDeficitService().create(storage_id=storage_id, item=item, amount=amount)
+            messages.success(request, 'Заявка на нехватку успешно создана.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+            messages.error(request, error)
+
+        return redirect(url)
+
+
+class NeedItemsReceiveView(BaseView):
+
+    def get(self, request):
+        request_id = request.GET.get('id')
+
+        try:
+            receive_status = ItemDeficitService().receive(request_id=request_id)
+            if receive_status:
+                messages.success(request, 'Статус успешно обновлен.')
+            else:
+                messages.error(request, 'Этот запрос еще не был обработан.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, ItemDeficit.DoesNotExist) as error:
+            messages.error(request, error)
+
+        return redirect('/bar/need_items?code=' + request.GET.get('code'))

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Нехватка{% endblock %}
+
+{% block page_title %}Нехватка{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-body table-responsive">
+                <table id="need-items-table" class="table">
+                    <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Заведение</th>
+                        <th>Владелец</th>
+                        <th>Предмет</th>
+                        <th>Кол-во</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(document).ready(function () {
+            run_datatable('need-items-table', '/api/item_deficit', '/lk/need_items', [
+                {data: 'created_at'},
+                {data: 'storage_name'},
+                {data: 'owner_fio'},
+                {data: 'item'},
+                {data: 'amount'},
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        if (row.status === 1) {
+                            url = '"/lk/need_items/send?id=' + row.id + '"'
+                            return "<button onclick='window.location.href = " + url + "' class='btn w-100'>Отправить</button>"
+                        } else if (row.status === 2) {
+                            return '<i class="fa fa-long-arrow-down"></i>'
+                        } else if (row.status === 3) {
+                            return '<i class="fa fa-check-circle"></i>'
+                        }
+                    }
+                }
+            ], has_delete = false, has_update = false, has_dismiss = false, has_edit = false, has_actions = false)
+        })
+    </script>
+{% endblock %}

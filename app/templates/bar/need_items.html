@@ -1,0 +1,52 @@
+{% extends 'bar_base.html' %}
+
+{% block page_name %}Нехватка{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3 mb-2">
+            <div class="card-table">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Предмет</th>
+                            <th>Кол-во</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in need_items %}
+                            <tr class="table-{% if item.status == 1 %}danger{% elif item.status == 2 %}warning{% elif item.status == 3 %}success{% endif %}">
+                                <td>{{ item.created_at|date:'F d G:i' }}</td>
+                                <td>{{ item.item }}</td>
+                                <td>{{ item.amount }}</td>
+                                <td>{% if item.status != 3 %}
+                                    <button onclick="window.location.href = '{% url 'Bar:receive_need_item' %}?code={{ code }}&id={{ item.id }}'" class="btn w-100"
+                                    {% if item.status != 2 %}disabled{% endif %}>Получено</button>{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card rounded-3">
+            <div class="card-body">
+                <form action="{% url 'Bar:need_items' %}?code={{ code }}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label">Предмет дефицита</label>
+                        <input class="form-control" name="need_item" placeholder="Введите предмет дефицита">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Количество нехватки</label>
+                        <input class="form-control" name="amount_need_item" placeholder="Введите количество нехватки">
+                    </div>
+                    <div class="mb-2">
+                        <button type="submit" class="btn w-100">Отправить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -8,6 +8,7 @@ from core.utils import BaseLkView, ObjectEditMixin, ObjectCreateMixin, ObjectDel
 from core import exceptions
 
 from .services import bars
+from .services.item_deficit import ItemDeficitService
 from .services.salary import SalaryService
 from .services.catalog import CatalogService
 from .services.positions import JobsService
@@ -21,7 +22,7 @@ from .services.index_page import IndexPageService
 
 from apps.iiko.services.storage import StorageService
 
-from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee
+from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee, ItemDeficit
 from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest
 from apps.iiko.models import Product, Supplier
 from .services.timetable import TimetableService
@@ -837,3 +838,26 @@ class TimetableUpdateView(BaseLkView):
     def get(self, request):
         calculate_percent_premium_for_all.delay()
         return HttpResponse('update started')
+
+
+class ItemDeficitView(BaseLkView):
+    template_name = 'lk/need_items.html'
+
+
+class ItemDeficitSendView(BaseLkView):
+
+    def get(self, request):
+        context = self.get_context_data(request)
+
+        request_id = request.GET.get('id')
+
+        try:
+            receive_status = ItemDeficitService().send(request_id=request_id, user=context.get('profile'))
+            if receive_status:
+                messages.success(request, 'Статус успешно обновлен.')
+            else:
+                messages.error(request, 'Этот запрос уже обработан.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, ItemDeficit.DoesNotExist) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/need_items')

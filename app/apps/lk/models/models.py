@@ -179,3 +179,20 @@ class Logs(models.Model):
     action = models.CharField(max_length=32)
     comment = models.CharField(max_length=128, null=True)
     is_bar = models.BooleanField(default=False)
+
+
+class ItemDeficit(models.Model):
+    STATUS_CHOICES = [
+        (1, 'Создано'),
+        (2, 'Отправлено'),
+        (3, 'Получено')
+    ]
+
+    created_at = models.DateTimeField(auto_now=True)
+    owner = models.ForeignKey(to=Profile, on_delete=models.SET_NULL, null=True)
+    storage = models.ForeignKey(to=Storage, on_delete=models.CASCADE)
+    item = models.CharField(max_length=128)
+    amount = models.CharField(max_length=32)
+    status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES)
+
+    objects = managers.ItemDeficitManager()

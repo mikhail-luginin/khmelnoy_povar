@@ -71,3 +71,9 @@ class ExpenseManager(models.Manager):
 
     def get_queryset(self):
         return super().get_queryset().select_related('storage', 'expense_type', 'expense_source')
+
+
+class ItemDeficitManager(models.Manager):
+
+    def get_queryset(self):
+        return super().get_queryset().select_related('owner', 'storage')
