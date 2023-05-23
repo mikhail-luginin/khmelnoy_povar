@@ -37,6 +37,12 @@ class HomePageService:
                 row['employees'] = [employee for employee in employees if employee.status == 2]
                 row['priority_id'] = position.priority_id
                 row['args'] = position.args
+            elif position.args['is_called']:
+                row['id'] = position.id
+                row['name'] = position.name
+                row['employees'] = [employee for employee in employees if employee.status == 4 or employee.status == 3]
+                row['priority_id'] = position.priority_id
+                row['args'] = position.args
             else:
                 row['id'] = position.id
                 row['name'] = position.name
