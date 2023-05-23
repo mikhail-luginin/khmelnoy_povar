@@ -15,7 +15,7 @@ def today_date() -> str:
 
 
 def today_datetime() -> str:
-    return get_current_time().strftime('%Y-%m-%d %H:%M:%S')
+    return datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 
 def monthdelta(date: datetime, delta: int) -> datetime.date:
