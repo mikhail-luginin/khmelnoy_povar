@@ -92,8 +92,11 @@
     <script>
         function typeChange() {
             let value = document.getElementById('type').value
-            if (value === 'Расчет') {
-                document.getElementById('raschet-block').removeAttribute('style')
+            if (value === '2') {
+                document.getElementById('raschet-block').style.display = 'block'
+            }
+            else{
+                document.getElementById('raschet-block').style.display = 'none'
             }
         }
     </script>

@@ -55,7 +55,7 @@
                         <input type="tel" inputmode="numeric" class="form-control" name="premium"
                                placeholder="Введите премию" value="{{ row.premium }}">
                     </div>
-                    <div id="raschet-block" style="display: none;">
+                    <div id="raschet-block" style="{% if row.type == 1 %}display: none;{% else %}display: block;{% endif %}">
                         <div class="mb-4">
                             <label class="form-label">Месяц</label>
                             <select type="text" class="form-select" name="month" id="month" placeholder="Выберите месяц">
@@ -89,7 +89,10 @@
         function typeChange() {
             let value = document.getElementById('type').value
             if (value === '2') {
-                document.getElementById('raschet-block').removeAttribute('style')
+                document.getElementById('raschet-block').style.display = 'block'
+            }
+            else{
+                document.getElementById('raschet-block').style.display = 'none'
             }
         }
     </script>
