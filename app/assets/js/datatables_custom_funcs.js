@@ -1,6 +1,6 @@
 function run_datatable(table_id, ajax_url, url, ajax_columns,
                        has_delete = true, has_update = false,
-                       has_dismiss = false, has_edit = true, has_actions = true) {
+                       has_dismiss = false, has_edit = true, has_actions = true, custom_dict = {}) {
     if (has_actions == true) {
         ajax_columns.concat([
             {
@@ -28,7 +28,7 @@ function run_datatable(table_id, ajax_url, url, ajax_columns,
             }
         ])
     }
-    let table = $('#' + table_id).DataTable({
+    let datatable_dict = {
         language: {
             "url": "//cdn.datatables.net/plug-ins/1.11.1/i18n/ru.json"
         },
@@ -43,15 +43,6 @@ function run_datatable(table_id, ajax_url, url, ajax_columns,
         columns: ajax_columns,
         deferRender: true,
         "order": [[0, "desc"]],
-        createdRow: function (row, data, dataIndex) {
-            if (data.status === 1) {
-                $(row).addClass('table-danger');
-            } else if (data.status === 2) {
-                $(row).addClass('table-warning');
-            } else if (data.status === 3) {
-                $(row).addClass('table-success');
-            }
-        },
         footerCallback: function (row, data, start, end, display) {
             var api = this.api();
             var total = [];
@@ -68,7 +59,8 @@ function run_datatable(table_id, ajax_url, url, ajax_columns,
         }
 
 
-    })
+    }
+    let table = $('#' + table_id).DataTable(Object.assign(datatable_dict, custom_dict))
     // Apply column filter
     $('#' + table_id + ' .dt-column-filter th').each(function (i) {
         $('input', this).on('keyup change', function () {

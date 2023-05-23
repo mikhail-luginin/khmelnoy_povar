@@ -47,7 +47,17 @@
                         }
                     }
                 }
-            ], has_delete = false, has_update = false, has_dismiss = false, has_edit = false, has_actions = false)
+            ], has_delete = false, has_update = false, has_dismiss = false, has_edit = false, has_actions = false, data = {
+                createdRow: function (row, data, dataIndex) {
+                    if (data.status === 1) {
+                        $(row).addClass('table-danger');
+                    } else if (data.status === 2) {
+                        $(row).addClass('table-warning');
+                    } else if (data.status === 3) {
+                        $(row).addClass('table-success');
+                    }
+                }
+            })
         })
     </script>
 {% endblock %}
