@@ -4,6 +4,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import redirect
 
+from core.time import get_months
 from core.utils import BaseLkView, ObjectEditMixin, ObjectCreateMixin, ObjectDeleteMixin
 from core import exceptions
 
@@ -502,6 +503,7 @@ class CreateSalaryView(ObjectCreateMixin):
         context = super().get_context_data(request, **kwargs)
         context['storages'] = StorageService().storages_all()
         context['employees'] = EmployeeService().employees_all(False)
+        context['months'] = get_months()
 
         return context
 
@@ -535,6 +537,7 @@ class EditSalaryView(ObjectEditMixin):
         context = super().get_context_data(request, **kwargs)
         context['storages'] = StorageService().storages_all()
         context['employees'] = EmployeeService().employees_all(False)
+        context['months'] = get_months()
 
         return context
 
