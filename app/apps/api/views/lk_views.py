@@ -43,7 +43,7 @@ class EmployeeViewSet(ModelViewSetMixin):
         if is_deleted:
             return Employee.objects.filter(is_deleted=int(is_deleted))
         else:
-            return self.queryset
+            return Employee.objects.all()
 
 
 class CatalogTypeViewSet(ModelViewSetMixin):
@@ -116,4 +116,4 @@ class ItemDeficitViewSet(ModelViewSetMixin):
         if status:
             return ItemDeficit.objects.filter(status=int(status))
         else:
-            return self.queryset
+            return ItemDeficit.objects.all()
