@@ -188,7 +188,7 @@ class ItemDeficit(models.Model):
         (3, 'Получено')
     ]
 
-    created_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField()
     owner = models.ForeignKey(to=Profile, on_delete=models.SET_NULL, null=True)
     storage = models.ForeignKey(to=Storage, on_delete=models.CASCADE)
     item = models.CharField(max_length=128)

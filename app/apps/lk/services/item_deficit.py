@@ -18,6 +18,7 @@ class ItemDeficitService:
         validators.validate_field(amount, 'кол-во нехватки')
 
         self.model.objects.create(
+            created_at=today_datetime(),
             storage_id=storage_id,
             item=item,
             amount=amount,
