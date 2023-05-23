@@ -16,7 +16,7 @@
                                 <div class="col">
                                     <label class="form-label">Остаток наличных в кассе</label>
                                     <input type="tel" inputmode="numeric" class="form-control" name="sum_cash_end_day"
-                                            placeholder="Введите остаток наличных в кассе"/>
+                                           placeholder="Введите остаток наличных в кассе"/>
                                 </div>
                             </div>
                         </div>
@@ -31,16 +31,18 @@
     {% endif %}
     {% if information.error is not True %}
         <div class="container-xl">
-            <div class="card rounded-3">
+            <div class="card rounded-3 mb-2">
                 <div class="card-header card-header-light"><b>Конец дня (№{{ information.session_number }})</b></div>
                 <div class="card-body">
                     <p class="mb-3">
                         Смена открыта: {{ information.open_date }}
-                        {% if information.close_date is not None %}<br> Смена закрыта: {{ information.close_date }}{% endif %}
+                        {% if information.close_date is not None %}<br> Смена закрыта:
+                            {{ information.close_date }}{% endif %}
                     </p>
                     <p class="mb-3">
                         Выручка: {{ information.total_day }}<br>
-                        Наличные: {{ information.total_cash }} ({{ information.cash }} + {{ information.cash_point }})<br>
+                        Наличные: {{ information.total_cash }} ({{ information.cash }}
+                        + {{ information.cash_point }})<br>
                         Оплата картой: {{ information.total_bn }}<br>
                         Яндекс ЕДА: {{ information.yandex }}<br>
                         Delivery Club: {{ information.delivery }}<br>
@@ -57,7 +59,8 @@
                     {% if information.close_date is not None %}
                         <p class="mb-2">
                             {% if information.sum_cash_end_day is None %}
-                                <a class="btn btn-tabler w-100" data-bs-toggle="modal" data-bs-target="#close-day">Заполнить остаток наличных в кассе</a>
+                                <a class="btn btn-tabler w-100" data-bs-toggle="modal" data-bs-target="#close-day">Заполнить
+                                    остаток наличных в кассе</a>
                             {% else %}
                                 <b>Остаток наличных в кассе: </b>{{ information.sum_cash_end_day }}<br>
                                 <b>Расчетный остаток на наличных в кассе: </b>{{ information.calculated }}<br>
@@ -67,6 +70,13 @@
                     {% endif %}
                 </div>
             </div>
+            {% if not information.error %}
+                <div class="card rounded-3">
+                    <div class="card-body">
+                        <b>Сумма для заполнения в IIKO:</b> {{ information.cash }}
+                    </div>
+                </div>
+            {% endif %}
         </div>
     {% endif %}
 {% endblock %}
@@ -85,7 +95,7 @@
     {% endif %}
     {% if information.sum_cash_end_day is None and information.close_date is not None %}
         <script>
-            $(document).ready(function() {
+            $(document).ready(function () {
                 if (document.getElementById('close-day') !== null) {
                     $('#close-day').modal('show');
                 }
