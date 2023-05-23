@@ -52,7 +52,7 @@ class FineService:
             timetable = Timetable.objects.filter(date_at=date_at, employee_id=employee_id)
             if timetable.exists():
                 timetable = timetable.first()
-                timetable.fine += fine_sum
+                timetable.fine += int(fine_sum)
                 timetable.save()
         else:
             raise self.model.DoesNotExist('Запись с указанным идентификатором не найдена.')
