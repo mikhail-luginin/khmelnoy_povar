@@ -8,24 +8,29 @@
             <div class="card-table">
                 <table class="table">
                     <thead>
-                        <tr>
-                            <th>Дата</th>
-                            <th>Предмет</th>
-                            <th>Кол-во</th>
-                            <th></th>
-                        </tr>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Предмет</th>
+                        <th>Кол-во</th>
+                        <th></th>
+                    </tr>
                     </thead>
                     <tbody>
-                        {% for item in need_items %}
-                            <tr class="table-{% if item.status == 1 %}danger{% elif item.status == 2 %}warning{% elif item.status == 3 %}success{% endif %}">
+                    {% for item in need_items %}
+                        {% if item.status != 3 %}
+                            <tr class="table-{% if item.status == 1 %}danger{% elif item.status == 2 %}warning{% endif %}">
                                 <td>{{ item.created_at|date:'F d G:i' }}</td>
                                 <td>{{ item.item }}</td>
                                 <td>{{ item.amount }}</td>
-                                <td>{% if item.status != 3 %}
-                                    <button onclick="window.location.href = '{% url 'Bar:receive_need_item' %}?code={{ code }}&id={{ item.id }}'" class="btn w-100"
-                                    {% if item.status != 2 %}disabled{% endif %}>Получено</button>{% endif %}</td>
+                                <td>
+                                    <button onclick="window.location.href = '{% url 'Bar:receive_need_item' %}?code={{ code }}&id={{ item.id }}'"
+                                            class="btn w-100"
+                                            {% if item.status != 2 %}disabled{% endif %}>Получено
+                                    </button>
+                                </td>
                             </tr>
-                        {% endfor %}
+                        {% endif %}
+                    {% endfor %}
                     </tbody>
                 </table>
             </div>
