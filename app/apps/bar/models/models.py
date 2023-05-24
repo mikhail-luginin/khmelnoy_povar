@@ -132,7 +132,7 @@ class Setting(models.Model):
     percent = models.FloatField(null=True)
     tg_chat_id = models.CharField(max_length=64, null=True)
     expenses_types_with_employees_in_comment = models.ManyToManyField(to=Catalog)
-    args = models.JSONField(default=dict)
+    bar_info = models.JSONField(default=dict)
 
     objects = managers.SettingManager()
 
