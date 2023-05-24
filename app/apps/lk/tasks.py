@@ -20,9 +20,17 @@ def calculate_percent_premium_for_all():
 def bar_actions_telegram_message(storage: int | str, message: str):
     if storage == 'all':
         for bar_setting in Setting.objects.all():
-            send_message_to_telegram(chat_id=bar_setting.tg_chat_id, message=message)
+            if bar_setting.tg_chat_id:
+                send_message_to_telegram(chat_id=bar_setting.tg_chat_id, message=message)
+            else:
+                send_message_to_telegram(chat_id=settings.TELEGRAM_CHAT_ID_FOR_ERRORS,
+                                         message=f'<b>[Admin]</b> ID телеграмм чата не указан для заведения {bar_setting.storage.name}')
     else:
         bar_setting = Setting.objects.filter(storage_id=storage)
         if bar_setting.exists():
             row = bar_setting.first()
-            send_message_to_telegram(chat_id=row.tg_chat_id, message=message)
+            if row.tg_chat_id:
+                send_message_to_telegram(chat_id=row.tg_chat_id, message=message)
+            else:
+                send_message_to_telegram(chat_id=settings.TELEGRAM_CHAT_ID_FOR_ERRORS,
+                                         message=f'<b>[Admin]</b> ID телеграмм чата не указан для заведения {row.storage.name}')

@@ -14,14 +14,14 @@
                         <select class="form-select" name="storage_id" placeholder="Выберите заведение">
                             <option></option>
                             <option value="all">Все</option>
-                            {% for storage in storages %}
-                                <option value="{{ storage.id }}">{{ storage.name }}</option>
+                            {% for setting in settings %}
+                                <option value="{{ setting.storage.id }}">{{ setting.storage.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="mb-4">
                         <label class="form-label">Сообщение</label>
-                        <textarea placeholder="Введите сообщение" name="message"></textarea>
+                        <textarea placeholder="Введите сообщение" name="message" class="form-control"></textarea>
                     </div>
                     <div class="mb-4">
                         <button type="submit" class="btn w-100">Отправить</button>

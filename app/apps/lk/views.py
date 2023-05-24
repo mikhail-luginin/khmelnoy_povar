@@ -873,6 +873,14 @@ class ItemDeficitSendView(BaseLkView):
 class BarActionsView(BaseLkView):
     template_name = 'lk/bar_actions.html'
 
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context.update({
+            "settings": Setting.objects.all()
+        })
+
+        return context
+
 
 def send_message_on_bar(request):
     storage = request.POST.get('storage_id')
