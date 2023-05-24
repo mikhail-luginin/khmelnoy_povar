@@ -19,9 +19,13 @@ class SalaryService:
 
         salary = self.model.objects.create(date_at=date_at, type=salary_type, employee_id=employee_id,
                                            storage_id=storage_id, oklad=oklad, percent=percent, premium=premium)
-        if month and period:
+        if salary_type == '2':
             salary.month = month
             salary.period = period
+            salary.save()
+        else:
+            salary.month = None
+            salary.period = None
             salary.save()
 
     def edit(self, salary_id: int | None, date_at: str | None, salary_type: int | None, employee_id: int | None,
@@ -50,7 +54,11 @@ class SalaryService:
         else:
             raise self.model.DoesNotExist('Запись с указанным идентификатором не найдена.')
 
-        if month and period:
+        if salary_type == '2':
             salary.month = month
             salary.period = period
+            salary.save()
+        else:
+            salary.month = None
+            salary.period = None
             salary.save()
