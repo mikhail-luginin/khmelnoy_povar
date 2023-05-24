@@ -1,3 +1,4 @@
+from apps.bar.models import Setting
 from apps.iiko.models import Storage
 from apps.iiko.services.api import IikoService
 
@@ -12,6 +13,7 @@ class StorageService:
 
     def update(self):
         storages_xml = ET.fromstring(IikoService().get_storages())
+        settings_row = None
 
         for storage in storages_xml.findall('corporateItemDto'):
             storage_id = storage.find('id').text
@@ -22,6 +24,7 @@ class StorageService:
             except Storage.DoesNotExist:
                 storage_row = self.model(storage_id=storage_id, name=name,
                                          code=uuid.uuid4(), is_office=0, is_hide=0)
+                settings_row = Setting(percent=2.5)
 
             storages_groups_xml = ET.fromstring(IikoService().get_storages_groups())
             for storage_group in storages_groups_xml.findall('groupDto'):
@@ -36,10 +39,14 @@ class StorageService:
                                 storage_row.point_of_sale = point_of_sale_id
             storage_row.save()
 
+            if settings_row:
+                settings_row.storage = storage_row
+                settings_row.save()
+
         return True
 
     def storages_all(self) -> List[model]:
         return self.model.objects.filter(is_office=0)
 
-    def storage_get(self, **kwargs) -> model:
+    def storage_get(self, **kwargs) -> model | None:
         return self.model.objects.filter(**kwargs).first()

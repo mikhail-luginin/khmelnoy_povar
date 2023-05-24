@@ -12,7 +12,7 @@ from .services.expenses import ExpensesPageService
 from .services.end_day import complete_day
 from .services.malfunctions import MalfunctionService
 from .services.fines import get_fines_on_storage_by_month
-from .services.bar_info import get_full_information_of_day
+from .services.bar_info import get_full_information_of_day, get_bar_settings
 
 from apps.bar.models import Timetable, TovarRequest, Arrival, Pays, Setting, Salary, Money
 from apps.lk.models import Expense, Fine, ItemDeficit
@@ -60,7 +60,7 @@ class ExpensesView(BaseView):
         context['payin_types'] = catalog.CatalogService().get_catalog_by_type(settings.PAYIN_CATEGORY)
         context['payout_types'] = catalog.CatalogService().get_catalog_by_type(settings.PAYOUT_CATEGORY)
         context['pays_rows'] = Pays.objects.filter(date_at=today_date(), storage=context['bar'])
-        context['bar_setting'] = Setting.objects.get(id=1)
+        context['bar_setting'] = get_bar_settings(storage_id=context.get('bar').id)
 
         return context
 

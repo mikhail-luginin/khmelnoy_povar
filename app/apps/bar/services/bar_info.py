@@ -1,4 +1,5 @@
 import json
+from typing import Type
 
 from apps.bar.models import Timetable, Setting, Money
 from apps.iiko.services.api import IikoService
@@ -16,8 +17,8 @@ def get_bar(**kwargs) -> Storage | None:
         return None
 
 
-def get_bar_settings() -> Setting:
-    return Setting.objects.get_or_create(id=1, percent=2.5)[0]
+def get_bar_settings(storage_id: Type[int] | int) -> Setting:
+    return Setting.objects.filter(storage_id=storage_id)
 
 
 def get_position_main_id(is_called: bool, job_name: str) -> int:

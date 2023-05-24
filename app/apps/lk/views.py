@@ -8,6 +8,7 @@ from core.utils import BaseLkView, ObjectEditMixin, ObjectCreateMixin, ObjectDel
 from core import exceptions
 
 from .services import bars
+from .services.bar_actions import BarActionsService
 from .services.item_deficit import ItemDeficitService
 from .services.salary import SalaryService
 from .services.catalog import CatalogService
@@ -23,7 +24,7 @@ from .services.index_page import IndexPageService
 from apps.iiko.services.storage import StorageService
 
 from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee, ItemDeficit
-from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest
+from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest, Setting
 from apps.iiko.models import Product, Supplier
 from .services.timetable import TimetableService
 
@@ -140,24 +141,27 @@ class BarsView(BaseLkView):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['bars'] = StorageService().storages_all()
+        context['bars'] = Setting.objects.all()
 
         return context
 
 
-class BarsSettingsView(BaseLkView):
+class BarsSettingsView(ObjectEditMixin):
     template_name = 'lk/bars_settings.html'
+    model = Setting
 
     def post(self, request):
+        storage_id = request.GET.get('id')
         percent = request.POST.get('percent')
+        tg_chat_id = request.POST.get('chat-id')
 
         try:
-            if bars.settings_edit(percent=percent):
-                messages.success(request, 'Настройки бара успешно обновлены')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+            bars.settings_edit(storage_id=storage_id, percent=percent, tg_chat_id=tg_chat_id)
+            messages.success(request, 'Настройки бара успешно обновлены')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Setting.DoesNotExist) as error:
             messages.error(request, error)
 
-        return redirect('/lk/bars/settings')
+        return redirect('/lk/bars')
 
 
 class PositionsView(BaseLkView):
@@ -861,3 +865,18 @@ class ItemDeficitSendView(BaseLkView):
             messages.error(request, error)
 
         return redirect('/lk/need_items')
+
+
+class BarActionsView(BaseLkView):
+    template_name = 'lk/bar_actions.html'
+
+
+def send_message_on_bar(request):
+    storage = request.POST.get('storage_id')
+    message = request.POST.get('message')
+
+    try:
+        BarActionsService().send_message_on_bar(storage=storage, message=message)
+        messages.success(request, 'Сообщение успешно отправлено.')
+    except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+        messages.error(request, error)

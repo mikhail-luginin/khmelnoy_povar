@@ -20,7 +20,7 @@ class SalaryService:
     def calculate_prepayment_salary_by_timetable_object(self, timetable_object: Timetable) -> dict[
         Literal["oklad", "percent", "premium"], int
     ]:
-        percent_num = get_bar_settings().percent
+        percent_num = get_bar_settings(storage_id=timetable_object.storage_id).percent
 
         percent = 0
         premium = 0

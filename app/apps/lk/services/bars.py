@@ -1,16 +1,17 @@
 from apps.bar.models import Setting
 
-from core import exceptions
+from core import validators
 
 
-def settings_edit(percent: str | None) -> bool:
-    settings = Setting.objects.get_or_create(id=1)
+def settings_edit(storage_id: int, percent: str, tg_chat_id: str):
+    validators.validate_field(percent, 'процент')
+    validators.validate_field(tg_chat_id, 'ID телеграм чата')
 
-    if not percent:
-        raise exceptions.FieldNotFoundError('Поле процент не найдено.')
-    if percent == '0' or percent == '':
-        raise exceptions.FieldCannotBeEmptyError('Поле процент не может быть пустым или равняться нулю.')
-
-    settings.percent = percent
-    settings.save()
-    return True
+    settings = Setting.objects.filter(storage_id=storage_id)
+    if settings.exists():
+        settings = settings.first()
+        settings.percent = percent
+        settings.tg_chat_id = tg_chat_id
+        settings.save()
+    else:
+        raise Setting.DoesNotExist('Запись с указанным идентификатором не найдена.')
