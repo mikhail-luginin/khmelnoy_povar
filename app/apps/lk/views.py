@@ -883,3 +883,5 @@ def send_message_on_bar(request):
         messages.success(request, 'Сообщение успешно отправлено.')
     except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
         messages.error(request, error)
+
+    return redirect('/lk/bars/actions')
