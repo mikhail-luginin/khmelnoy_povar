@@ -18,7 +18,7 @@ def get_bar(**kwargs) -> Storage | None:
 
 
 def get_bar_settings(storage_id: Type[int] | int) -> Setting:
-    return Setting.objects.filter(storage_id=storage_id)
+    return Setting.objects.filter(storage_id=storage_id).first()
 
 
 def get_position_main_id(is_called: bool, job_name: str) -> int:
