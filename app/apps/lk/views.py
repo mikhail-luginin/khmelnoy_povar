@@ -712,6 +712,10 @@ class DeleteFineView(ObjectDeleteMixin):
     model = Fine
     success_url = '/lk/fines'
 
+    def get(self, request):
+        FineService().delete(fine_id=request.GET.get('id'))
+        return redirect('/lk/fines')
+
 
 class EmployeesView(BaseLkView):
     template_name = 'lk/employees/index.html'
