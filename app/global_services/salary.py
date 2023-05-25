@@ -262,22 +262,29 @@ class SalaryService:
         calculated_sum = 0
 
         if not Salary.objects.filter(employee=employee, period=3).exists():
-            current_month_datetime = get_current_time()
+            current_datetime = get_current_time()
             previous_month_datetime = monthdelta(get_current_time(), -1)
 
             calculated_sum += self.calculate_salary(employee=employee,
-                                                    year=current_month_datetime.year,
-                                                    month=current_month_datetime.month, period=1)
+                                                    year=current_datetime.year,
+                                                    month=current_datetime.month,
+                                                    period=1,
+                                                    is_received=True)
             calculated_sum += self.calculate_salary(employee=employee,
-                                                    year=current_month_datetime.year,
-                                                    month=current_month_datetime.month, period=2)
-
+                                                    year=current_datetime.year,
+                                                    month=current_datetime.month,
+                                                    period=2,
+                                                    is_received=True)
             calculated_sum += self.calculate_salary(employee=employee,
                                                     year=previous_month_datetime.year,
-                                                    month=previous_month_datetime.month, period=1)
+                                                    month=previous_month_datetime.month,
+                                                    period=1,
+                                                    is_received=True)
             calculated_sum += self.calculate_salary(employee=employee,
                                                     year=previous_month_datetime.year,
-                                                    month=previous_month_datetime.month, period=2)
+                                                    month=previous_month_datetime.month,
+                                                    period=2,
+                                                    is_received=True)
 
             return calculated_sum
         else:
@@ -326,7 +333,7 @@ class SalaryService:
 
         return redirect('/bar/salary/retired_employees?code=' + code)
 
-    def calculate_salary(self, employee: Employee, year: int, month: int, period: int) -> int:
+    def calculate_salary(self, employee: Employee, year: int, month: int, period: int, is_received: bool = False) -> int:
         day_gte = None
         day_lte = None
 
@@ -369,7 +376,15 @@ class SalaryService:
             except Fine.DoesNotExist:
                 pass
 
-            calculated_sum += oklad + percent + premium - fine
+            if is_received:
+                try:
+                    salary = Salary.objects.get(employee=employee, date_at=timetable.date_at, type=2)
+                    oklad -= salary.oklad
+                except Salary.DoesNotExist:
+                    pass
+                calculated_sum += oklad + percent + premium - fine
+            else:
+                calculated_sum += oklad + percent + premium - fine
 
         return calculated_sum
 
