@@ -44,7 +44,7 @@ class SalaryService:
                         premium += 2000
                 else:
                     total_day = today_money['total_day'] if timetable_object.employee.job_place.name != 'Бармен' else \
-                    today_money['sum_for_percent']
+                        today_money['sum_for_percent']
                     if 60000 <= total_day < 70000:
                         premium += 200
                     elif 70000 <= total_day < 100000:
@@ -151,9 +151,9 @@ class SalaryService:
                 data['issued_sum'] += salary.oklad + salary.percent + salary.premium
             else:
                 if (timetable.position.args['is_called']
-                        or timetable.position.args['is_usil']
-                        or 'овар' in timetable.position.name
-                        or 'служащий' in timetable.position.name) and not timetable.position.args['is_trainee']:
+                    or timetable.position.args['is_usil']
+                    or 'овар' in timetable.position.name
+                    or 'служащий' in timetable.position.name) and not timetable.position.args['is_trainee']:
                     if 'служащий' in timetable.position.name and not timetable.position.args['is_called']:
                         row['oklad'] = 800
                     elif 'овар' in timetable.position.name and not timetable.position.args['is_called']:
@@ -259,44 +259,21 @@ class SalaryService:
         return redirect(request.META.get('HTTP_REFERER'))
 
     def get_retired_employee_accrue_sum(self, employee: Employee) -> int | bool:
-        oklad = 0
-        percent = 0
-        premium = 0
-        fine = 0
+        first_period = 0
+        second_period = 0
 
         if Salary.objects.filter(employee=employee, period=3).exists() is False:
             for timetable in Timetable.objects.filter(employee=employee):
                 if timetable.date_at.month == get_current_time().month or timetable.date_at.month == monthdelta(
                         get_current_time(), -1).month:
-                    oklad += timetable.oklad
+                    first_period += self.calculate_salary(timetable.employee,
+                                                         timetable.date_at.year,
+                                                         timetable.date_at.month, 1)
+                    second_period += self.calculate_salary(timetable.employee,
+                                                          timetable.date_at.year,
+                                                          timetable.date_at.month, 2)
 
-                    employee_money_information = self.calculate_prepayment_salary_by_timetable_object(
-                        timetable_object=timetable)
-                    percent += employee_money_information['percent']
-                    premium += employee_money_information['premium']
-
-                    try:
-                        salary = Salary.objects.get(employee=employee, date_at=timetable.date_at, type=1)
-                        oklad -= salary.oklad
-                        percent -= salary.percent
-                        premium -= salary.premium
-                    except Salary.DoesNotExist:
-                        pass
-
-                    try:
-                        salary = Salary.objects.get(employee=employee, date_at=timetable.date_at, type=2)
-                        oklad -= salary.oklad
-                    except Salary.DoesNotExist:
-                        pass
-
-                    try:
-                        fines = Fine.objects.filter(employee=employee, date_at=timetable.date_at)
-                        for row in fines:
-                            fine += row.sum
-                    except Fine.DoesNotExist:
-                        pass
-
-            return oklad + percent + premium - fine
+            return first_period + second_period
         else:
             return False
 
