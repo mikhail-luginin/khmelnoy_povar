@@ -259,21 +259,27 @@ class SalaryService:
         return redirect(request.META.get('HTTP_REFERER'))
 
     def get_retired_employee_accrue_sum(self, employee: Employee) -> int | bool:
-        first_period = 0
-        second_period = 0
+        calculated_sum = 0
 
-        if Salary.objects.filter(employee=employee, period=3).exists() is False:
-            for timetable in Timetable.objects.filter(employee=employee):
-                if timetable.date_at.month == get_current_time().month or timetable.date_at.month == monthdelta(
-                        get_current_time(), -1).month:
-                    first_period += self.calculate_salary(timetable.employee,
-                                                          timetable.date_at.year,
-                                                          timetable.date_at.month, 1)
-                    second_period += self.calculate_salary(timetable.employee,
-                                                           timetable.date_at.year,
-                                                           timetable.date_at.month, 2)
+        if not Salary.objects.filter(employee=employee, period=3).exists():
+            current_month_datetime = get_current_time()
+            previous_month_datetime = monthdelta(get_current_time(), -1)
 
-            return first_period + second_period
+            calculated_sum += self.calculate_salary(employee=employee,
+                                                    year=current_month_datetime.year,
+                                                    month=current_month_datetime.month, period=1)
+            calculated_sum += self.calculate_salary(employee=employee,
+                                                    year=current_month_datetime.year,
+                                                    month=current_month_datetime.month, period=2)
+
+            calculated_sum += self.calculate_salary(employee=employee,
+                                                    year=previous_month_datetime.year,
+                                                    month=previous_month_datetime.month, period=1)
+            calculated_sum += self.calculate_salary(employee=employee,
+                                                    year=previous_month_datetime.year,
+                                                    month=previous_month_datetime.month, period=2)
+
+            return calculated_sum
         else:
             return False
 
