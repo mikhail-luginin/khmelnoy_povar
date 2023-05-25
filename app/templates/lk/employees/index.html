@@ -69,7 +69,7 @@
                 table.destroy()
                 table = run_datatable('employees-table', '/api/employees?is_deleted=1', '/lk/employees', [
                     {data: 'photo'},
-                    {data: 'fio'},
+                    {data: 'employee_fio'},
                     {data: 'birth_date'},
                     {data: 'address'},
                     {data: 'job'},
@@ -83,7 +83,7 @@
                 table.destroy()
                 table = run_datatable('employees-table', '/api/employees?is_deleted=0', '/lk/employees', [
                     {data: 'photo'},
-                    {data: 'fio'},
+                    {data: 'employee_fio'},
                     {data: 'birth_date'},
                     {data: 'address'},
                     {data: 'job'},
