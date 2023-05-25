@@ -378,13 +378,12 @@ class SalaryService:
 
             if is_received:
                 try:
-                    salary = Salary.objects.get(employee=employee, date_at=timetable.date_at, type=2)
+                    salary = Salary.objects.get(employee=employee, type=2, period=period, month=month-1)
                     oklad -= salary.oklad
                 except Salary.DoesNotExist:
                     pass
-                calculated_sum += oklad + percent + premium - fine
-            else:
-                calculated_sum += oklad + percent + premium - fine
+
+            calculated_sum += oklad + percent + premium - fine
 
         return calculated_sum
 
