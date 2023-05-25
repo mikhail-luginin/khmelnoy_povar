@@ -330,6 +330,7 @@ def update_money(request):
 
 
 class MoneyEditView(ObjectEditMixin):
+    template_name = 'lk/money/edit.html'
     model = Money
 
     def post(self, request):
