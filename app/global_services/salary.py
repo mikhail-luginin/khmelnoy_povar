@@ -386,7 +386,7 @@ class SalaryService:
             except Fine.DoesNotExist:
                 pass
 
-            calculated_sum += oklad + percent + premium
+            calculated_sum += oklad + percent + premium - fine
 
         return calculated_sum
 
