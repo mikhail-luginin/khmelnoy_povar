@@ -714,6 +714,7 @@ class DeleteFineView(ObjectDeleteMixin):
 
     def get(self, request):
         FineService().delete(fine_id=request.GET.get('id'))
+        messages.success(request, 'Штраф успешно удален.')
         return redirect('/lk/fines')
 
 
