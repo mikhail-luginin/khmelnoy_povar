@@ -1,3 +1,4 @@
+from django.db.models import Sum
 from django.shortcuts import redirect
 from django.contrib import messages
 
@@ -268,25 +269,26 @@ class SalaryService:
             calculated_sum += self.calculate_salary(employee=employee,
                                                     year=current_datetime.year,
                                                     month=current_datetime.month,
-                                                    period=1,
-                                                    is_received=True)
+                                                    period=1)
             calculated_sum += self.calculate_salary(employee=employee,
                                                     year=current_datetime.year,
                                                     month=current_datetime.month,
-                                                    period=2,
-                                                    is_received=True)
+                                                    period=2)
             calculated_sum += self.calculate_salary(employee=employee,
                                                     year=previous_month_datetime.year,
                                                     month=previous_month_datetime.month,
-                                                    period=1,
-                                                    is_received=True)
+                                                    period=1)
             calculated_sum += self.calculate_salary(employee=employee,
                                                     year=previous_month_datetime.year,
                                                     month=previous_month_datetime.month,
-                                                    period=2,
-                                                    is_received=True)
+                                                    period=2)
 
-            return calculated_sum
+            received_sum = Salary.objects.filter(date_at__month=current_datetime.month,
+                                                 date_at__year=current_datetime.year,
+                                                 month=previous_month_datetime.month,
+                                                 type=2).aggregate(total_sum=Sum('oklad'))['total_sum']
+
+            return calculated_sum - received_sum
         else:
             return False
 
@@ -333,7 +335,7 @@ class SalaryService:
 
         return redirect('/bar/salary/retired_employees?code=' + code)
 
-    def calculate_salary(self, employee: Employee, year: int, month: int, period: int, is_received: bool = False) -> int:
+    def calculate_salary(self, employee: Employee, year: int, month: int, period: int) -> int:
         day_gte = None
         day_lte = None
 
@@ -375,13 +377,6 @@ class SalaryService:
                     fine += row.sum
             except Fine.DoesNotExist:
                 pass
-
-            if is_received:
-                try:
-                    salary = Salary.objects.get(employee=employee, type=2, period=period, month=month-1)
-                    oklad -= salary.oklad
-                except Salary.DoesNotExist:
-                    pass
 
             calculated_sum += oklad + percent + premium - fine
 
