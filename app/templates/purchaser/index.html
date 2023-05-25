@@ -22,6 +22,10 @@
                 <div class="card-body">
                     ИП Лугинин: {{ data.ip_luginin }}<br>
                     ИП Москвичев: {{ data.ip_moskvichev }}<br>
+                    ИП Лугинин нал: {{ data.ip_luginin_nal }}<br>
+                    ИП Москвичев нал: {{ data.ip_moskvichev_nal }}<br>
+                    ИП Лугинин безнал: {{ data.ip_luginin_bn }}<br>
+                    ИП Москвичев безнал: {{ data.ip_moskvichev_bn }}<br>
                     Нал: {{ data.nal }}<br>
                     Безнал: {{ data.bn }}<br>
                 </div>
@@ -40,7 +44,7 @@
                     </thead>
                     <tbody>
                         {% for row in rows %}
-                            <tr>
+                            <tr onclick="delete_confirm('{{ row.id }}', 'Вы действительно хотите удалить расход {{ row.payment_receiver }}?', '/purchaser')">
                                 <td>{{ row.date_at|date:'m.d' }}</td>
                                 <td>{{ row.storage.name }}</td>
                                 <td>{{ row.payment_receiver }}</td>
