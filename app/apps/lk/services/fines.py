@@ -68,7 +68,7 @@ class FineService:
         if fine.exists():
             fine = fine.first()
 
-            timetable = self.model.objects.filter(employee=fine.employee, date_at=fine.date_at)
+            timetable = Timetable.objects.filter(employee=fine.employee, date_at=fine.date_at)
             if timetable.exists():
                 timetable = timetable.first()
                 timetable.fine -= fine.sum
