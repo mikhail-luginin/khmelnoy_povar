@@ -44,7 +44,7 @@
                     </thead>
                     <tbody>
                         {% for row in rows %}
-                            <tr onclick="delete_confirm('{{ row.id }}', 'Вы действительно хотите удалить расход {{ row.payment_receiver }}?', '/purchaser')">
+                            <tr onclick="delete_confirm('{{ row.id }}', 'Вы действительно хотите удалить расход {{ row.payment_receiver }}?', '/purchaser/delete')">
                                 <td>{{ row.date_at|date:'m.d' }}</td>
                                 <td>{{ row.storage.name }}</td>
                                 <td>{{ row.payment_receiver }}</td>
