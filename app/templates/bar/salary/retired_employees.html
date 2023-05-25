@@ -18,7 +18,7 @@
                     <tbody>
                     {% for row in data.rows %}
                         <tr>
-                            <td>{{ row.employee.fio }}</td>
+                            <td><a href="/bar/employee?employee_code={{ row.employee.code }}">{{ row.employee.fio }}</a></td>
                             <td>{{ row.sum }}</td>
                             <td><a class="btn" href="{% url 'Bar:salary_for_retired_employee_accrue' %}?code={{ code }}&employee_code={{ row.employee.code }}">Получить</a></td>
                         </tr>
