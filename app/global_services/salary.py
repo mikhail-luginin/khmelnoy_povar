@@ -267,11 +267,11 @@ class SalaryService:
                 if timetable.date_at.month == get_current_time().month or timetable.date_at.month == monthdelta(
                         get_current_time(), -1).month:
                     first_period += self.calculate_salary(timetable.employee,
-                                                         timetable.date_at.year,
-                                                         timetable.date_at.month, 1)
-                    second_period += self.calculate_salary(timetable.employee,
                                                           timetable.date_at.year,
-                                                          timetable.date_at.month, 2)
+                                                          timetable.date_at.month, 1)
+                    second_period += self.calculate_salary(timetable.employee,
+                                                           timetable.date_at.year,
+                                                           timetable.date_at.month, 2)
 
             return first_period + second_period
         else:
