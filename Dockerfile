@@ -15,8 +15,3 @@ RUN apk add mariadb-dev
 RUN apk add --update --no-cache --virtual .tmp-build-deps gcc libc-dev linux-headers
 
 RUN pip install --no-cache-dir -r /temp/requirements.txt
-
-RUN useradd -rms /bin/bash appuser && chmod 777 /opt /run
-RUN chown -R appuser:appuser /app && chmod 755 /app
-
-USER appuser
