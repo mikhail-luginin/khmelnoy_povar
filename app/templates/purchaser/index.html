@@ -6,11 +6,13 @@
             <div class="card-header card-header-light">Фильтр</div>
             <div class="card-body">
                 <form action="{% url 'Purchaser:index' %}">
-                    <input class="form-control date-at" name="date_at" placeholder="Выберите дату" {% if date_at %}value="{{ date_at }}"{% endif %}><br>
+                    <input class="form-control date-at" name="date_at" placeholder="Выберите дату"
+                           {% if date_at %}value="{{ date_at }}"{% endif %}><br>
                     <select class="form-select mb-1" placeholder="Выберите заведение" name="storage_id">
                         <option></option>
                         {% for storage in storages %}
-                            <option value="{{ storage.id }}" {% if storage.id == storage_id %}selected{% endif %}>{{ storage.name }}</option>
+                            <option value="{{ storage.id }}"
+                                    {% if storage.id == storage_id %}selected{% endif %}>{{ storage.name }}</option>
                         {% endfor %}
                     </select>
                     <button type="submit" class="btn btn-tabler w-100">Применить</button>
@@ -20,14 +22,22 @@
         <div class="mb-2">
             <div class="card rounded-3">
                 <div class="card-body">
-                    ИП Лугинин: {{ data.ip_luginin }}<br>
-                    ИП Москвичев: {{ data.ip_moskvichev }}<br>
-                    ИП Лугинин нал: {{ data.ip_luginin_nal }}<br>
-                    ИП Москвичев нал: {{ data.ip_moskvichev_nal }}<br>
-                    ИП Лугинин безнал: {{ data.ip_luginin_bn }}<br>
-                    ИП Москвичев безнал: {{ data.ip_moskvichev_bn }}<br>
-                    Нал: {{ data.nal }}<br>
-                    Безнал: {{ data.bn }}<br>
+                    <div class="row">
+                        <div class="col-4">
+                            ИП Лугинин: {{ data.ip_luginin }}<br>
+                            ИП Лугинин нал: {{ data.ip_luginin_nal }}<br>
+                            ИП Лугинин безнал: {{ data.ip_luginin_bn }}<br>
+                        </div>
+                        <div class="col-4">
+                            ИП Москвичев: {{ data.ip_moskvichev }}<br>
+                            ИП Москвичев нал: {{ data.ip_moskvichev_nal }}<br>
+                            ИП Москвичев безнал: {{ data.ip_moskvichev_bn }}<br>
+                        </div>
+                        <div class="col-4">
+                            Нал: {{ data.nal }}<br>
+                            Безнал: {{ data.bn }}<br>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -35,22 +45,22 @@
             <div class="card-body">
                 <table class="table table-sm table-vcenter">
                     <thead>
-                        <tr>
-                            <th>Дата</th>
-                            <th>Заведение</th>
-                            <th>Получатель платежа</th>
-                            <th>Сумма</th>
-                        </tr>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Заведение</th>
+                        <th>Получатель платежа</th>
+                        <th>Сумма</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        {% for row in rows %}
-                            <tr onclick="delete_confirm('{{ row.id }}', 'Вы действительно хотите удалить расход {{ row.payment_receiver }}?', '/purchaser/delete')">
-                                <td>{{ row.date_at|date:'m.d' }}</td>
-                                <td>{{ row.storage.name }}</td>
-                                <td>{{ row.payment_receiver }}</td>
-                                <td>{{ row.sum }}</td>
-                            </tr>
-                        {% endfor %}
+                    {% for row in rows %}
+                        <tr onclick="delete_confirm('{{ row.id }}', 'Вы действительно хотите удалить расход {{ row.payment_receiver }}?', '/purchaser/delete')">
+                            <td>{{ row.date_at|date:'m.d' }}</td>
+                            <td>{{ row.storage.name }}</td>
+                            <td>{{ row.payment_receiver }}</td>
+                            <td>{{ row.sum }}</td>
+                        </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
             </div>
