@@ -289,14 +289,20 @@ class SalaryService:
                                                      month=previous_month_datetime.month,
                                                      type=2).aggregate(total_sum=Sum('oklad'))['total_sum']
             received_sum_objj = Salary.objects.filter(employee=employee,
-                                                     date_at__month=current_datetime.month,
-                                                     date_at__year=current_datetime.year,
-                                                     month=current_datetime.month,
-                                                     type=2).aggregate(total_sum=Sum('oklad'))['total_sum']
+                                                      date_at__month=current_datetime.month,
+                                                      date_at__year=current_datetime.year,
+                                                      month=current_datetime.month,
+                                                      type=2).aggregate(total_sum=Sum('oklad'))['total_sum']
+            received_sum_objjj = Salary.objects.filter(employee=employee,
+                                                       date_at__month=previous_month_datetime.month,
+                                                       date_at__year=previous_month_datetime.year,
+                                                       month=previous_month_datetime.month,
+                                                       type=2).aggregate(total_sum=Sum('oklad'))['total_sum']
             received_sum = received_sum_obj if received_sum_obj else 0
             received_summ = received_sum_objj if received_sum_objj else 0
+            received_summm = received_sum_objjj if received_sum_objjj else 0
 
-            return calculated_sum - received_sum - received_summ
+            return calculated_sum - received_sum - received_summ - received_summm
         else:
             return False
 
