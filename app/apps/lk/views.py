@@ -737,7 +737,7 @@ class CreateEmployeeView(ObjectCreateMixin):
                                               address=address, job_id=job_id, storage_id=storage_id, phone=phone, status=status, photo=photo)
             messages.success(request, 'Сотрудник успешно создан.')
             url='/lk/employees'
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Exception) as error:
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, exceptions.UniqueFieldError, exceptions.IncorrectFieldError) as error:
             messages.error(request, error)
             url='/lk/employees/create'
 
@@ -773,7 +773,7 @@ class EditEmployeeView(ObjectEditMixin):
                                             storage_id=storage_id, phone=phone, status=status, photo=photo)
             messages.success(request, 'Сотрудник успешно отредактирован.')
             url = '/lk/employees'
-        except (Exception, exceptions.FieldCannotBeEmptyError, exceptions.FieldNotFoundError) as error:
+        except (exceptions.FieldCannotBeEmptyError, exceptions.FieldNotFoundError, exceptions.UniqueFieldError, exceptions.IncorrectFieldError) as error:
             messages.error(request, error)
             url = f'/lk/employees/edit?id={employee_id}'
 

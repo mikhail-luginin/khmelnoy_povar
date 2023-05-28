@@ -38,10 +38,10 @@ class EmployeeService:
             photo = None
 
         if '_' in phone:
-            raise exceptions.FieldNotFoundError('Некорректный ввод номера телефона. Попробуйте еще раз.')
+            raise exceptions.IncorrectFieldError('Некорректный ввод номера телефона. Попробуйте еще раз.')
 
         if self.model.objects.filter(phone__contains=phone[1:9]).exists():
-            raise Exception('Данный номер телефона уже присутствует в базе сотрудников.')
+            raise exceptions.UniqueFieldError('Данный номер телефона уже присутствует в базе сотрудников.')
 
         row = self.model(
             code=secrets.token_hex(16),
@@ -65,13 +65,12 @@ class EmployeeService:
         validators.validate_field(last_name, 'имя')
         validators.validate_field(birth_date, 'дата рождения')
         validators.validate_field(phone, 'номер телефона')
-
-        job_place_id = None if job_place_id == '' else job_place_id
-        storage_id = None if storage_id == '' else storage_id
-        status = 3 if status == '' else status
+        validators.validate_field(job_place_id, 'должность')
+        validators.validate_field(storage_id, 'заведение')
+        validators.validate_field(status, 'статус')
 
         if len(phone) != 10:
-            raise exceptions.FieldNotFoundError('Некорректный ввод номера телефона. Попробуйте еще раз')
+            raise exceptions.IncorrectFieldError('Некорректный ввод номера телефона. Попробуйте еще раз')
 
         employee = self.model.objects.filter(id=employee_id)
 
@@ -96,7 +95,7 @@ class EmployeeService:
 
             similar_employee = self.model.objects.filter(phone=phone).exclude(id=employee_id)
             if similar_employee.exists():
-                raise Exception('Данный номер телефона уже присутствует в базе сотрудников.')
+                raise exceptions.UniqueFieldError('Данный номер телефона уже присутствует в базе сотрудников.')
             else:
                 employee.phone = phone
                 employee.save()

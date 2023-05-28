@@ -44,10 +44,10 @@ class PositionSerializer(serializers.ModelSerializer):
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
-    job = serializers.CharField(source='job_place.name', default='Не привязана')
-    storage_name = serializers.CharField(source='storage.name', default='Не привязано')
-    active_status = serializers.SerializerMethodField()
-    status = serializers.CharField(source='get_status_display', default='Сотрудник')
+    job = serializers.CharField(source='job_place.name', default='Не привязана', allow_null=True)
+    storage_name = serializers.CharField(source='storage.name', default='Не привязано', allow_null=True)
+    active_status = serializers.SerializerMethodField(allow_null=True)
+    status = serializers.CharField(source='get_status_display', default='Сотрудник', allow_null=True)
     employee_fio = serializers.SerializerMethodField()
     photo = serializers.SerializerMethodField()
 
