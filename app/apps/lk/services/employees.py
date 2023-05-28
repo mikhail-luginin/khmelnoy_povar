@@ -1,5 +1,7 @@
+import os
 import secrets
 
+from core import exceptions
 from core.time import today_date
 from core import validators
 from apps.lk.models import Employee
@@ -11,62 +13,68 @@ from apps.iiko.services.storage import StorageService
 from django.shortcuts import redirect
 from django.contrib import messages
 
-from typing import List
-
 
 class EmployeeService:
     model = Employee
 
-    def employees_all(self, is_deleted: bool, **kwargs) -> List[model]:
+    def employees_all(self, is_deleted: bool, **kwargs) -> list[model]:
         return self.model.objects.filter(is_deleted=0, **kwargs) if is_deleted is False else self.model.objects.filter(is_deleted=1, **kwargs)
 
     def employee_get(self, employee_id) -> model:
         return self.model.objects.get(id=employee_id)
 
-    def employee_create(self, request) -> redirect:
-        first_name = request.POST.get('first-name')
-        last_name = request.POST.get('last-name')
-        birth_date = request.POST.get('birth-date')
-        address = request.POST.get('address')
-        job_id = request.POST.get('job-id')
-        storage_id = request.POST.get('storage-id')
-        phone = request.POST.get('phone')
-        status = request.POST.get('status')
+    def employee_create(self, request, first_name: str | None, last_name: str | None, birth_date: str | None, address: str | None,
+                        job_id: int | None, storage_id: int | None, phone: str | None, status: int | None, photo) -> redirect:
+        validators.validate_field(first_name, 'фамилия')
+        validators.validate_field(last_name, 'имя')
+        validators.validate_field(birth_date, 'дата рождения')
+        validators.validate_field(phone, 'номер телефона')
+
+        job_id = None if job_id == '' else job_id
+        storage_id = None if storage_id == '' else storage_id
+        status = 3 if status == '' else status
+
+        if not photo:
+            photo = None
+
+        if '_' in phone:
+            raise exceptions.FieldNotFoundError('Некорректный ввод номера телефона. Попробуйте еще раз.')
 
         if self.model.objects.filter(phone__contains=phone[1:9]).exists():
-            messages.error(request, 'Данный сотрудник уже добавлен в базу.')
-            return redirect(request.META.get('HTTP_REFERER'))
+            raise Exception('Данный номер телефона уже присутствует в базе сотрудников.')
 
         row = self.model(
-            photo=0,
             code=secrets.token_hex(16),
+            photo=photo,
             fio=f'{last_name} {first_name}',
             birth_date=birth_date,
             address=address,
             job_place=positions.JobsService().job_get(id=job_id),
             phone=phone,
-            status=status
+            status=status,
         )
         row.storage = StorageService().storage_get(id=storage_id) if storage_id is not None else StorageService().storage_get(
             code=request.GET.get('code'))
 
         row.save()
 
-        messages.success(request, 'Сотрудник успешно создан.')
-        return redirect('/lk/employees')
-
     def employee_edit(self, employee_id: int | None, first_name: str | None, last_name: str | None,
                       birth_date: str | None, address: str | None, job_place_id: int | None,
-                      storage_id: int | None, phone: str | None, status: int | None) -> None:
-        validators.validate_field(employee_id, 'идентификатор записи')
-        validators.validate_field(first_name, 'имя')
-        validators.validate_field(last_name, 'фамилия')
-        validators.validate_field(phone, 'телефон')
-        validators.validate_field(job_place_id, 'должность')
-        validators.validate_field(storage_id, 'заведение')
-        validators.validate_field(status, 'статус')
+                      storage_id: int | None, phone: str | None, status: int | None, photo) -> None:
+        validators.validate_field(first_name, 'фамилия')
+        validators.validate_field(last_name, 'имя')
+        validators.validate_field(birth_date, 'дата рождения')
+        validators.validate_field(phone, 'номер телефона')
+
+        job_place_id = None if job_place_id == '' else job_place_id
+        storage_id = None if storage_id == '' else storage_id
+        status = 3 if status == '' else status
+
+        if len(phone) != 10:
+            raise exceptions.FieldNotFoundError('Некорректный ввод номера телефона. Попробуйте еще раз')
 
         employee = self.model.objects.filter(id=employee_id)
+
         if employee.exists():
             employee = employee.first()
             employee.fio = f'{last_name} {first_name}'
@@ -75,6 +83,16 @@ class EmployeeService:
             employee.job_place_id = job_place_id
             employee.storage_id = storage_id
             employee.status = status
+
+            old_photo = employee.photo
+
+            if photo:
+                employee.photo = photo
+                if old_photo:
+                    if os.path.isfile(old_photo.path):
+                        os.remove(old_photo.path)
+            else:
+                employee.photo = old_photo
 
             similar_employee = self.model.objects.filter(phone=phone).exclude(id=employee_id)
             if similar_employee.exists():

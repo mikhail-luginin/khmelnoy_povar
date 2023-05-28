@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
-
 {% block title %}Сотрудники{% endblock %}
 {% block page_title %}Список сотрудников{% endblock %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="/assets/css/magnific-popup.css">
+{% endblock %}
 
 {% block body %}
     <div class="container-xl">
@@ -18,30 +21,30 @@
                 <div class="table-responsive">
                     <table id="employees-table" class="table table-sm table-striped table-hover table-bordered nowrap w-100">
                         <thead>
-                            <tr class="column-filter dt-column-filter">
-                                <th></th>
-                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
-                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
-                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
-                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
-                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
-                                <th><input type="text" class="form-control form-control-sm" placeholder="" id="delete_status"></th>
-                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
-                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
-                                <th></th>
-                            </tr>
-                            <tr>
-                                <th></th>
-                                <th>ФИО</th>
-                                <th>Дата рождения</th>
-                                <th>Адрес проживания</th>
-                                <th>Должность</th>
-                                <th>Заведение</th>
-                                <th>Телефон</th>
-                                <th>Статус</th>
-                                <th></th>
-                                <th></th>
-                            </tr>
+                        <tr class="column-filter dt-column-filter">
+                            <th></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder="" id="delete_status"></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th>ФИО</th>
+                            <th>Дата рождения</th>
+                            <th>Адрес проживания</th>
+                            <th>Должность</th>
+                            <th>Заведение</th>
+                            <th>Телефон</th>
+                            <th>Статус</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
                         </thead>
                     </table>
                 </div>
@@ -53,7 +56,21 @@
 {% block scripts %}
     <script>
         table = run_datatable('employees-table', '/api/employees?is_deleted=0', '/lk/employees', [
-            {data: 'photo'},
+            {
+                data: 'photo',
+                render: function (data, typa, row) {
+                    if (row.photo === '') {
+                        return row.photo
+                    }
+                    else {
+                        let photo = '<a class="image-popup" title="Фото" href="' + row.photo + '"><i class="fa fa-camera"></i></a>'
+                        $('.image-popup').magnificPopup({
+                            type: 'image'
+                        });
+                        return photo
+                    }
+                }
+            },
             {data: 'employee_fio'},
             {data: 'birth_date'},
             {data: 'address'},
@@ -62,13 +79,27 @@
             {data: 'phone'},
             {data: 'active_status'},
             {data: 'status'}
-        ], has_delete=false, has_update=false, has_dismiss=true)
+        ], has_delete = false, has_update = false, has_dismiss = true)
 
-        $(document).ready(function() {
-            $('#only-deleted').click(function() {
+        $(document).ready(function () {
+            $('#only-deleted').click(function () {
                 table.destroy()
                 table = run_datatable('employees-table', '/api/employees?is_deleted=1', '/lk/employees', [
-                    {data: 'photo'},
+                    {
+                        data: 'photo'},
+                        {#render: function (data, typa, row) {#}
+                        {#    if (row.photo === 'Нет фото') {#}
+                        {#        return row.photo#}
+                        {#    }#}
+                        {#    else {#}
+                        {#        let photo = '<a class="image-popup" title="Фото" href="' + row.photo + '"><i class="fa fa-camera"></i></a>'#}
+                        {#        $('.image-popup').magnificPopup({#}
+                        {#            type: 'image'#}
+                        {#        });#}
+                        {#        return photo#}
+                        {#    }#}
+
+
                     {data: 'fio'},
                     {data: 'birth_date'},
                     {data: 'address'},
@@ -77,12 +108,24 @@
                     {data: 'phone'},
                     {data: 'active_status'},
                     {data: 'status'}
-                ], has_delete=false, has_update=false, has_dismiss=true)
+                ], has_delete = false, has_update = false, has_dismiss = true)
             })
-            $('#without-deleted').click(function() {
+            $('#without-deleted').click(function () {
                 table.destroy()
                 table = run_datatable('employees-table', '/api/employees?is_deleted=0', '/lk/employees', [
-                    {data: 'photo'},
+                    {
+                        data: 'photo',
+                        render: function (data, typa, row) {
+                            let photo = '';
+                            if (row.photo !== null) {
+                                photo = '<a class="image-popup" title="Фото" href="' + row.photo + '"><i class="fa fa-camera"></i></a>'
+                                $('.image-popup').magnificPopup({
+                                    type: 'image'
+                                });
+                            }
+                            return photo
+                        }
+                    },
                     {data: 'fio'},
                     {data: 'birth_date'},
                     {data: 'address'},
@@ -91,8 +134,9 @@
                     {data: 'phone'},
                     {data: 'active_status'},
                     {data: 'status'}
-                ], has_delete=false, has_update=false, has_dismiss=true)
+                ], has_delete = false, has_update = false, has_dismiss = true)
             })
         })
     </script>
+    <script src="/assets/js/jquery.magnific-popup.min.js"></script>
 {% endblock %}
