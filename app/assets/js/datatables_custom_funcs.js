@@ -1,6 +1,6 @@
 function run_datatable(table_id, ajax_url, url, ajax_columns,
                        has_delete = true, has_update = false,
-                       has_dismiss = false, has_edit = true, has_actions = true, custom_dict = {}) {
+                       has_dismiss = false, has_edit = true, has_actions = true, custom_dict = {}, order_id = 0) {
     let datatable_dict = {
         language: {
             "url": "//cdn.datatables.net/plug-ins/1.11.1/i18n/ru.json"
@@ -15,7 +15,7 @@ function run_datatable(table_id, ajax_url, url, ajax_columns,
         },
         columns: ajax_columns,
         deferRender: true,
-        "order": [[0, "desc"]],
+        "order": [[order_id, "desc"]],
         footerCallback: function (row, data, start, end, display) {
             var api = this.api();
             var total = [];

@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from apps.lk.models import Navbar, Role, Profile, JobPlace, Position, Employee, Catalog, CatalogType, Logs, Expense, \
     Fine, Statement, Card, Partner, TelegramChat, TestResult, Test, TestQuestion, ItemDeficit
+from apps.repairer.models import Malfunction
 
 
 class NavbarSerializer(serializers.ModelSerializer):
@@ -165,4 +166,13 @@ class ItemDeficitSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ItemDeficit
+        fields = '__all__'
+
+
+class MalfunctionSerializer(serializers.ModelSerializer):
+    storage_name = serializers.CharField(source='storage.name')
+    photo_link = serializers.CharField(source='photo.url')
+
+    class Meta:
+        model = Malfunction
         fields = '__all__'

@@ -25,6 +25,8 @@ from django.db.models import Sum
 
 from apps.iiko.models import Storage
 from ..lk.services.item_deficit import ItemDeficitService
+from ..repairer.models import Malfunction
+from ..repairer.services import RepairerService
 
 
 class IndexView(BaseView):
@@ -212,6 +214,32 @@ class MalfunctionsView(BaseView):
 
     def post(self, request):
         return MalfunctionService().malfunction_create(request)
+
+
+class MalfunctionCompleteView(BaseView):
+
+    def get(self, request):
+        malfunction_id = request.GET.get('id')
+
+        try:
+            RepairerService().malfunction_complete(malfunction_id=malfunction_id)
+            messages.success(request, 'Ваш ответ был успешно отправлен.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Malfunction.DoesNotExist) as error:
+            messages.error(request, error)
+
+        return redirect('/bar/malfunctions?code=' + request.GET.get('code'))
+
+    def post(self, request):
+        malfunction_id = request.GET.get('id')
+        comment = request.POST.get('comment')
+
+        try:
+            RepairerService().malfunction_complete(malfunction_id=malfunction_id, comment=comment)
+            messages.success(request, 'Ваш ответ был успешно отправлен.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Malfunction.DoesNotExist) as error:
+            messages.error(request, error)
+
+        return redirect('/bar/malfunctions?code=' + request.GET.get('code'))
 
 
 class PaysAddView(BaseView):

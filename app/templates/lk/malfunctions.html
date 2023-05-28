@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-striped table-hover table-bordered nowrap w-100"
+                           id="malfunctions-table">
+                        <thead>
+                        <tr class="column-filter dt-column-filter">
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th>Дата</th>
+                            <th>Заведение</th>
+                            <th>Объект неисправности</th>
+                            <th>Описание</th>
+                            <th>Комментарий</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        run_datatable('malfunctions-table', '/api/malfunctions', '/lk/malfunctions', [
+            {
+                data: 'photo_link',
+                render: function(data, type, row) {
+                    let photo = "<a href='" + row.photo_link + "' class='image-popup'><i class='fa fa-camera'></i></a>"
+                    $('.image-popup').magnificPopup({
+                        type: 'image'
+                    })
+                    return photo
+                }
+            },
+            {data: 'date_at'},
+            {data: 'storage_name'},
+            {data: 'fault_object'},
+            {data: 'description'},
+            {data: 'comment'}
+        ], has_delete=true, has_update=false, has_dismiss=false, has_edit=false, has_actions=true, custom_dict = {
+            createdRow: function (row, data, dataIndex) {
+                if (data.status === 0) {
+                    $(row).addClass('table-danger');
+                } else if (data.status === 2) {
+                    $(row).addClass('table-success');
+                } else if (data.status === 1) {
+                    $(row).addClass('table-warning')
+                }
+            },
+        }, order_id=1)
+    </script>
+{% endblock %}

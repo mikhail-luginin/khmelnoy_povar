@@ -30,6 +30,7 @@ from apps.iiko.models import Product, Supplier
 from .services.timetable import TimetableService
 
 from .tasks import calculate_percent_premium_for_all
+from ..repairer.models import Malfunction
 
 
 class IndexView(BaseLkView):
@@ -897,3 +898,12 @@ def send_message_on_bar(request):
         messages.error(request, error)
 
     return redirect('/lk/bars/actions')
+
+
+class MalfunctionsView(BaseLkView):
+    template_name = 'lk/malfunctions.html'
+
+
+class MalfunctionDeleteView(ObjectDeleteMixin):
+    model = Malfunction
+    success_url = '/lk/malfunctions'
