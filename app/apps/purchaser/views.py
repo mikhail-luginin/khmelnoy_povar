@@ -9,6 +9,8 @@ from apps.lk.services.catalog import CatalogService
 
 from .utils import BaseView
 from .services import PurchaserService
+from .exceptions import DateIsNotEqualCurrentError, RowWasNotCreatedByPurchaser
+from ..lk.models import Expense
 
 
 class IndexView(BaseView):
@@ -54,6 +56,18 @@ class ExpenseCreateView(BaseView):
                                               expense_sum=expense_sum, comment=comment)
             messages.success(request, 'Расход успешно записан.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+            messages.error(request, error)
+
+        return redirect('/purchaser')
+
+
+class DeleteRowView(BaseView):
+
+    def get(self, request):
+        try:
+            PurchaserService().delete(row_id=request.GET.get('id'))
+            messages.success(request, 'Запись успешно удалена.')
+        except (DateIsNotEqualCurrentError, RowWasNotCreatedByPurchaser, Expense.DoesNotExist) as error:
             messages.error(request, error)
 
         return redirect('/purchaser')

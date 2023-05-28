@@ -12,7 +12,7 @@ from .services.expenses import ExpensesPageService
 from .services.end_day import complete_day
 from .services.malfunctions import MalfunctionService
 from .services.fines import get_fines_on_storage_by_month
-from .services.bar_info import get_full_information_of_day
+from .services.bar_info import get_full_information_of_day, get_bar_settings
 
 from apps.bar.models import Timetable, TovarRequest, Arrival, Pays, Setting, Salary, Money
 from apps.lk.models import Expense, Fine, ItemDeficit
@@ -25,6 +25,8 @@ from django.db.models import Sum
 
 from apps.iiko.models import Storage
 from ..lk.services.item_deficit import ItemDeficitService
+from ..repairer.models import Malfunction
+from ..repairer.services import RepairerService
 
 
 class IndexView(BaseView):
@@ -60,7 +62,7 @@ class ExpensesView(BaseView):
         context['payin_types'] = catalog.CatalogService().get_catalog_by_type(settings.PAYIN_CATEGORY)
         context['payout_types'] = catalog.CatalogService().get_catalog_by_type(settings.PAYOUT_CATEGORY)
         context['pays_rows'] = Pays.objects.filter(date_at=today_date(), storage=context['bar'])
-        context['bar_setting'] = Setting.objects.get(id=1)
+        context['bar_setting'] = get_bar_settings(storage_id=context.get('bar').id)
 
         return context
 
@@ -212,6 +214,32 @@ class MalfunctionsView(BaseView):
 
     def post(self, request):
         return MalfunctionService().malfunction_create(request)
+
+
+class MalfunctionCompleteView(BaseView):
+
+    def get(self, request):
+        malfunction_id = request.GET.get('id')
+
+        try:
+            RepairerService().malfunction_complete(malfunction_id=malfunction_id)
+            messages.success(request, 'Ваш ответ был успешно отправлен.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Malfunction.DoesNotExist) as error:
+            messages.error(request, error)
+
+        return redirect('/bar/malfunctions?code=' + request.GET.get('code'))
+
+    def post(self, request):
+        malfunction_id = request.GET.get('id')
+        comment = request.POST.get('comment')
+
+        try:
+            RepairerService().malfunction_complete(malfunction_id=malfunction_id, comment=comment)
+            messages.success(request, 'Ваш ответ был успешно отправлен.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Malfunction.DoesNotExist) as error:
+            messages.error(request, error)
+
+        return redirect('/bar/malfunctions?code=' + request.GET.get('code'))
 
 
 class PaysAddView(BaseView):

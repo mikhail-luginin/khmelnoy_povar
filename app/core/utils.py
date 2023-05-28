@@ -9,7 +9,7 @@ from apps.lk.models import Navbar
 from .exceptions import FieldNotFoundError
 from .permissions import CanViewMixin, AccessMixin
 from .logs import create_log
-from .profile import get_profile, get_navbar
+from .profile import get_profile
 from .time import today_date
 
 
@@ -101,8 +101,7 @@ class ObjectEditMixin(AccessMixin, BaseLkView):
         return context
 
     def get(self, request):
-
-        try :
+        try:
             context = self.get_context_data(request)
         except FieldNotFoundError as error:
             messages.error(request, error)

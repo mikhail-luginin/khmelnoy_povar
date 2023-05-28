@@ -5,7 +5,7 @@
 
 {% block body %}
     <div class="container-xl">
-        <div class="card">
+        <div class="card rounded-3">
             <div class="card-header card-header-light rounded-top-3">
                 <h3 class="card-title">Список заведений (вход по клику)</h3>
                 <div class="card-actions">
@@ -13,19 +13,27 @@
                     <a href="/iiko/terminals/update" class="btn btn-primary">Обновить терминалы</a>
                 </div>
             </div>
-            <div class="card-body">
-                <div class="list-group list-group-flush list-group-hoverable">
-                    {% for bar in bars %}
-                        <div class="list-group-item">
-                            <div class="row align-items-center">
-                                <div class="col text-truncate">
-                                    <a href="/bar?code={{ bar.code }}" class="text-reset d-block">{{ bar.name }}</a>
-                                    <div class="d-block text-muted text-truncate mt-n1"></div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
+            <div class="card-table">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Заведение</th>
+                            <th>Дата оплаты (аренда)</th>
+                            <th>ID Telegram чата</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bar in bars %}
+                            <tr>
+                                <td><a href="/bar?code={{ bar.storage.code }}">{{ bar.storage.name }}</a></td>
+                                <td></td>
+                                <td>{% if bar.tg_chat_id %}<span class="text-success"><i class="fa fa-circle-check"></i></span>{% else %}<span class="text-danger"><i class="fa fa-circle-xmark"></i></span>{% endif %}</td>
+                                <td><a href="/lk/bars/settings?id={{ bar.id }}"><i class="fa fa-gear"></i></a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

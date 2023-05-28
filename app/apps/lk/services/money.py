@@ -18,7 +18,8 @@ class MoneyService:
     model = Money
 
     def update(self, row_id: int | None) -> None:
-        validators.validate_field(row_id, 'идентификатор записи')
+        if type(row_id) is str:
+            validators.validate_field(row_id, 'идентификатор записи')
 
         money_record = self.model.objects.filter(id=row_id)
         if money_record.exists():

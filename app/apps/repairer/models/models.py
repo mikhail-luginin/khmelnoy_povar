@@ -8,7 +8,8 @@ from . import managers
 class Malfunction(models.Model):
     STATUS_CHOICES = [
         (0, 'Не исправлено'),
-        (1, 'Исправлено')
+        (1, 'Исправлено'),
+        (2, 'Одобрено')
     ]
 
     date_at = models.DateTimeField(auto_now=True)
@@ -17,5 +18,6 @@ class Malfunction(models.Model):
     fault_object = models.CharField(max_length=64)
     description = models.TextField()
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=0)
+    comment = models.CharField(max_length=128, null=True)
 
     objects = managers.MalfunctionManager()

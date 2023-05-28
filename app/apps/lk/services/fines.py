@@ -43,16 +43,35 @@ class FineService:
         fine = self.model.objects.filter(id=fine_id)
         if fine.exists():
             fine = fine.first()
+            timetable = Timetable.objects.filter(date_at=date_at, employee_id=employee_id)
+            if timetable.exists():
+                timetable = timetable.first()
+                timetable.fine -= fine.sum
+                if int(fine_sum) == 0:
+                    timetable.fine = 0
+                else:
+                    timetable.fine += int(fine_sum)
+
+                timetable.save()
+
             fine.date_at = date_at
             fine.employee_id = employee_id
             fine.sum = fine_sum
             fine.reason_id = reason_id
             fine.save()
 
-            timetable = Timetable.objects.filter(date_at=date_at, employee_id=employee_id)
-            if timetable.exists():
-                timetable = timetable.first()
-                timetable.fine += int(fine_sum)
-                timetable.save()
         else:
             raise self.model.DoesNotExist('Запись с указанным идентификатором не найдена.')
+
+    def delete(self, fine_id: int):
+        fine = self.model.objects.filter(id=fine_id)
+        if fine.exists():
+            fine = fine.first()
+
+            timetable = Timetable.objects.filter(employee=fine.employee, date_at=fine.date_at)
+            if timetable.exists():
+                timetable = timetable.first()
+                timetable.fine -= fine.sum
+                timetable.save()
+
+            fine.delete()

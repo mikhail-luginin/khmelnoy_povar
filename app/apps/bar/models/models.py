@@ -128,8 +128,12 @@ class Pays(models.Model):
 
 
 class Setting(models.Model):
+    storage = models.ForeignKey(to=Storage, on_delete=models.CASCADE)
     percent = models.FloatField(null=True)
+    tg_chat_id = models.CharField(max_length=64, null=True)
     expenses_types_with_employees_in_comment = models.ManyToManyField(to=Catalog)
+    bar_info = models.JSONField(default=dict)
+
     objects = managers.SettingManager()
 
 

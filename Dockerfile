@@ -15,9 +15,3 @@ RUN apk add mariadb-dev
 RUN apk add --update --no-cache --virtual .tmp-build-deps gcc libc-dev linux-headers
 
 RUN pip install --no-cache-dir -r /temp/requirements.txt
-
-RUN adduser --disabled-password appuser
-
-RUN chown appuser:appuser -R /app/
-
-USER appuser
