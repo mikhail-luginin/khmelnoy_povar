@@ -4,10 +4,12 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import redirect
 
+from core.time import get_months
 from core.utils import BaseLkView, ObjectEditMixin, ObjectCreateMixin, ObjectDeleteMixin
 from core import exceptions
 
 from .services import bars
+from .services.bar_actions import BarActionsService
 from .services.item_deficit import ItemDeficitService
 from .services.salary import SalaryService
 from .services.catalog import CatalogService
@@ -23,11 +25,12 @@ from .services.index_page import IndexPageService
 from apps.iiko.services.storage import StorageService
 
 from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee, ItemDeficit
-from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest
+from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest, Setting
 from apps.iiko.models import Product, Supplier
 from .services.timetable import TimetableService
 
 from .tasks import calculate_percent_premium_for_all
+from ..repairer.models import Malfunction
 
 
 class IndexView(BaseLkView):
@@ -140,24 +143,27 @@ class BarsView(BaseLkView):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['bars'] = StorageService().storages_all()
+        context['bars'] = Setting.objects.all()
 
         return context
 
 
-class BarsSettingsView(BaseLkView):
+class BarsSettingsView(ObjectEditMixin):
     template_name = 'lk/bars_settings.html'
+    model = Setting
 
     def post(self, request):
+        storage_id = request.GET.get('id')
         percent = request.POST.get('percent')
+        tg_chat_id = request.POST.get('chat-id')
 
         try:
-            if bars.settings_edit(percent=percent):
-                messages.success(request, 'Настройки бара успешно обновлены')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+            bars.settings_edit(storage_id=storage_id, percent=percent, tg_chat_id=tg_chat_id)
+            messages.success(request, 'Настройки бара успешно обновлены')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Setting.DoesNotExist) as error:
             messages.error(request, error)
 
-        return redirect('/lk/bars/settings')
+        return redirect('/lk/bars')
 
 
 class PositionsView(BaseLkView):
@@ -325,6 +331,7 @@ def update_money(request):
 
 
 class MoneyEditView(ObjectEditMixin):
+    template_name = 'lk/money/edit.html'
     model = Money
 
     def post(self, request):
@@ -354,7 +361,7 @@ class CreateTimetableView(ObjectCreateMixin):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context['storages'] = StorageService().storages_all()
-        context['employees'] = EmployeeService().employees_all(False)
+        context['employees'] = EmployeeService().all()
         context['positions'] = JobsService().positions_all()
 
         return context
@@ -384,7 +391,7 @@ class EditTimetableView(ObjectEditMixin):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context['storages'] = StorageService().storages_all()
-        context['employees'] = EmployeeService().employees_all(False)
+        context['employees'] = EmployeeService().all()
         context['positions'] = JobsService().positions_all()
 
         return context
@@ -501,7 +508,8 @@ class CreateSalaryView(ObjectCreateMixin):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context['storages'] = StorageService().storages_all()
-        context['employees'] = EmployeeService().employees_all(False)
+        context['employees'] = EmployeeService().all()
+        context['months'] = get_months()
 
         return context
 
@@ -534,7 +542,8 @@ class EditSalaryView(ObjectEditMixin):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context['storages'] = StorageService().storages_all()
-        context['employees'] = EmployeeService().employees_all(False)
+        context['employees'] = EmployeeService().all()
+        context['months'] = get_months()
 
         return context
 
@@ -578,7 +587,6 @@ class CreatePaysView(ObjectCreateMixin):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context['storages'] = StorageService().storages_all()
-        context['employees'] = EmployeeService().employees_all(False)
         context['pays'] = CatalogService().get_catalog_by_catalog_type_name_in_list(
             [settings.PAYIN_CATEGORY, settings.PAYOUT_CATEGORY])
 
@@ -609,7 +617,6 @@ class EditPaysView(ObjectEditMixin):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context['storages'] = StorageService().storages_all()
-        context['employees'] = EmployeeService().employees_all(False)
         context['pays'] = CatalogService().get_catalog_by_catalog_type_name_in_list(
             [settings.PAYIN_CATEGORY, settings.PAYOUT_CATEGORY])
 
@@ -650,7 +657,7 @@ class CreateFineView(ObjectCreateMixin):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context['storages'] = StorageService().storages_all()
-        context['employees'] = EmployeeService().employees_all(False)
+        context['employees'] = EmployeeService().all()
         context['reasons'] = CatalogService().get_catalog_by_catalog_type_name_contains(settings.FINE_REASON_CATEGORY)
 
         return context
@@ -679,7 +686,7 @@ class EditFinesView(ObjectEditMixin):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context['storages'] = StorageService().storages_all()
-        context['employees'] = EmployeeService().employees_all(False)
+        context['employees'] = EmployeeService().all()
         context['reasons'] = CatalogService().get_catalog_by_type(settings.FINE_REASON_CATEGORY)
 
         return context
@@ -704,6 +711,11 @@ class EditFinesView(ObjectEditMixin):
 class DeleteFineView(ObjectDeleteMixin):
     model = Fine
     success_url = '/lk/fines'
+
+    def get(self, request):
+        FineService().delete(fine_id=request.GET.get('id'))
+        messages.success(request, 'Штраф успешно удален.')
+        return redirect('/lk/fines')
 
 
 class EmployeesView(BaseLkView):
@@ -882,3 +894,37 @@ class ItemDeficitSendView(BaseLkView):
             messages.error(request, error)
 
         return redirect('/lk/need_items')
+
+
+class BarActionsView(BaseLkView):
+    template_name = 'lk/bar_actions.html'
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context.update({
+            "settings": Setting.objects.all()
+        })
+
+        return context
+
+
+def send_message_on_bar(request):
+    storage = request.POST.get('storage_id')
+    message = request.POST.get('message')
+
+    try:
+        BarActionsService().send_message_on_bar(storage=storage, message=message)
+        messages.success(request, 'Сообщение успешно отправлено.')
+    except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+        messages.error(request, error)
+
+    return redirect('/lk/bars/actions')
+
+
+class MalfunctionsView(BaseLkView):
+    template_name = 'lk/malfunctions.html'
+
+
+class MalfunctionDeleteView(ObjectDeleteMixin):
+    model = Malfunction
+    success_url = '/lk/malfunctions'

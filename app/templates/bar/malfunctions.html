@@ -35,35 +35,71 @@
                 </form>
             </div>
         </div>
-        <div class="card rounded-3">
-            <div class="card-header card-header-light rounded-top-3">
-                Список неисправностей
-            </div>
-            <div class="card-body">
-                <table class="table table-sm">
-                    <thead>
-                    <tr>
-                        <th>Фото</th>
-                        <th>Дата</th>
-                        <th>Объект</th>
-                        <th>Описание</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for row in rows %}
-                        <tr class="table-{% if row.status == 0 %}danger{% else %}success{% endif %}">
-                            <td><a class="image-popup" title="Фото" href="{{ row.photo.url }}">
-                                <i class="fa fa-camera"></i>
-                            </a></td>
-                            <td>{{ row.date_at|date:'Y-m-d h:i' }}</td>
-                            <td>{{ row.fault_object }}</td>
-                            <td>{{ row.description }}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        {% for row in rows %}
+            {% if row.status != 2 %}
+                <div class="mb-3">
+                    <div class="card rounded-3">
+                        <div class="card-body">
+                            <a class="image-popup btn btn-tabler w-100" title="Фото" href="{{ row.photo.url }}">
+                                Посмотреть фото
+                            </a><br><br>
+                            Дата: {{ row.date_at|date:'Y-m-d H:i' }}<br>
+                            Объект неисправности: {{ row.fault_object }}<br>
+                            Описание: {{ row.description }}<br><br>
+                            {% if row.status == 1 %}
+                                <div class="row">
+                                    <div class="col-6">
+                                        <a href="{% url 'Bar:malfunction_complete' %}?code={{ code }}&id={{ row.id }}" class="btn w-100">Подтвердить</a>
+                                    </div>
+                                    <div class="col-6">
+                                        <button class="btn btn-danger w-100" data-bs-toggle="modal"
+                                                data-bs-target="#cancel-modal-{{ row.id }}">Отмена
+                                        </button>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="row">
+                                    <div class="col-6">
+                                        <button class="btn w-100" disabled>Подтвердить</button>
+                                    </div>
+                                    <div class="col-6">
+                                        <button class="btn btn-danger w-100" disabled>Отмена
+                                        </button>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal modal-blur fade" id="cancel-modal-{{ row.id }}" tabindex="-1" role="dialog"
+                     aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <form action="{% url 'Bar:malfunction_complete' %}?id={{ row.id }}&code={{ code }}" method="post">
+                                {% csrf_token %}
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col">
+                                            <label class="form-label">Комментарий</label>
+                                            <input type="text" class="form-control" name="comment"
+                                                   placeholder="Введите причину отмены"
+                                                   required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn me-auto" data-bs-dismiss="modal">Закрыть
+                                    </button>
+                                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">
+                                        Отправить
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
     </div>
 {% endblock %}
 

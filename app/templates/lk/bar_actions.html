@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Действия бары{% endblock %}
+{% block page_title %}Действия с барами{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-body">
+                <form action="{% url 'LK:send_message_on_bar' %}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label">Заведение</label>
+                        <select class="form-select" name="storage_id" placeholder="Выберите заведение">
+                            <option></option>
+                            <option value="all">Все</option>
+                            {% for setting in settings %}
+                                <option value="{{ setting.storage.id }}">{{ setting.storage.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Сообщение</label>
+                        <textarea placeholder="Введите сообщение" name="message" class="form-control"></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <button type="submit" class="btn w-100">Отправить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

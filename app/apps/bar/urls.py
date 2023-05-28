@@ -40,6 +40,7 @@ urlpatterns = [
     path('inventory/ware', views.InventoryWareView.as_view(), name="inventory_ware"),
 
     path('malfunctions', views.MalfunctionsView.as_view(), name="malfunctions"),
+    path('malfunctions/complete', views.MalfunctionCompleteView.as_view(), name="malfunction_complete"),
 
     path('fines', views.FinesView.as_view(), name="fines"),
 

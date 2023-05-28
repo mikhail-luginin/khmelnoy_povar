@@ -7,39 +7,26 @@
     <div class="container-xl">
         <div class="card">
             <div class="card-header card-header-light rounded-top-3">
-                <h3 class="card-title">Настройки</h3>
+                <h3 class="card-title">Настройки {{ row.storage.name }}</h3>
             </div>
             <div class="card-body">
-                <form action="{% url 'LK:bars_settings' %}" method="post">
+                <form action="{% url 'LK:bars_settings' %}?id={{ row.id }}" method="post">
                     {% csrf_token %}
                     <div class="mb-2">
                         <label class="form-label" for="percent">Процент барменов</label>
                         <input class="form-control" type="tel" id="percent" name="percent"
                                placeholder="Введите процент для барменов целым числом, либо через . (2.5, 3.0 итд.)"
-                               value="{{ setting.percent }}">
+                               value="{{ row.percent }}">
                     </div>
                     <div class="mb-2">
-                        <label class="form-label">Привязка страниц приложения к Telegram чатам
+                        <label class="form-label">ID телеграм чата заведения
                             <a href="#"
                                data-bs-toggle="modal"
                                data-bs-target="#how-to-chat-id">Как
                                 узнать ID чата?</a></label>
-                        <div class="row">
-                            <div class="col-4">
-                                <select class="form-select" name="chat-type-id"
-                                        aria-label="Floating label select example">
-                                    <option value="-1" selected="">Список чатов</option>
-                                    {% for chat in telegram_chats %}
-                                        <option value="{{ chat.id }}">{{ chat.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-8">
-                                <input type="text" class="form-control" name="chat-id" placeholder="Введите ID чата">
-                            </div>
-                        </div>
+                        <input type="text" class="form-control" name="chat-id" placeholder="Введите ID чата" value="{{ row.tg_chat_id }}">
                     </div>
-                    <button type="submit" class="btn btn-success w-100">Сохранить</button>
+                    <button type="submit" class="btn w-100">Сохранить</button>
                 </form>
             </div>
         </div>
