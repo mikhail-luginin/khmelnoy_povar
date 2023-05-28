@@ -86,20 +86,20 @@
                 table.destroy()
                 table = run_datatable('employees-table', '/api/employees?is_deleted=1', '/lk/employees', [
                     {
-                        data: 'photo'},
-                        {#render: function (data, typa, row) {#}
-                        {#    if (row.photo === 'Нет фото') {#}
-                        {#        return row.photo#}
-                        {#    }#}
-                        {#    else {#}
-                        {#        let photo = '<a class="image-popup" title="Фото" href="' + row.photo + '"><i class="fa fa-camera"></i></a>'#}
-                        {#        $('.image-popup').magnificPopup({#}
-                        {#            type: 'image'#}
-                        {#        });#}
-                        {#        return photo#}
-                        {#    }#}
-
-
+                        data: 'photo',
+                        render: function (data, typa, row) {
+                            if (row.photo === '') {
+                                return row.photo
+                            }
+                            else {
+                                let photo = '<a class="image-popup" title="Фото" href="' + row.photo + '"><i class="fa fa-camera"></i></a>'
+                                $('.image-popup').magnificPopup({
+                                    type: 'image'
+                                });
+                                return photo
+                            }
+                        }
+                    },
                     {data: 'fio'},
                     {data: 'birth_date'},
                     {data: 'address'},
@@ -116,14 +116,16 @@
                     {
                         data: 'photo',
                         render: function (data, typa, row) {
-                            let photo = '';
-                            if (row.photo !== null) {
-                                photo = '<a class="image-popup" title="Фото" href="' + row.photo + '"><i class="fa fa-camera"></i></a>'
+                            if (row.photo === '') {
+                                return row.photo
+                            }
+                            else {
+                                let photo = '<a class="image-popup" title="Фото" href="' + row.photo + '"><i class="fa fa-camera"></i></a>'
                                 $('.image-popup').magnificPopup({
                                     type: 'image'
                                 });
+                                return photo
                             }
-                            return photo
                         }
                     },
                     {data: 'fio'},
