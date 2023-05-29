@@ -5,7 +5,7 @@ from apps.lk.services.employees import EmployeeService
 from core.time import today_date, get_current_time
 from .bar_info import get_main_barmen
 
-from apps.bar.models import Timetable, Position, Money
+from apps.bar.models import Timetable, Position, Money, Setting
 from apps.lk.models import Employee, JobPlace
 
 from apps.iiko.services.storage import StorageService
@@ -58,6 +58,7 @@ class HomePageService:
     def timetable_add(self, request) -> redirect:
         error = False
         storage = StorageService().storage_get(code=request.GET.get('code'))
+        bar_setting = Setting.objects.get(storage=storage)
 
         for position in Position.objects.all():
             employee_id = request.POST.get(f'position[{position.id}]')
@@ -93,7 +94,7 @@ class HomePageService:
             sum_cash_morning = request.POST.get('sum_cash_morning')
             if sum_cash_morning:
                 Money.objects.create(date_at=today_date(), storage=storage,
-                                     sum_cash_morning=sum_cash_morning)
+                                     sum_cash_morning=sum_cash_morning, barmen_percent=bar_setting.percent)
 
         if not error:
             messages.success(request, 'Данные смены успешно обновлены :)')

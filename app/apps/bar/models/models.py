@@ -23,6 +23,7 @@ class Money(models.Model):
     sum_cash_end_day = models.IntegerField(null=True)
     calculated = models.IntegerField(null=True)
     difference = models.IntegerField(null=True)
+    barmen_percent = models.FloatField(null=True)
 
     objects = managers.MoneyManager()
 
