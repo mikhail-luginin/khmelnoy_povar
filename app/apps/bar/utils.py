@@ -24,8 +24,6 @@ import xml.etree.ElementTree as ET
 from apps.lk.models import Expense, Catalog
 from apps.lk.services.catalog import CatalogService
 
-from typing import List
-
 
 class BaseView(View):
     template_name = None
@@ -230,10 +228,14 @@ class InventoryMixin(BaseView):
             for product in item.findall('product'):
                 name = product.find('name').text
                 code = product.find('code').text
-                if code:
+                if code and len(code) > 0:
                     code = int(code)
+                else:
+                    continue
             expected_amount = item.find('expectedAmount').text
             count = request.POST.get(str(code))
+            if len(count) == 0:
+                count = 0
             difference = int(count) - int(round(float(expected_amount)))
             row[name] = {'fact': count, 'iiko': int(round(float(expected_amount))), 'difference': difference}
             if difference < 0:
