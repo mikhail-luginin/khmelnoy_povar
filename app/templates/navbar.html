@@ -95,6 +95,12 @@
                                             <a class="dropdown-item" href="{{ item.link }}">
                                                 {{ item.text }}
                                             </a>
+                                        {% else %}
+                                            {% if item.app_name == 'apps' %}
+                                                <a class="dropdown-item" href="{{ item.link }}">
+                                                    {{ item.text }}
+                                                </a>
+                                            {% endif %}
                                         {% endif %}
                                     {% endfor %}
                                 </div>
@@ -135,11 +141,11 @@
                                                 {{ item.text }}
                                             </a>
                                         {% else %}
-                                        {% if item.app_name == 'lk' %}
-                                            <a class="dropdown-item" href="{{ item.link }}">
-                                                {{ item.text }}
-                                            </a>
-                                        {% endif %}
+                                            {% if item.app_name == 'lk' %}
+                                                <a class="dropdown-item" href="{{ item.link }}">
+                                                    {{ item.text }}
+                                                </a>
+                                            {% endif %}
                                         {% endif %}
                                     {% endfor %}
                                 </div>
@@ -172,9 +178,9 @@
                                             </a>
                                         {% else %}
                                             {% if item.app_name == 'iiko' %}
-                                            <a class="dropdown-item" href="{{ item.link }}">
-                                                {{ item.text }}
-                                            </a>
+                                                <a class="dropdown-item" href="{{ item.link }}">
+                                                    {{ item.text }}
+                                                </a>
                                             {% endif %}
                                         {% endif %}
                                     {% endfor %}
@@ -208,9 +214,9 @@
                                             </a>
                                         {% else %}
                                             {% if item.app_name == 'other' %}
-                                            <a class="dropdown-item" href="{{ item.link }}">
-                                                {{ item.text }}
-                                            </a>
+                                                <a class="dropdown-item" href="{{ item.link }}">
+                                                    {{ item.text }}
+                                                </a>
                                             {% endif %}
                                         {% endif %}
                                     {% endfor %}
