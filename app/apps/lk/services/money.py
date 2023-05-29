@@ -113,7 +113,7 @@ class MoneyService:
             money_record.save()
             self.update(row_id=money_record.id)
             if barmen_percent:
-                add_percent_and_premium_to_timetable.delay(date_at=money_record.date_at,
-                                                           storage_id=money_record.storage_id)
+                add_percent_and_premium_to_timetable(date_at=money_record.date_at,
+                                                     storage_id=money_record.storage_id)
         else:
             raise self.model.DoesNotExist('Запись с указанным идентификатором не найдена.')
