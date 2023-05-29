@@ -10,6 +10,7 @@
                     <div class="card rounded-3">
                         <div class="card-body">
                             Дата: {{ row.created_at|date:'Y-m-d H:i' }}<br>
+                            Заведение: {{ row.storage.name }}<br>
                             Предмет нехватки: {{ row.item }}<br>
                             Кол-во: {{ row.amount }}<br>
                             {% if row.status == 2 %}Привязано к: {{ row.owner.user.username }}<br>{% endif %}
