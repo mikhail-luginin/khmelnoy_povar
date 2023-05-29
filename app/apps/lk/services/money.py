@@ -1,11 +1,12 @@
 from django.contrib import messages
 from django.shortcuts import redirect
 
+from apps.bar.tasks import add_percent_and_premium_to_timetable
 from core import validators
 from core.total_values import get_total_expenses_by_date_and_storage, \
     get_total_payin_by_date_and_storage, get_total_payout_by_date_and_storage, get_total_salary_by_date_and_storage
 
-from apps.bar.models import Money
+from apps.bar.models import Money, Timetable
 from apps.iiko.models import PaymentType
 from apps.iiko.services.api import IikoService
 
@@ -111,5 +112,8 @@ class MoneyService:
             money_record.barmen_percent = barmen_percent
             money_record.save()
             self.update(row_id=money_record.id)
+            if barmen_percent:
+                add_percent_and_premium_to_timetable.delay(date_at=money_record.date_at,
+                                                           storage_id=money_record.storage_id)
         else:
             raise self.model.DoesNotExist('Запись с указанным идентификатором не найдена.')
