@@ -338,10 +338,11 @@ class MoneyEditView(ObjectEditMixin):
         row_id = request.GET.get('id')
         sum_cash_morning = request.POST.get('sum_cash_morning')
         sum_cash_end_day = request.POST.get('sum_cash_end_day')
+        barmen_percent = request.POST.get('barmen_percent')
 
         try:
             MoneyService().money_edit(row_id=row_id, sum_cash_morning=sum_cash_morning,
-                                      sum_cash_end_day=sum_cash_end_day)
+                                      sum_cash_end_day=sum_cash_end_day, barmen_percent=barmen_percent)
             messages.success(request, 'Запись успешно отредактирована.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Money.DoesNotExist) as error:
             messages.error(request, error)

@@ -96,16 +96,19 @@ class MoneyService:
     def get_all(self) -> List[model]:
         return self.model.objects.all()
 
-    def money_edit(self, row_id: int | None, sum_cash_morning: int | None, sum_cash_end_day: int | None) -> None:
+    def money_edit(self, row_id: int | None, sum_cash_morning: int | None,
+                   sum_cash_end_day: int | None, barmen_percent: float | None) -> None:
         validators.validate_field(row_id, 'идентификатор записи')
         validators.validate_field(sum_cash_morning, 'касса утро')
         validators.validate_field(sum_cash_end_day, 'касса вечер')
+        validators.validate_field(barmen_percent, 'процент бармена')
 
         money_record = self.model.objects.filter(id=row_id)
         if money_record.exists():
             money_record = money_record.first()
             money_record.sum_cash_morning = sum_cash_morning
             money_record.sum_cash_end_day = sum_cash_end_day
+            money_record.barmen_percent = barmen_percent
             money_record.save()
             self.update(row_id=money_record.id)
         else:
