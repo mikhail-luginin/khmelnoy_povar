@@ -3,8 +3,11 @@ from django.shortcuts import redirect
 
 from core import exceptions
 from core.utils import BaseLkView
-from .models import Malfunction
 
+from apps.lk.models import ItemDeficit
+from apps.lk.services.item_deficit import ItemDeficitService
+
+from .models import Malfunction
 from .services import RepairerService
 
 
@@ -32,3 +35,34 @@ class MalfunctionComplete(BaseLkView):
             messages.error(request, error)
 
         return redirect('/repairer')
+
+
+class ItemDeficitView(BaseLkView):
+    template_name = 'repairer/item_deficit.html'
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context.update({
+            "rows": ItemDeficitService().all()
+        })
+
+        return context
+
+
+class ItemDeficitSendView(BaseLkView):
+
+    def get(self, request):
+        context = self.get_context_data(request)
+
+        request_id = request.GET.get('id')
+
+        try:
+            receive_status = ItemDeficitService().send(request_id=request_id, user=context.get('profile'))
+            if receive_status:
+                messages.success(request, 'Статус успешно обновлен.')
+            else:
+                messages.error(request, 'Этот запрос уже обработан.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, ItemDeficit.DoesNotExist) as error:
+            messages.error(request, error)
+
+        return redirect('/repairer/item_deficit')

@@ -1,0 +1,29 @@
+{% extends 'repairer/base.html' %}
+
+{% block title %}Нехватка{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        {% for row in rows %}
+            {% if row.status != 3 %}
+                <div class="mb-3">
+                    <div class="card rounded-3">
+                        <div class="card-body">
+                            Дата: {{ row.created_at|date:'Y-m-d H:i' }}<br>
+                            Предмет нехватки: {{ row.item }}<br>
+                            Кол-во: {{ row.amount }}<br>
+                            {% if row.status == 2 %}Привязано к: {{ row.owner.user.username }}<br>{% endif %}
+                            <br>
+                            {% if row.status == 1 %}
+                                <a href="{% url 'Repairer:item_deficit_send' %}?code={{ code }}&id={{ row.id }}"
+                                   class="btn w-100">Отправить</a>
+                            {% else %}
+                                <button class="btn w-100" disabled>Отправлено</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endblock %}
