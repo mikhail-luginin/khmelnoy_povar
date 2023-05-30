@@ -55,7 +55,7 @@ class Employee(models.Model):
     ]
 
     code = models.CharField(max_length=64)
-    photo = models.IntegerField(default=0)
+    photo = models.ImageField(upload_to='employee_photo', null=True)
     fio = models.CharField(max_length=64)
     birth_date = models.DateField(null=True)
     address = models.CharField(max_length=64, null=True)

@@ -735,8 +735,26 @@ class CreateEmployeeView(ObjectCreateMixin):
         return context
 
     def post(self, request):
-        return EmployeeService().employee_create(request)
+        first_name = request.POST.get('first-name')
+        last_name = request.POST.get('last-name')
+        birth_date = request.POST.get('birth-date')
+        address = request.POST.get('address')
+        job_id = request.POST.get('job-id')
+        storage_id = request.POST.get('storage-id')
+        phone = request.POST.get('phone')
+        status = request.POST.get('status')
+        photo = request.FILES.get('employee_photo')
 
+        try:
+            EmployeeService().employee_create(request, first_name=first_name, last_name=last_name, birth_date=birth_date,
+                                              address=address, job_id=job_id, storage_id=storage_id, phone=phone, status=status, photo=photo)
+            messages.success(request, 'Сотрудник успешно создан.')
+            url='/lk/employees'
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, exceptions.UniqueFieldError, exceptions.IncorrectFieldError) as error:
+            messages.error(request, error)
+            url='/lk/employees/create'
+
+        return redirect(url)
 
 class EditEmployeeView(ObjectEditMixin):
     template_name = 'lk/employees/edit.html'
@@ -760,16 +778,19 @@ class EditEmployeeView(ObjectEditMixin):
         storage_id = request.POST.get('storage_id')
         phone = request.POST.get('phone')
         status = request.POST.get('status')
+        photo = request.FILES.get('employee_photo')
 
         try:
             EmployeeService().employee_edit(employee_id=employee_id, first_name=first_name, last_name=last_name,
                                             birth_date=birth_date, address=address, job_place_id=job_place_id,
-                                            storage_id=storage_id, phone=phone, status=status)
+                                            storage_id=storage_id, phone=phone, status=status, photo=photo)
             messages.success(request, 'Сотрудник успешно отредактирован.')
-        except Exception as error:
+            url = '/lk/employees'
+        except (exceptions.FieldCannotBeEmptyError, exceptions.FieldNotFoundError, exceptions.UniqueFieldError, exceptions.IncorrectFieldError) as error:
             messages.error(request, error)
+            url = f'/lk/employees/edit?id={employee_id}'
 
-        return redirect('/lk/employees')
+        return redirect(url)
 
 
 class DissmissEmployeeView(BaseLkView):
