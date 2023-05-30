@@ -92,15 +92,23 @@ class ExpensesPageService:
         purchaser_sum = request.POST.get('purchaser_sum')
         purchaser_comment = request.POST.get('purchaser_comment')
 
+        danil_sum = request.POST.get('danil_sum')
+        danil_comment = request.POST.get('danil_comment')
+
         if len(oil_sum) > 0:
             if not oil_comment:
                 messages.error(request, 'Комментарий к внесению не указан.')
                 return redirect(redirect_url)
 
+            from_to_id = CatalogService().get_catalog_by_name(catalog_name='Масло -')
+            if from_to_id:
+                from_to_id = from_to_id.id
+
             Pays.objects.create(
                 date_at=today_date(),
                 storage=storage,
-                type=5,
+                type=1,
+                from_to_id=from_to_id,
                 sum=oil_sum,
                 comment=oil_comment
             )
@@ -110,12 +118,35 @@ class ExpensesPageService:
                 messages.error(request, 'Комментарий к изъятию закупщика не указан.')
                 return redirect(redirect_url)
 
+            from_to_id = CatalogService().get_catalog_by_name(catalog_name='Закупщик')
+            if from_to_id:
+                from_to_id = from_to_id.id
+
             Pays.objects.create(
                 date_at=today_date(),
                 storage=storage,
-                type=4,
+                type=2,
+                from_to_id=from_to_id,
                 sum=purchaser_sum,
                 comment=purchaser_comment
+            )
+
+        if len(danil_sum) > 0:
+            if not danil_comment:
+                messages.error(request, 'Комментарий к изъятию Данила не указан.')
+                return redirect(redirect_url)
+
+            from_to_id = CatalogService().get_catalog_by_name(catalog_name='Данил')
+            if from_to_id:
+                from_to_id = from_to_id.id
+
+            Pays.objects.create(
+                date_at=today_date(),
+                storage=storage,
+                type=2,
+                from_to_id=from_to_id,
+                sum=danil_sum,
+                comment=danil_comment
             )
 
         messages.success(request, 'Запись успешно добавлена.')
