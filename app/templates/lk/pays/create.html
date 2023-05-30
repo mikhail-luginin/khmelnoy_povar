@@ -35,7 +35,7 @@
                         <select class="form-select" name="from_to_id" placeholder="Выберите отправителя или получателя">
                             <option></option>
                             {% for from_to in pays %}
-                                <option value="{{ from_to.name }}">{{ from_to.name }}</option>
+                                <option value="{{ from_to.id }}">{{ from_to.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
