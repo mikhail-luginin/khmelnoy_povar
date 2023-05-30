@@ -79,6 +79,7 @@ class CatalogType(models.Model):
 class Catalog(models.Model):
     name = models.CharField(max_length=32)
     catalog_types = models.ManyToManyField(CatalogType)
+    args = models.JSONField(default=dict)
 
     objects = managers.CatalogManager()
 
