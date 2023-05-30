@@ -599,10 +599,12 @@ class CreatePaysView(ObjectCreateMixin):
         pay_type = request.POST.get('type')
         pay_sum = request.POST.get('sum')
         comment = request.POST.get('comment')
+        from_to_id = request.POST.get('from_to_id')
 
         try:
             PaysService().create(date_at=date_at, storage_id=storage_id,
-                                 pay_type=pay_type, pay_sum=pay_sum, comment=comment)
+                                 pay_type=pay_type, pay_sum=pay_sum, comment=comment,
+                                 from_to_id=from_to_id)
             messages.success(request, 'Запись успешно создана.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
             messages.error(request, error)
@@ -630,10 +632,12 @@ class EditPaysView(ObjectEditMixin):
         pay_type = request.POST.get('type')
         pay_sum = request.POST.get('sum')
         comment = request.POST.get('comment')
+        from_to_id = request.POST.get('from_to_id')
 
         try:
             PaysService().edit(pay_id=pay_id, date_at=date_at, storage_id=storage_id,
-                               pay_type=pay_type, pay_sum=pay_sum, comment=comment)
+                               pay_type=pay_type, pay_sum=pay_sum, comment=comment,
+                               from_to_id=from_to_id)
             messages.success(request, 'Запись успешно создана.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Pays.DoesNotExist) as error:
             messages.error(request, error)
