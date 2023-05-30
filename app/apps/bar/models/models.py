@@ -112,16 +112,14 @@ class Arrival(models.Model):
 class Pays(models.Model):
     PAYS_TYPES = [
         (1, 'Внесение'),
-        (2, 'Изъятие'),
-        (4, 'Закупщик'),
-        (5, 'Масло'),
-        (6, 'Данил')
+        (2, 'Изъятие')
     ]
 
     date_at = models.DateField()
     created_at = models.DateTimeField(auto_now=True)
     storage = models.ForeignKey(Storage, on_delete=models.SET_NULL, null=True)
     type = models.PositiveSmallIntegerField(choices=PAYS_TYPES)
+    from_to = models.ForeignKey(Catalog, on_delete=models.SET_NULL, null=True)
     sum = models.FloatField()
     comment = models.CharField(max_length=64)
 
