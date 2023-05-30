@@ -1,4 +1,4 @@
-{% extends 'bar_base.html' %}
+ {% extends 'bar_base.html' %}
 
 {% block page_title %}
     <center><big><b>{{ data.employee.fio }}<br>Выбранный месяц: {{ data.month_name }}</b></big></center>{% endblock %}
@@ -105,6 +105,29 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+        <div class="card rounded-3 mb-2">
+                <div class="card-header rounded-top-3">
+                    <center>Вся зарплата за месяц</center>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-striped table-bordered nowrap w-100">
+                        <thead>
+                        <tr>
+                            <th>Месяц(год)</th>
+                            <th>Начислено</th>
+                            <th>Получено</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>{{ data.month_name }} {% if data.entire_salary_data.year %}({{ data.entire_salary_data.year }}){% endif %}</td>
+                            <td>{{ data.entire_salary_data.entire_salary_accrued }}</td>
+                            <td>{{ data.entire_salary_data.entire_salary_received }}</td>
+                        </tr>
+                    </tbody>
+                    </table>
+               </div>
         </div>
     </div>
 {% endblock %}
