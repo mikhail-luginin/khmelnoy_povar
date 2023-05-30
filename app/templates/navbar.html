@@ -95,12 +95,11 @@
                                             <a class="dropdown-item" href="{{ item.link }}">
                                                 {{ item.text }}
                                             </a>
-                                        {% else %}
-                                            {% if item.app_name == 'apps' %}
+                                        {% endif %}
+                                        {% if item.app_name == 'apps' and request.user.is_superuser %}
                                                 <a class="dropdown-item" href="{{ item.link }}">
                                                     {{ item.text }}
                                                 </a>
-                                            {% endif %}
                                         {% endif %}
                                     {% endfor %}
                                 </div>
@@ -140,12 +139,11 @@
                                             <a class="dropdown-item" href="{{ item.link }}">
                                                 {{ item.text }}
                                             </a>
-                                        {% else %}
-                                            {% if item.app_name == 'lk' %}
+                                        {% endif %}
+                                        {% if item.app_name == 'lk' and request.user.is_superuser %}
                                                 <a class="dropdown-item" href="{{ item.link }}">
                                                     {{ item.text }}
                                                 </a>
-                                            {% endif %}
                                         {% endif %}
                                     {% endfor %}
                                 </div>
@@ -176,12 +174,11 @@
                                             <a class="dropdown-item" href="{{ item.link }}">
                                                 {{ item.text }}
                                             </a>
-                                        {% else %}
-                                            {% if item.app_name == 'iiko' %}
+                                        {% endif %}
+                                        {% if item.app_name == 'iiko' and request.user.is_superuser %}
                                                 <a class="dropdown-item" href="{{ item.link }}">
                                                     {{ item.text }}
                                                 </a>
-                                            {% endif %}
                                         {% endif %}
                                     {% endfor %}
                                 </div>
@@ -212,12 +209,11 @@
                                             <a class="dropdown-item" href="{{ item.link }}">
                                                 {{ item.text }}
                                             </a>
-                                        {% else %}
-                                            {% if item.app_name == 'other' %}
+                                        {% endif %}
+                                        {% if item.app_name == 'other' and request.user.is_superuser %}
                                                 <a class="dropdown-item" href="{{ item.link }}">
                                                     {{ item.text }}
                                                 </a>
-                                            {% endif %}
                                         {% endif %}
                                     {% endfor %}
                                 </div>
