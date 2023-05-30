@@ -45,6 +45,7 @@ class SalarySerializer(serializers.ModelSerializer):
 
 class TimetableSerializer(serializers.ModelSerializer):
     employee_fio = serializers.CharField(source='employee.fio')
+    employee_job_place = serializers.CharField(source='employee.job_place.name')
     storage_name = serializers.CharField(source='storage.name')
     position_name = serializers.CharField(source='position.name')
 
