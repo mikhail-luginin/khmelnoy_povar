@@ -26,32 +26,10 @@
         body {
             font-feature-settings: "cv03", "cv04", "cv11";
         }
-
-        .preloader {
-            position: fixed;
-            left: 0;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ffffff;
-            z-index: 12391;
-        }
     </style>
 
 </head>
 <body class="layout-fluid">
-<div class="page page-center preloader" id="preloader">
-    <div class="container container-slim py-4">
-        <div class="text-center">
-            <div class="mb-3">
-                <a class="navbar-brand navbar-brand-autodark"><img src="/assets/img/preloader.png" alt="" class="rounded"></a>
-            </div>
-            <div class="progress progress-sm">
-                <div class="progress-bar progress-bar-indeterminate"></div>
-            </div>
-        </div>
-    </div>
-</div>
 <div class="page" id="main-page">
     {% include 'navbar.html' %}
     <div class="page-wrapper">
@@ -81,9 +59,6 @@
 </div>
 {% include 'js_imports.html' %}
 <script>
-    $(window).on('load', function () {
-        $('#preloader').fadeOut().end().delay().fadeOut('slow');
-    });
     $(document).ready(function () {
         document.querySelectorAll('.form-select').forEach((el) => {
             let settings = {
