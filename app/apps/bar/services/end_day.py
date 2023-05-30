@@ -1,4 +1,4 @@
-from apps.bar.models import Money, TovarRequest
+from apps.bar.models import Money, TovarRequest, Setting, Timetable
 from apps.bar.services.bar_info import get_full_information_of_day
 from apps.iiko.services.storage import StorageService
 from core.telegram import send_message_to_telegram
@@ -10,6 +10,8 @@ from apps.bar.tasks import add_percent_and_premium_to_timetable
 
 from django.contrib import messages
 from django.shortcuts import redirect
+
+from global_services.salary import SalaryService
 
 
 def complete_day(request):
@@ -24,6 +26,8 @@ def complete_day(request):
     except Money.DoesNotExist:
         messages.error(request, 'Смена в CRM не была открыта :(')
         return redirect('/bar/end_day?code=' + code)
+
+    bar_setting = Setting.objects.get(storage=storage)
 
     calculated = int(row.sum_cash_morning) + information_of_day["total_cash"] - \
                  information_of_day["expenses_nal"] - information_of_day["salary_prepayment"] - \
@@ -48,8 +52,23 @@ def complete_day(request):
     messages.success(request, 'Остаток в кассе успешно заполнен :)')
 
     message = f'Дата: {today_date()}\nЗаведение: {storage.name}\n\n'
+
+    tovar_request_message = message
     for tovar_request in TovarRequest.objects.filter(date_at=today_date(), storage_id=storage.id):
-        message += f'{tovar_request.product.name}\n'
-    send_message_to_telegram('-1001646808631', message)
+        tovar_request_message += f'{tovar_request.product.name}\n'
+    send_message_to_telegram('-1001646808631', tovar_request_message)
+
+    end_day_message = message
+    end_day_message += 'Смена успешно закрыта.\n\n'
+    end_day_message += f'Выручка: {row.total_day}\nНаличные: {row.total_cash}\nБезнал: {row.total_bn}\nМаркеты: {row.total_market}\n' \
+                       f'Сумма для начисления процентов: {row.total_day - row.total_market}\n\n' \
+                       f'Касса утро: {row.sum_cash_morning}\nРасходы (из кассы): {row.total_expenses}\nЗарплаты: {row.total_salary}\n' \
+                       f'Внесения: {row.total_payin}\nИзъятия: {row.total_payout}\n\n' \
+                       f'Остаток наличных в кассе: {row.sum_cash_end_day}\nРасчетный остаток: {row.calculated}\nРазница: {row.difference}\n\n'
+    for timetable in Timetable.objects.filter(date_at=today_date(), storage_id=row.storage_id):
+        salary = SalaryService().calculate_prepayment_salary_by_timetable_object(timetable_object=timetable)
+        end_day_message = f'{timetable.position.name} {timetable.employee.fio}: {salary["oklad"] + salary["percent"] + salary["premium"]}\n'
+    send_message_to_telegram(chat_id=bar_setting.tg_chat_id,
+                             message=end_day_message)
 
     return redirect('/bar/end_day?code=' + code)

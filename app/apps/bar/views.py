@@ -1,32 +1,29 @@
 from django.contrib import messages
 from django.shortcuts import redirect
+from django.conf import settings
+from django.db.models import Sum
 
 from core import exceptions
 from core.time import today_date, get_months, get_current_time
 from global_services.salary import SalaryService
 
 from .utils import BaseView, ObjectDeleteMixin, TovarRequestMixin, ArrivalMixin, InventoryMixin, DataLogsMixin
-
 from .services.index import HomePageService
 from .services.expenses import ExpensesPageService
 from .services.end_day import complete_day
 from .services.malfunctions import MalfunctionService
 from .services.fines import get_fines_on_storage_by_month
 from .services.bar_info import get_full_information_of_day, get_bar_settings
+from .exceptions import EmployeeAlreadyWorkingToday
 
-from apps.bar.models import Timetable, TovarRequest, Arrival, Pays, Setting, Salary, Money
+from apps.bar.models import Timetable, TovarRequest, Arrival, Pays, Salary, Money, Setting
 from apps.lk.models import Expense, Fine, ItemDeficit
+from apps.repairer.models import Malfunction
+from apps.iiko.models import Storage
 
 from apps.lk.services import catalog, positions, employees
-
-from django.conf import settings
-
-from django.db.models import Sum
-
-from apps.iiko.models import Storage
-from ..lk.services.item_deficit import ItemDeficitService
-from ..repairer.models import Malfunction
-from ..repairer.services import RepairerService
+from apps.lk.services.item_deficit import ItemDeficitService
+from apps.repairer.services import RepairerService
 
 
 class IndexView(BaseView):
@@ -36,13 +33,18 @@ class IndexView(BaseView):
         context = super().get_context_data(request, **kwargs)
         context['rows'] = HomePageService().get_timetable_today(context['bar'])
         context['positions'] = HomePageService().positions_on_storage()
-        context['is_morning_cashbox_filled'] = HomePageService().validate_today_morning_cashbox(context['bar'])
+        context['is_morning_cashbox_filled'] = HomePageService().morning_cashbox_today(context['bar'])
         context['evening_cashbox_previous_day'] = HomePageService().evening_cashbox_previous_day(context['bar'])
 
         return context
 
     def post(self, request):
-        return HomePageService().timetable_add(request)
+        try:
+            HomePageService().timetable_add(request)
+            messages.success(request, 'Данные смены успешно обновлены.')
+        except (EmployeeAlreadyWorkingToday, Setting.DoesNotExist) as error:
+            messages.error(request, error)
+        return redirect('/bar?code=' + request.GET.get('code'))
 
 
 class TimetableDeleteView(ObjectDeleteMixin):
