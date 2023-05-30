@@ -33,7 +33,7 @@ class TimetableService:
         timetable.premium = money_data['premium']
 
         fine = Fine.objects.filter(employee_id=employee_id, date_at=date_at).aggregate(Sum("sum"))['sum__sum']
-        timetable.fine = int(fine)
+        timetable.fine = int(fine) if fine else 0
         timetable.save()
 
     def edit(self, timetable_id: int | None, date_at: str | None, employee_id: int | None,
