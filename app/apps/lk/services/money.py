@@ -78,7 +78,7 @@ class MoneyService:
             money_record.total_payin = payin
             money_record.total_payout = payout
             money_record.calculated = calculated
-            money_record.difference = calculated - money_record.sum_cash_end_day
+            money_record.difference = money_record.sum_cash_end_day - calculated
             money_record.save()
         else:
             raise self.model.DoesNotExist('Запись с указанным идентификатором не найдена.')
