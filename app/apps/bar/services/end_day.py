@@ -67,7 +67,7 @@ def complete_day(request):
                        f'Остаток наличных в кассе: {row.sum_cash_end_day}\nРасчетный остаток: {row.calculated}\nРазница: {row.difference}\n\n'
     for timetable in Timetable.objects.filter(date_at=today_date(), storage_id=row.storage_id):
         salary = SalaryService().calculate_prepayment_salary_by_timetable_object(timetable_object=timetable)
-        end_day_message = f'{timetable.position.name} {timetable.employee.fio}: {salary["oklad"] + salary["percent"] + salary["premium"]}\n'
+        end_day_message += f'{timetable.position.name} {timetable.employee.fio}: {salary["oklad"] + salary["percent"] + salary["premium"]}\n'
     send_message_to_telegram(chat_id=bar_setting.tg_chat_id,
                              message=end_day_message)
 
