@@ -46,12 +46,7 @@
                     </div>
                     <div class="mb-4">
                         <label class="form-label">Комментарий</label>
-                        <select class="form-select" name="comment" placeholder="Выберите комментарий" required>
-                            <option></option>
-                            {% for comment in pays %}
-                                <option value="{{ comment.id }}">{{ comment.name }}</option>
-                            {% endfor %}
-                        </select>
+                        <input class="form-control" name="comment" placeholder="Введите комментарий">
                     </div>
                     <div class="mb-1">
                         <button type="submit" class="btn btn-success w-100">Создать</button>
