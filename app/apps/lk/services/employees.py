@@ -24,7 +24,7 @@ class EmployeeService:
         return self.model.objects.all()
 
     def employee_get(self, employee_id) -> model:
-        return self.model.objects.get(id=employee_id)
+        return self.model.objects.filter(id=employee_id).first()
 
     def employee_create(self, request) -> redirect:
         first_name = request.POST.get('first-name')
