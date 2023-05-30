@@ -89,6 +89,7 @@ class ArrivalSerializer(serializers.ModelSerializer):
 class PaysSerializer(serializers.ModelSerializer):
     storage_name = serializers.CharField(source='storage.name')
     type_name = serializers.CharField(source='get_type_display')
+    from_to_name = serializers.CharField(source='from_to.name')
 
     class Meta:
         model = Pays
