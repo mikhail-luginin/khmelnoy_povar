@@ -638,7 +638,7 @@ class EditPaysView(ObjectEditMixin):
             PaysService().edit(pay_id=pay_id, date_at=date_at, storage_id=storage_id,
                                pay_type=pay_type, pay_sum=pay_sum, comment=comment,
                                from_to_id=from_to_id)
-            messages.success(request, 'Запись успешно создана.')
+            messages.success(request, 'Запись успешно отредактирована.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Pays.DoesNotExist) as error:
             messages.error(request, error)
 
