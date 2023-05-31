@@ -28,6 +28,7 @@ urlpatterns = [
     path('bank', BankView.as_view(), name="bank"),
     path('bank/update', bank_update, name="update_bank"),
     path('bank/partners', BankPartnersView.as_view(), name="bank_partners"),
+    path('bank/partners/edit', BankPartnerEditView.as_view(), name="edit_bank_partner"),
     path('bank/cards', BankCardsView.as_view(), name="bank_cards"),
     path('bank/cards/create', BankCardCreateView.as_view(), name="create_bank_card"),
     path('bank/cards/edit', BankCardEditView.as_view(), name="edit_bank_card"),

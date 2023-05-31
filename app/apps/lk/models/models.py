@@ -117,8 +117,8 @@ class Partner(models.Model):
     name = models.CharField(max_length=128)
     inn = models.CharField(max_length=12)
     friendly_name = models.CharField(max_length=64)
-    expense_type = models.ManyToManyField(Catalog)
-    storage = models.ManyToManyField(Storage)
+    expense_types = models.ManyToManyField(Catalog)
+    storages = models.ManyToManyField(Storage)
 
     objects = managers.PartnerManager()
 

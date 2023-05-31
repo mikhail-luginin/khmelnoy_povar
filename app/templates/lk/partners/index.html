@@ -32,9 +32,14 @@
 
 {% block scripts %}
     <script>
-        let partners_table = run_datatable('partners-table', '/api/partners', '/lk/partners', [
-            {data: 'name'},
+        let partners_table = run_datatable('partners-table', '/api/partners', '/lk/bank/partners', [
+            {
+                data: null,
+                render: function(data, type, row) {
+                    return row.name + ' (' + row.friendly_name + ')'
+                }
+            },
             {data: 'inn'}
-        ])
+        ], has_delete=false)
     </script>
 {% endblock %}

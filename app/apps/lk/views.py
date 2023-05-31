@@ -14,23 +14,22 @@ from .services.item_deficit import ItemDeficitService
 from .services.salary import SalaryService
 from .services.catalog import CatalogService
 from .services.positions import JobsService
-from .services.bank import StatementUpdateService, CardService
+from .services.bank import StatementUpdateService, CardService, PartnerService
 from .services.money import MoneyService
 from .services.employees import EmployeeService
 from .services.expenses import ExpenseService
 from .services.pays import PaysService
 from .services.fines import FineService
 from .services.index_page import IndexPageService
+from .services.timetable import TimetableService
+from .tasks import calculate_percent_premium_for_all
 
 from apps.iiko.services.storage import StorageService
 
-from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee, ItemDeficit
+from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee, ItemDeficit, Partner
 from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest, Setting
 from apps.iiko.models import Product, Supplier
-from .services.timetable import TimetableService
-
-from .tasks import calculate_percent_premium_for_all
-from ..repairer.models import Malfunction
+from apps.repairer.models import Malfunction
 
 
 class IndexView(BaseLkView):
@@ -275,6 +274,35 @@ class BankPartnersView(BaseLkView):
     template_name = 'lk/partners/index.html'
 
 
+class BankPartnerEditView(ObjectEditMixin):
+    template_name = 'lk/partners/edit.html'
+    model = Partner
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context.update({
+            "types": CatalogService().get_catalog_by_type(type_name=settings.EXPENSE_TYPE_CATEGORY),
+            "storages": StorageService().storages_all()
+        })
+
+        return context
+
+    def post(self, request):
+        partner_id = request.GET.get('id')
+        friendly_name = request.POST.get('friendly_name')
+        expense_types = request.POST.getlist('expense_types')
+        storages = request.POST.getlist('storages')
+
+        try:
+            PartnerService().edit(partner_id=partner_id, friendly_name=friendly_name,
+                                  expense_types=expense_types, storages=storages)
+            messages.success(request, 'Контрагент успешно отредактирован.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Partner.DoesNotExist) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/bank/partners')
+
+
 class BankCardsView(BaseLkView):
     template_name = 'lk/cards/index.html'
 
@@ -311,6 +339,19 @@ class BankCardEditView(ObjectEditMixin):
         context['storages'] = StorageService().storages_all()
 
         return context
+
+    def post(self, request):
+        card_id = request.GET.get('id')
+        name = request.POST.get('name')
+        storage_id = request.POST.get('storage_id')
+
+        try:
+            CardService().edit(card_id=card_id, name=name, storage_id=storage_id)
+            messages.success(request, 'Карта успешно отредактирована.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Card.DoesNotExist) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/bank/cards')
 
 
 class MoneyView(BaseLkView):
@@ -750,15 +791,19 @@ class CreateEmployeeView(ObjectCreateMixin):
         photo = request.FILES.get('employee_photo')
 
         try:
-            EmployeeService().employee_create(request, first_name=first_name, last_name=last_name, birth_date=birth_date,
-                                              address=address, job_id=job_id, storage_id=storage_id, phone=phone, status=status, photo=photo)
+            EmployeeService().employee_create(request, first_name=first_name, last_name=last_name,
+                                              birth_date=birth_date,
+                                              address=address, job_id=job_id, storage_id=storage_id, phone=phone,
+                                              status=status, photo=photo)
             messages.success(request, 'Сотрудник успешно создан.')
-            url='/lk/employees'
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, exceptions.UniqueFieldError, exceptions.IncorrectFieldError) as error:
+            url = '/lk/employees'
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, exceptions.UniqueFieldError,
+                exceptions.IncorrectFieldError) as error:
             messages.error(request, error)
-            url='/lk/employees/create'
+            url = '/lk/employees/create'
 
         return redirect(url)
+
 
 class EditEmployeeView(ObjectEditMixin):
     template_name = 'lk/employees/edit.html'
@@ -790,7 +835,8 @@ class EditEmployeeView(ObjectEditMixin):
                                             storage_id=storage_id, phone=phone, status=status, photo=photo)
             messages.success(request, 'Сотрудник успешно отредактирован.')
             url = '/lk/employees'
-        except (exceptions.FieldCannotBeEmptyError, exceptions.FieldNotFoundError, exceptions.UniqueFieldError, exceptions.IncorrectFieldError) as error:
+        except (exceptions.FieldCannotBeEmptyError, exceptions.FieldNotFoundError, exceptions.UniqueFieldError,
+                exceptions.IncorrectFieldError) as error:
             messages.error(request, error)
             url = f'/lk/employees/edit?id={employee_id}'
 
