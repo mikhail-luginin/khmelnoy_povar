@@ -46,7 +46,7 @@ class TestResultManager(models.Manager):
 class PartnerManager(models.Manager):
 
     def get_queryset(self):
-        return super().get_queryset().prefetch_related('expense_type', 'storage')
+        return super().get_queryset().prefetch_related('expense_types', 'storages')
 
 
 class CardManager(models.Manager):

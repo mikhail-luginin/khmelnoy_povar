@@ -1,10 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block title %}Редактирование{% endblock %}
+{% block page_title %}Редактирование{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">Редактирование {{ row.name }}</div>
+            <div class="card-body">
+                <form action="{% url 'LK:edit_bank_partner' %}?id={{ row.id }}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label">Имя для отображения</label>
+                        <input class="form-control" name="friendly_name" placeholder="Введите имя для отображения" value="{{ row.friendly_name }}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Заведение</label>
+                        <select class="form-select" name="storages" placeholder="Выберите заведение или оставьте пустым" multiple>
+                            <option></option>
+                            {% for storage in storages %}
+                                <option value="{{ storage.id }}" {% if storage in row.storages.all %}selected{% endif %}>{{ storage.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Типы расходов</label>
+                        <select class="form-select" name="expense_types" placeholder="Выберите тип расхода или оставьте пустым" multiple>
+                            <option></option>
+                            {% for type in types %}
+                                <option value="{{ type.id }}" {% if type in row.expense_types.all %}selected{% endif %}>{{ type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-1">
+                        <button type="submit" class="btn btn-success w-100">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

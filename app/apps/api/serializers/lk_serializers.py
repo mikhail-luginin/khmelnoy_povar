@@ -122,7 +122,7 @@ class PartnerSerializer(serializers.ModelSerializer):
 
 
 class CardSerializer(serializers.ModelSerializer):
-    storage_name = serializers.CharField(source='storage.name')
+    storage_name = serializers.CharField(source='storage.name', allow_null=True, default='Не привязано')
 
     class Meta:
         model = Card
@@ -130,7 +130,7 @@ class CardSerializer(serializers.ModelSerializer):
 
 
 class StatementSerializer(serializers.ModelSerializer):
-    linked = serializers.CharField(source='linked.name', allow_null=True, default='Не привязана')
+    linked = serializers.CharField(source='linked.name', allow_null=True, default='Не привязано')
     payer_name = serializers.CharField(source='payer.name', allow_null=True, default='Не привязан')
     recipient_name = serializers.CharField(source='recipient.name', allow_null=True, default='Не привязан')
 

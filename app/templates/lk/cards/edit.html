@@ -20,8 +20,8 @@
                     </div>
                     <div class="mb-4">
                         <label class="form-label">Заведение</label>
-                        <select class="form-select" name="storage_id">
-                            <option value="-1">Выберите или оставьте пустым</option>
+                        <select class="form-select" name="storage_id" placeholder="Выберите заведение или оставьте пустым">
+                            <option></option>
                             {% for storage in storages %}
                                 <option value="{{ storage.id }}" {% if storage.id == row.storage_id %}selected{% endif %}>{{ storage.name }}</option>
                             {% endfor %}
