@@ -80,7 +80,7 @@ class HomePageService:
                     oklad=oklad
                 )
                 send_message_to_telegram(chat_id=bar_setting.tg_chat_id,
-                                         message=f'{position.name} {employee.fio} вышел на смену.')
+                                         message=f'{position.name} {employee.fio} вышел(-а) на смену.')
 
         if self.morning_cashbox_today(storage) is False:
             sum_cash_morning = request.POST.get('sum_cash_morning')
