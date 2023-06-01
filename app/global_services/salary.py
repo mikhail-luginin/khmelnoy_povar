@@ -192,28 +192,6 @@ class SalaryService:
             period=period
         )
 
-        total_sum = oklad + percent + premium
-        comment = f'ЗП {salary_type} '
-        if salary_type == 2:
-            if period == 1:
-                period = 'С 1 по 15 число'
-            elif period == 2:
-                period = 'С 16 по 31 число'
-            elif period == 3:
-                period = 'Расчет для уволенного'
-            comment += get_months(month) + ' ' + period
-
-        Expense.objects.create(
-            writer=get_main_barmen(today_date(), storage),
-            date_at=today_date(),
-            storage=storage,
-            expense_type=CatalogService().get_catalog_by_name('Зарплата'),
-            expense_source=CatalogService().get_catalog_by_name('Наличные'),
-            payment_receiver=employee.fio,
-            sum=total_sum,
-            comment=comment
-        )
-
     def accrue_salary_prepayment(self, request) -> redirect:
         bar = StorageService().storage_get(code=request.GET.get('code'))
         employee = None
