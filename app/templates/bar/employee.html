@@ -120,11 +120,14 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td>{{ data.month_name }} {% if data.entire_salary_data.year %}({{ data.entire_salary_data.year }}){% endif %}</td>
-                            <td>{{ data.entire_salary_data.entire_salary_accrued }}</td>
-                            <td>{{ data.entire_salary_data.entire_salary_received }}</td>
-                        </tr>
+                        {% for row in data.entire_salary_data %}
+                            <tr>
+                                <td>{{ row.month }} ({{ row.year }})</td>
+                                <td>{{ row.accrued_salary }}</td>
+                                <td>{{ row.received_salary }}</td>
+                            </tr>
+                        {% endfor %}
+
                     </tbody>
                     </table>
                </div>

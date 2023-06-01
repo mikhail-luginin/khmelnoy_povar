@@ -76,7 +76,34 @@ class SalaryService:
         accrued_prepayed_data = []
         accrued_month_data = []
         session_data = []
-        entire_salary_data = {'entire_salary_received': 0, 'entire_salary_accrued': 0, 'year': None}
+
+        entire_salary_data = []
+        work_months = []
+
+        for timetable in Timetable.objects.filter(employee=employee).order_by('-date_at'):
+            row = dict()
+            row['year'] = timetable.date_at.year
+            row['month'] = timetable.date_at.month
+            if row not in work_months:
+                work_months.append(row)
+
+        for date in work_months:
+            row = {'year': date['year'], 'month': get_months(date['month']),
+                   'received_salary': 0, 'accrued_salary': 0}
+
+            for salary in Salary.objects.filter(date_at__month=date['month'], date_at__year=date['year'], employee=employee, type=1):
+                row['received_salary'] += int(salary.get_total_sum())
+
+            for salary in Salary.objects.filter(date_at__month=date['month'], date_at__year=date['year'],employee=employee, type=2):
+                row['received_salary'] += salary.oklad
+
+            for timetable in Timetable.objects.filter(date_at__month=date['month'], date_at__year=date['year'],employee=employee).order_by('-date_at'):
+                calculated_salary = SalaryService().calculate_prepayment_salary_by_timetable_object(
+                    timetable_object=timetable)
+                row['accrued_salary'] += calculated_salary['oklad'] + calculated_salary['percent'] + calculated_salary['premium'] - timetable.fine
+
+            entire_salary_data.append(row)
+
 
         for salary in Salary.objects.filter(date_at__month=month, employee=employee, type=1).order_by('-date_at'):
             row = dict()
@@ -84,17 +111,12 @@ class SalaryService:
             row['total'] = salary.get_total_sum()
             accrued_prepayed_data.append(row)
 
-            entire_salary_data['entire_salary_received'] += row['total']
-            entire_salary_data['year'] = salary.date_at.year
-
         for salary in Salary.objects.filter(date_at__month=month, employee=employee, type=2).order_by('-date_at'):
             row = dict()
             row['salary'] = salary
             row['month_name'] = salary.get_month_name()
             row['period_name'] = salary.get_period_name()
             accrued_month_data.append(row)
-
-            entire_salary_data['entire_salary_received'] += salary.oklad
 
         for timetable in Timetable.objects.filter(date_at__month=month, employee=employee).order_by('-date_at'):
             calculated_salary = SalaryService().calculate_prepayment_salary_by_timetable_object(
@@ -112,8 +134,6 @@ class SalaryService:
             row['total'] = oklad + percent + premium - timetable.fine
             row['fine'] = timetable.fine
             session_data.append(row)
-
-            entire_salary_data['entire_salary_accrued'] += row['total']
 
         data['accrued_prepayed_data'] = accrued_prepayed_data
         data['session_data'] = session_data
