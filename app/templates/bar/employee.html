@@ -8,14 +8,15 @@
         <div class="card rounded-3 mb-3">
             <div class="card-body">
                 Сумма к получению (с 1 по 15): <b>{{ data.first_period }}</b><br>
-                Сумма к получению (с 16 по 31): <b>{{ data.second_period }}</b><br><br>
+                Сумма к получению (с 16 по 31): <b>{{ data.second_period }}</b><br>
+                Основных смен: {{ data.amount_main_shifts }} // Смен в усиление: {{ data.amount_gain_shifts }}<br><br>
 
                 <center>
                     Выбор месяца:<br>
                     <a href="{% url 'Bar:employee' %}?employee_code={{ data.employee.code }}&previous=1"
-                   class="btn btn-{% if data.previous %}primary{% else %}secondary{% endif %}">Предыдущий</a>
-                <a href="{% url 'Bar:employee' %}?employee_code={{ data.employee.code }}"
-                   class="btn btn-{% if data.previous is False %}primary{% else %}secondary{% endif %}">Текущий</a>
+                       class="btn btn-{% if data.previous %}primary{% else %}secondary{% endif %}">Предыдущий</a>
+                    <a href="{% url 'Bar:employee' %}?employee_code={{ data.employee.code }}"
+                       class="btn btn-{% if data.previous is False %}primary{% else %}secondary{% endif %}">Текущий</a>
                 </center>
             </div>
         </div>
@@ -24,7 +25,7 @@
                 <center>Смены (зарплата начислено)</center>
             </div>
             <div class="table-responsive">
-                <table class="table table-sm table-striped table-bordered nowrap w-100">
+                <table id="timetable-table" class="table table-sm table-striped table-bordered nowrap w-100">
                     <thead>
                     <tr>
                         <th>Дата</th>
@@ -47,6 +48,16 @@
                         </tr>
                     {% endfor %}
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
@@ -55,7 +66,7 @@
                 <center>Полученные авансы</center>
             </div>
             <div class="table-responsive">
-                <table class="table table-sm table-striped table-bordered nowrap w-100">
+                <table id="salary-table" class="table table-sm table-striped table-bordered nowrap w-100">
                     <thead>
                     <tr>
                         <th>Дата</th>
@@ -76,6 +87,15 @@
                         </tr>
                     {% endfor %}
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
@@ -110,3 +130,118 @@
 {% endblock %}
 
 {% block bottom_menu %}{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(() => {
+            // Run datatable
+            var table = $('#timetable-table').DataTable({
+                language: {
+                    "url": "//cdn.datatables.net/plug-ins/1.11.1/i18n/ru.json"
+                },
+                pageLength: 75,
+                "info": false,
+                "sDom": '',
+                "paging": false,
+
+                drawCallback: function () {
+                    $('.dataTables_paginate > .pagination').addClass('pagination-sm') // make pagination small
+                },
+                "order": [[0, "desc"]],
+                footerCallback: function (row, data, start, end, display) {
+                    var api = this.api();
+                    // Remove the formatting to get integer data for summation
+                    var intVal = function (i) {
+                        return typeof i === 'string' ?
+                            i.replace(/[\$,]/g, '') * 1 :
+                            typeof i === 'number' ?
+                                i : 0;
+                    };
+                    pageTotal4 = api.column(1, {page: 'current'}).data().reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                    $(api.column(1).footer()).html(
+                        '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                    );
+                    pageTotal4 = api.column(2, {page: 'current'}).data().reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                    $(api.column(2).footer()).html(
+                        '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                    );
+                    pageTotal4 = api.column(3, {page: 'current'}).data().reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                    $(api.column(3).footer()).html(
+                        '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                    );
+                    pageTotal4 = api.column(4, {page: 'current'}).data().reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                    $(api.column(4).footer()).html(
+                        '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                    );
+                    pageTotal4 = api.column(5, {page: 'current'}).data().reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                    $(api.column(5).footer()).html(
+                        '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                    );
+                }
+            })
+        })
+    </script>
+    <script>
+        $(() => {
+            // Run datatable
+            var table = $('#salary-table').DataTable({
+                language: {
+                    "url": "//cdn.datatables.net/plug-ins/1.11.1/i18n/ru.json"
+                },
+                pageLength: 75,
+                "info": false,
+                "sDom": '',
+                "paging": false,
+
+                drawCallback: function () {
+                    $('.dataTables_paginate > .pagination').addClass('pagination-sm') // make pagination small
+                },
+                "order": [[0, "desc"]],
+                footerCallback: function (row, data, start, end, display) {
+                    var api = this.api();
+                    // Remove the formatting to get integer data for summation
+                    var intVal = function (i) {
+                        return typeof i === 'string' ?
+                            i.replace(/[\$,]/g, '') * 1 :
+                            typeof i === 'number' ?
+                                i : 0;
+                    };
+                    pageTotal4 = api.column(1, {page: 'current'}).data().reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                    $(api.column(1).footer()).html(
+                        '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                    );
+                    pageTotal4 = api.column(2, {page: 'current'}).data().reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                    $(api.column(2).footer()).html(
+                        '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                    );
+                    pageTotal4 = api.column(3, {page: 'current'}).data().reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                    $(api.column(3).footer()).html(
+                        '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                    );
+                    pageTotal4 = api.column(4, {page: 'current'}).data().reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                    $(api.column(4).footer()).html(
+                        '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                    );
+                }
+            })
+        })
+    </script>
+{% endblock %}

@@ -62,6 +62,8 @@ class SalaryService:
 
     def get_money_data_employee(self, request) -> dict:
         data = dict()
+        data['amount_main_shifts'] = 0
+        data['amount_gain_shifts'] = 0
 
         employee_code = request.GET.get('employee_code')
         previous = request.GET.get('previous')
@@ -109,6 +111,11 @@ class SalaryService:
             row['total'] = oklad + percent + premium - timetable.fine
             row['fine'] = timetable.fine
             session_data.append(row)
+
+            if timetable.position.args["is_usil"]:
+                data['amount_gain_shifts'] += 1
+            else:
+                data['amount_main_shifts'] += 1
 
         data['accrued_prepayed_data'] = accrued_prepayed_data
         data['session_data'] = session_data
