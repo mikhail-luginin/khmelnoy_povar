@@ -126,12 +126,17 @@ class Pays(models.Model):
     objects = managers.PaysManager()
 
 
+class EndDayQuestions(models.Model):
+    text = models.CharField(max_length=255)
+
+
 class Setting(models.Model):
     storage = models.ForeignKey(to=Storage, on_delete=models.CASCADE)
     percent = models.FloatField(null=True)
     tg_chat_id = models.CharField(max_length=64, null=True)
     expenses_types_with_employees_in_comment = models.ManyToManyField(to=Catalog)
     bar_info = models.JSONField(default=dict)
+    end_day_questions = models.ManyToManyField(to=EndDayQuestions)
 
     objects = managers.SettingManager()
 

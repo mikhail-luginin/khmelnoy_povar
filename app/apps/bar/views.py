@@ -21,7 +21,7 @@ from apps.lk.models import Expense, Fine, ItemDeficit
 from apps.repairer.models import Malfunction
 from apps.iiko.models import Storage
 
-from apps.lk.services import catalog, positions, employees
+from apps.lk.services import catalog, positions, employees, bars
 from apps.lk.services.item_deficit import ItemDeficitService
 from apps.repairer.services import RepairerService
 
@@ -116,6 +116,7 @@ class EndDayView(BaseView):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context['information'] = get_full_information_of_day(today_date(), context['bar'])
+        context['data'] = bars.BarSettingService().get_question_on_end_day_by_storage_id(storage_id=context['bar'].id)
 
         return context
 

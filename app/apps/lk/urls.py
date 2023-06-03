@@ -18,6 +18,7 @@ urlpatterns = [
 
     path('bars', BarsView.as_view(), name="bars"),
     path('bars/settings', BarsSettingsView.as_view(), name="bars_settings"),
+    path('link_question_to_bar_setting', link_question_to_bar_setting, name="link_question_to_bar_setting"),
 
     path('positions', PositionsView.as_view(), name="positions"),
     path('positions/edit', PositionsEditView.as_view(), name="position_edit"),

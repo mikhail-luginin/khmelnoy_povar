@@ -147,9 +147,17 @@ class BarsView(BaseLkView):
         return context
 
 
-class BarsSettingsView(ObjectEditMixin):
+class BarsSettingsView(BaseLkView):
     template_name = 'lk/bars_settings.html'
-    model = Setting
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context.update({
+            "questions": bars.BarSettingService().questions_for_link(),
+            "row": bars.BarSettingService().get_setting_by_storage_id(storage_id=request.GET.get('id'))
+        })
+
+        return context
 
     def post(self, request):
         storage_id = request.GET.get('id')
@@ -157,7 +165,7 @@ class BarsSettingsView(ObjectEditMixin):
         tg_chat_id = request.POST.get('chat-id')
 
         try:
-            bars.settings_edit(storage_id=storage_id, percent=percent, tg_chat_id=tg_chat_id)
+            bars.BarSettingService().settings_edit(storage_id=storage_id, percent=percent, tg_chat_id=tg_chat_id)
             messages.success(request, 'Настройки бара успешно обновлены')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Setting.DoesNotExist) as error:
             messages.error(request, error)
@@ -979,3 +987,18 @@ class MalfunctionsView(BaseLkView):
 class MalfunctionDeleteView(ObjectDeleteMixin):
     model = Malfunction
     success_url = '/lk/malfunctions'
+
+
+def link_question_to_bar_setting(request):
+    question_text = request.POST.get('question_text')
+    question_id = request.GET.get('question_id')
+    storage_id = request.GET.get('id')
+
+    try:
+        bars.BarSettingService().link_question_to_storage(question_text=question_text, storage_id=storage_id,
+                                                          question_id=question_id)
+        messages.success(request, 'Вопрос для конца дня успешно привязан к заведению.')
+    except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Setting.DoesNotExist) as error:
+        messages.error(request, error)
+
+    return redirect('/lk/bars/settings?id=' + storage_id)
