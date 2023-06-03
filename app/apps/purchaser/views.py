@@ -4,13 +4,14 @@ from django.conf import settings
 
 from core import exceptions
 
+from apps.lk.models import Expense
+
 from apps.iiko.services.storage import StorageService
 from apps.lk.services.catalog import CatalogService
 
 from .utils import BaseView
 from .services import PurchaserService
 from .exceptions import DateIsNotEqualCurrentError, RowWasNotCreatedByPurchaser
-from ..lk.models import Expense
 
 
 class IndexView(BaseView):
@@ -22,7 +23,8 @@ class IndexView(BaseView):
             "rows": PurchaserService().get_rows_by_date(date_at=request.GET.get('date_at'),
                                                         storage_id=request.GET.get('storage_id')),
             "storages": StorageService().storages_all(),
-            "data": PurchaserService().get_money_data()
+            "data": PurchaserService().get_money_data(date_at=request.GET.get('date_at'),
+                                                      storage_id=request.GET.get('storage_id'))
         })
 
         return context

@@ -43,7 +43,7 @@ class PurchaserService:
             comment=comment
         )
 
-    def get_money_data(self) -> dict[str, int]:
+    def get_money_data(self, date_at: str | None, storage_id: int | None) -> dict[str, int]:
         data = {
             "ip_luginin": 0,
             "ip_moskvichev": 0,
@@ -55,7 +55,13 @@ class PurchaserService:
             "bn": 0
         }
 
-        for expense in Expense.objects.filter(date_at=today_date(), writer__contains="акупщик"):
+        filter_params = {
+            "date_at": date_at if date_at else today_date(),
+            "writer__contains": 'акупщик'
+        }
+        if storage_id:
+            filter_params.update({"storage_id": storage_id})
+        for expense in Expense.objects.filter(**filter_params):
             if 'угинин' in expense.storage.entity:
                 data['ip_luginin'] += expense.sum
             elif 'осквичев' in expense.storage.entity:
