@@ -82,6 +82,34 @@ class SalaryService:
         accrued_month_data = []
         session_data = []
 
+        entire_salary_data = []
+        work_months = []
+
+        for timetable in Timetable.objects.filter(employee=employee).order_by('-date_at'):
+            row = dict()
+            row['year'] = timetable.date_at.year
+            row['month'] = timetable.date_at.month
+            if row not in work_months:
+                work_months.append(row)
+
+        for date in work_months:
+            row = {'year': date['year'], 'month': get_months(date['month']),
+                   'received_salary': 0, 'accrued_salary': 0}
+
+            for salary in Salary.objects.filter(date_at__month=date['month'], date_at__year=date['year'], employee=employee, type=1):
+                row['received_salary'] += int(salary.get_total_sum())
+
+            for salary in Salary.objects.filter(date_at__month=date['month'], date_at__year=date['year'],employee=employee, type=2):
+                row['received_salary'] += salary.oklad
+
+            for timetable in Timetable.objects.filter(date_at__month=date['month'], date_at__year=date['year'],employee=employee).order_by('-date_at'):
+                calculated_salary = SalaryService().calculate_prepayment_salary_by_timetable_object(
+                    timetable_object=timetable)
+                row['accrued_salary'] += calculated_salary['oklad'] + calculated_salary['percent'] + calculated_salary['premium'] - timetable.fine
+
+            entire_salary_data.append(row)
+
+
         for salary in Salary.objects.filter(date_at__month=month, employee=employee, type=1).order_by('-date_at'):
             row = dict()
             row['salary'] = salary
@@ -124,6 +152,7 @@ class SalaryService:
         data['month_name'] = get_months(month)
         data['first_period'] = self.calculate_salary(employee, current_date.year, month, 1)
         data['second_period'] = self.calculate_salary(employee, current_date.year, month, 2)
+        data['entire_salary_data'] = entire_salary_data
 
         return data
 
