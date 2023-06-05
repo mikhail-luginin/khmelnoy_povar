@@ -5,32 +5,6 @@
 {% block body %}
     <div class="container-xl">
         <div class="card rounded-3 mb-2">
-            <div class="card-table">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th>Дата</th>
-                        <th>Заведение</th>
-                        <th>Предмет</th>
-                        <th>Кол-во</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for item in need_items %}
-                        {% if item.status != 3 %}
-                            <tr class="table-{% if item.status == 1 %}danger{% elif item.status == 2 %}warning{% endif %}">
-                                <td>{{ item.created_at|date:'F d G:i' }}</td>
-                                <td>{{ item.storage.name }}</td>
-                                <td>{{ item.item }}</td>
-                                <td>{{ item.amount }}</td>
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="card rounded-3">
             <div class="card-body">
                 <form action="{% url 'BrandChief:item_deficit' %}" method="post">
                     {% csrf_token %}
@@ -55,6 +29,32 @@
                         <button type="submit" class="btn w-100">Отправить</button>
                     </div>
                 </form>
+            </div>
+        </div>
+        <div class="card rounded-3">
+            <div class="card-table">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Заведение</th>
+                        <th>Предмет</th>
+                        <th>Кол-во</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in need_items %}
+                        {% if item.status != 3 %}
+                            <tr class="table-{% if item.status == 1 %}danger{% elif item.status == 2 %}warning{% endif %}">
+                                <td>{{ item.created_at|date:'F d G:i' }}</td>
+                                <td>{{ item.storage.name }}</td>
+                                <td>{{ item.item }}</td>
+                                <td>{{ item.amount }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
