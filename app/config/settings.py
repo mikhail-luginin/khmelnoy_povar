@@ -29,7 +29,8 @@ LOCAL_APPS = [
     'apps.repairer.apps.RepairerConfig',
     'apps.api.apps.ApiConfig',
     'apps.purchaser.apps.PurchaserConfig',
-    'apps.admin.apps.AdminConfig'
+    'apps.admin.apps.AdminConfig',
+    'apps.brand_chief.apps.BrandChiefConfig'
 ]
 THIRD_PARTY_APPS = [
     'rest_framework'
