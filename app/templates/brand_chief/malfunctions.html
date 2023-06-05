@@ -53,6 +53,7 @@
                                 Посмотреть фото
                             </a><br><br>
                             Дата: {{ row.date_at|date:'Y-m-d H:i' }}<br>
+                            Заведение: {{ row.storage.name }}<br>
                             Объект неисправности: {{ row.fault_object }}<br>
                             Описание: {{ row.description }}<br><br>
                         </div>
