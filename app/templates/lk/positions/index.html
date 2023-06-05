@@ -209,7 +209,7 @@
                 .test(navigator.userAgent)) {
                 return false;
             } else document.getElementById('position-add-ctrl-alert').setAttribute('style', '')
-            var table = run_datatable('table', '/api/positions', '/lk/positions', [{data: 'name'}, {data: 'oklad'}])
+            var table = run_datatable('table', '/api/positions', '/lk/positions', [{data: 'name'}, {data: 'args.oklad'}])
             var table2 = run_datatable('table2', '/api/jobplaces', '/lk/jobs', [{data: 'name'}, {data: 'main_shift_oklad'}, {data: 'gain_shift_oklad'}])
         });
     </script>

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from apps.lk.models import Navbar, Role, Profile, JobPlace, Position, Employee, Catalog, CatalogType, Logs, Expense, \
-    Fine, Statement, Card, Partner, TelegramChat, TestResult, Test, TestQuestion, ItemDeficit
+    Fine, Statement, Card, Partner, TelegramChat, TestResult, Test, TestQuestion, ItemDeficit, Review
 from apps.repairer.models import Malfunction
 
 
@@ -34,10 +34,6 @@ class JobPlaceSerializer(serializers.ModelSerializer):
 
 
 class PositionSerializer(serializers.ModelSerializer):
-    oklad = serializers.SerializerMethodField()
-
-    def get_oklad(self, obj):
-        return obj.args['oklad']
 
     class Meta:
         model = Position
@@ -51,6 +47,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
     status = serializers.CharField(source='get_status_display', default='Сотрудник', allow_null=True)
     employee_fio = serializers.SerializerMethodField()
     photo = serializers.SerializerMethodField()
+    reviews_count = serializers.CharField(source='reviews.count', default=0)
 
     def get_active_status(self, obj):
         if obj.is_deleted == 0:
@@ -181,4 +178,13 @@ class MalfunctionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Malfunction
+        fields = '__all__'
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    storage_name = serializers.CharField(source='storage.name')
+    photo_link = serializers.CharField(source='photo.url')
+
+    class Meta:
+        model = Review
         fields = '__all__'

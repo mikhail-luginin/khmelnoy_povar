@@ -25,5 +25,6 @@ router.register('expenses', lk_views.ExpenseViewSet)
 router.register('logs', lk_views.LogsViewSet)
 router.register('item_deficit', lk_views.ItemDeficitViewSet)
 router.register('malfunctions', lk_views.MalfunctionViewSet)
+router.register('reviews', lk_views.ReviewViewSet)
 
 urls = router.urls

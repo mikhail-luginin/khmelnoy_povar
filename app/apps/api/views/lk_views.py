@@ -1,11 +1,11 @@
 from ..serializers import NavbarSerializer, RoleSerializer, ProfileSerializer, JobPlaceSerializer, PositionSerializer, \
     EmployeeSerializer, CatalogTypeSerializer, CatalogSerializer, TestQuestionSerializer, TestSerializer, \
     TestResultSerializer, TelegramChatSerializer, CardSerializer, PartnerSerializer, StatementSerializer, \
-    FineSerializer, ExpenseSerializer, LogsSerializer, ItemDeficitSerializer, MalfunctionSerializer
+    FineSerializer, ExpenseSerializer, LogsSerializer, ItemDeficitSerializer, MalfunctionSerializer, ReviewSerializer
 from ..utils import ModelViewSetMixin
 
 from apps.lk.models import Navbar, Role, Profile, JobPlace, Position, Employee, Catalog, CatalogType, Logs, Expense, \
-    Fine, Statement, Card, Partner, TelegramChat, TestResult, Test, TestQuestion, ItemDeficit
+    Fine, Statement, Card, Partner, TelegramChat, TestResult, Test, TestQuestion, ItemDeficit, Review
 from ...repairer.models import Malfunction
 
 
@@ -123,3 +123,8 @@ class ItemDeficitViewSet(ModelViewSetMixin):
 class MalfunctionViewSet(ModelViewSetMixin):
     queryset = Malfunction.objects.all()
     serializer_class = MalfunctionSerializer
+
+
+class ReviewViewSet(ModelViewSetMixin):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
