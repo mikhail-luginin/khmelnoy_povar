@@ -15,6 +15,7 @@ urlpatterns = [
     path('api/', include('apps.api.urls')),
     path('purchaser/', include('apps.purchaser.urls')),
     path('admin/', include('apps.admin.urls')),
+    path('brand_chief/', include('apps.brand_chief.urls')),
 
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
     re_path(r'^assets/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),

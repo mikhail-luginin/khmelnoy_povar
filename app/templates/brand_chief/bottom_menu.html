@@ -1,0 +1,5 @@
+<br> <br><div id="footer-bar" class="footer-bar-5 rounded-3">
+    <a href="{% url 'BrandChief:index' %}" {% if request.path == '/brand_chief/' %}class="active-nav"{% endif %}class="active-nav"><i class="fa fa-home"></i><span>Главная</span><strong></strong></a>
+    <a href="{% url 'BrandChief:malfunctions' %}" {% if request.path == '/brand_chief/malfunctions' %}class="active-nav"{% endif %}class="active-nav"><i class="fa fa-link-slash"></i><span>Неисправности</span><strong></strong></a>
+    <a href="{% url 'BrandChief:item_deficit' %}" {% if request.path == '/brand_chief/item_deficit' %}class="active-nav"{% endif %}class="active-nav"><i class="fa fa-thermometer"></i><span>Нехватка</span><strong></strong></a>
+</div>
