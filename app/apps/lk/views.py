@@ -11,6 +11,7 @@ from core import exceptions
 from .services import bars
 from .services.bar_actions import BarActionsService
 from .services.item_deficit import ItemDeficitService
+from .services.reviews import ReviewService
 from .services.salary import SalaryService
 from .services.catalog import CatalogService
 from .services.positions import JobsService
@@ -26,7 +27,7 @@ from .tasks import calculate_percent_premium_for_all
 
 from apps.iiko.services.storage import StorageService
 
-from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee, ItemDeficit, Partner
+from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee, ItemDeficit, Partner, Profile
 from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest, Setting
 from apps.iiko.models import Product, Supplier
 from apps.repairer.models import Malfunction
@@ -64,7 +65,7 @@ class CatalogAddView(ObjectCreateMixin):
             if CatalogService().catalog_create(name, linked):
                 messages.success(request, 'Запись успешно добавлена в справочник.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, CatalogType.DoesNotExist) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
 
         return redirect('/lk/catalog')
 
@@ -80,7 +81,7 @@ class CatalogTypeAddView(ObjectCreateMixin):
             if CatalogService().catalog_type_create(name):
                 messages.success(request, 'Тип каталога успешно создан.')
         except (exceptions.FieldCannotBeEmptyError, exceptions.FieldNotFoundError) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
 
         return redirect('/lk/catalog')
 
@@ -115,7 +116,7 @@ class CatalogEditView(ObjectEditMixin):
             if CatalogService().catalog_edit(row_id=row_id, name=name, linked=linked):
                 messages.success(request, 'Запись успешно отредактирована.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, CatalogType.DoesNotExist) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
 
         return redirect('/lk/catalog')
 
@@ -132,7 +133,7 @@ class CatalogTypeEditView(ObjectEditMixin):
             if CatalogService().catalog_type_edit(row_id=row_id, name=name):
                 messages.success(request, 'Тип справочника успешно отредактирован.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, CatalogType.DoesNotExist) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
 
         return redirect('/lk/catalog')
 
@@ -168,7 +169,7 @@ class BarsSettingsView(BaseLkView):
             bars.BarSettingService().settings_edit(storage_id=storage_id, percent=percent, tg_chat_id=tg_chat_id)
             messages.success(request, 'Настройки бара успешно обновлены')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Setting.DoesNotExist) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
 
         return redirect('/lk/bars')
 
@@ -204,7 +205,7 @@ class PositionsView(BaseLkView):
                                           position_job_ids=position_job_ids, priority_id=priority_id)
             messages.success(request, 'Позиция успешно создана.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
 
         return redirect('/lk/positions')
 
@@ -242,7 +243,7 @@ class PositionsEditView(ObjectEditMixin):
                                         priority_id=priority_id)
             messages.success(request, 'Позиция успешно отредактирована')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Position.DoesNotExist) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
 
         return redirect('/lk/positions')
 
@@ -264,7 +265,7 @@ class JobAddView(BaseLkView):
                                      job_main_oklad=job_main_oklad)
             messages.success(request, 'Должность успешно создана.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
 
         return redirect('/lk/positions')
 
@@ -306,7 +307,7 @@ class BankPartnerEditView(ObjectEditMixin):
                                   expense_types=expense_types, storages=storages)
             messages.success(request, 'Контрагент успешно отредактирован.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Partner.DoesNotExist) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
 
         return redirect('/lk/bank/partners')
 
@@ -357,7 +358,7 @@ class BankCardEditView(ObjectEditMixin):
             CardService().edit(card_id=card_id, name=name, storage_id=storage_id)
             messages.success(request, 'Карта успешно отредактирована.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Card.DoesNotExist) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
 
         return redirect('/lk/bank/cards')
 
@@ -374,7 +375,7 @@ def update_money(request):
         MoneyService().update(row_id=row_id)
         messages.success(request, 'Запись успешно обновлена.')
     except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Money.DoesNotExist) as error:
-        messages.error(request, error)
+        messages.error(request, str(error))
 
     return redirect('/lk/money')
 
@@ -394,7 +395,7 @@ class MoneyEditView(ObjectEditMixin):
                                       sum_cash_end_day=sum_cash_end_day, barmen_percent=barmen_percent)
             messages.success(request, 'Запись успешно отредактирована.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Money.DoesNotExist) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
 
         return redirect('/lk/money')
 
@@ -428,7 +429,7 @@ class CreateTimetableView(ObjectCreateMixin):
                                       oklad=oklad, position_id=position_id, storage_id=storage_id)
             messages.success(request, 'Запись успешно создана.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
 
         return redirect('/lk/timetable')
 
@@ -459,7 +460,7 @@ class EditTimetableView(ObjectEditMixin):
                                     oklad=oklad, position_id=position_id, storage_id=storage_id)
             messages.success(request, 'Запись успешно отредактирована.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Timetable.DoesNotExist) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
 
         return redirect('/lk/timetable')
 
@@ -501,7 +502,7 @@ class CreateExpenseView(ObjectCreateMixin):
                                     expense_type_id=type_id, expense_source_id=source_id)
             messages.success(request, 'Расход успешно создан.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
 
         return redirect('/lk/expenses')
 
@@ -536,7 +537,7 @@ class EditExpenseView(ObjectEditMixin):
                                   expense_type_id=type_id, expense_source_id=source_id)
             messages.success(request, 'Расход успешно отредактирован.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Expense.DoesNotExist) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
 
         return redirect('/lk/expenses')
 
@@ -579,7 +580,7 @@ class CreateSalaryView(ObjectCreateMixin):
                                    storage_id=storage_id, oklad=oklad, percent=percent, premium=premium,
                                    month=month, period=period)
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
 
         return redirect('/lk/salary')
 
@@ -615,7 +616,7 @@ class EditSalaryView(ObjectEditMixin):
                                  percent=percent, premium=premium, month=month, period=period)
             messages.success(request, 'Запись успешно отредактирована.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Salary.DoesNotExist) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
 
         return redirect('/lk/salary')
 
@@ -656,7 +657,7 @@ class CreatePaysView(ObjectCreateMixin):
                                  from_to_id=from_to_id)
             messages.success(request, 'Запись успешно создана.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
 
         return redirect('/lk/pays')
 
@@ -689,7 +690,7 @@ class EditPaysView(ObjectEditMixin):
                                from_to_id=from_to_id)
             messages.success(request, 'Запись успешно отредактирована.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Pays.DoesNotExist) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
 
         return redirect('/lk/pays')
 
@@ -727,7 +728,7 @@ class CreateFineView(ObjectCreateMixin):
                                  fine_sum=fine_sum, reason_id=reason_id)
             messages.success(request, 'Запись успешно создана.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
 
         return redirect('/lk/fines')
 
@@ -757,7 +758,7 @@ class EditFinesView(ObjectEditMixin):
                                fine_sum=fine_sum, reason_id=reason_id)
             messages.success(request, 'Запись успешно отредактирована.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Fine.DoesNotExist) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
 
         return redirect('/lk/fines')
 
@@ -807,7 +808,7 @@ class CreateEmployeeView(ObjectCreateMixin):
             url = '/lk/employees'
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, exceptions.UniqueFieldError,
                 exceptions.IncorrectFieldError) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
             url = '/lk/employees/create'
 
         return redirect(url)
@@ -845,7 +846,7 @@ class EditEmployeeView(ObjectEditMixin):
             url = '/lk/employees'
         except (exceptions.FieldCannotBeEmptyError, exceptions.FieldNotFoundError, exceptions.UniqueFieldError,
                 exceptions.IncorrectFieldError) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
             url = f'/lk/employees/edit?id={employee_id}'
 
         return redirect(url)
@@ -950,7 +951,7 @@ class ItemDeficitSendView(BaseLkView):
             else:
                 messages.error(request, 'Этот запрос уже обработан.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, ItemDeficit.DoesNotExist) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
 
         return redirect('/lk/need_items')
 
@@ -967,17 +968,22 @@ class BarActionsView(BaseLkView):
         return context
 
 
-def send_message_on_bar(request):
-    storage = request.POST.get('storage_id')
-    message = request.POST.get('message')
+class SendMessageOnBar(BaseLkView):
+    
+    def post(self, request):
+        context = self.get_context_data(request)
+        
+        storage = request.POST.get('storage_id')
+        message = request.POST.get('message')
 
-    try:
-        BarActionsService().send_message_on_bar(storage=storage, message=message)
-        messages.success(request, 'Сообщение успешно отправлено.')
-    except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
-        messages.error(request, error)
+        try:
+            profile = context.get('profile')
+            BarActionsService().send_message_on_bar(storage=storage, message=message, profile=profile)
+            messages.success(request, 'Сообщение успешно отправлено.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+            messages.error(request, str(error))
 
-    return redirect('/lk/bars/actions')
+        return redirect('/lk/bars/actions')
 
 
 class MalfunctionsView(BaseLkView):
@@ -999,6 +1005,47 @@ def link_question_to_bar_setting(request):
                                                           question_id=question_id)
         messages.success(request, 'Вопрос для конца дня успешно привязан к заведению.')
     except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Setting.DoesNotExist) as error:
-        messages.error(request, error)
+        messages.error(request, str(error))
 
     return redirect('/lk/bars/settings?id=' + storage_id)
+
+
+class ReviewsView(BaseLkView):
+    template_name = 'lk/reviews/index.html'
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context.update({
+            "jobs": JobsService().jobs_all(),
+            "storages": StorageService().storages_all()
+        })
+        return context
+
+
+def review_create(request):
+    if request.method == "POST":
+        photo = request.FILES.get('review_photo')
+        review_date = request.POST.get('review_date')
+        storage_id = request.POST.get('storage_id')
+        jobs = request.POST.getlist('jobs')
+
+        try:
+            ReviewService().create(photo=photo, review_date=review_date, storage_id=storage_id, jobs=jobs)
+            messages.success(request, 'Отзыв успешно добавлен.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+            messages.error(request, str(error))
+
+        return redirect('/lk/reviews')
+    
+
+def review_link_to_employee(request):
+    if request.method == "GET":
+        review_id = request.GET.get('id')
+        
+        try:
+            ReviewService().link_to_employee(review_id=review_id)
+            messages.success(request, 'Отзыв привязан к сотрудникам.')
+        except Exception as error:
+            messages.error(request, str(error))
+            
+        return redirect('/lk/reviews')

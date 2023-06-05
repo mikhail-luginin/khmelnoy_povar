@@ -18,22 +18,15 @@
                 <div id="tab-top-1" class="card tab-pane active show">
                     <div class="card-body">
                         <div class="card-title mb-2">Отзывы</div>
-                        <table id="reviews-table" class="table table-sm table-striped table-hover table-bordered nowrap w-100">
+                        <table id="table" class="table table-sm table-striped table-hover table-bordered nowrap w-100">
                             <thead>
-                            <tr class="column-filter dt-column-filter">
-                                <th></th>
-                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
-                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
-                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
-                                <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
-                                <th></th>
-                            </tr>
                             <tr>
                                 <th></th>
                                 <th>Дата создания</th>
                                 <th>Дата отзыва</th>
                                 <th>Заведение</th>
                                 <th>Тип(-ы)</th>
+                                <th></th>
                                 <th></th>
                             </tr>
                             </thead>
@@ -86,7 +79,7 @@
 
 {% block scripts %}
     <script>
-        run_datatable('reviews-table', '/api/reviews', '/lk/reviews', [
+        run_datatable('table', '/api/reviews', '/lk/reviews', [
             {
                 data: null,
                 render: function(data, type, row) {
@@ -104,7 +97,12 @@
             {
                 data: null,
                 render: function (data, type, row) {
-                    return 'asd'
+                    let html = '<a href="/lk/reviews/link_to_employee?id=' + row.id + '" class="btn w-100">Привязать отзыв</a>'
+                    if(row.status == 2) {
+                        html = '<button class="btn w-100" disabled>Отзыв привязан</button>'
+                    }
+
+                    return html
                 }
             }
         ])

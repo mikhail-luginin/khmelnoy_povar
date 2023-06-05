@@ -36,6 +36,9 @@ class JobPlace(models.Model):
     main_shift_oklad = models.IntegerField(default=0)
     gain_shift_oklad = models.IntegerField(default=0)
 
+    def __str__(self):
+        return self.name
+
 
 class Position(models.Model):
     name = models.CharField(max_length=32)
@@ -44,6 +47,22 @@ class Position(models.Model):
     priority_id = models.IntegerField()
 
     objects = managers.PositionManager()
+    
+    
+class Review(models.Model):
+    STATUS_CHOICES = [
+        (1, 'Создан'),
+        (2, 'Закрыт')
+    ]
+    
+    created_at = models.DateField(auto_now_add=True)
+    review_date = models.DateField()
+    storage = models.ForeignKey(to=Storage, on_delete=models.CASCADE)
+    jobs = models.ManyToManyField(to=JobPlace)
+    photo = models.ImageField(upload_to='reviews_photo')
+    status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=1)
+
+    objects = managers.ReviewManager()
 
 
 class Employee(models.Model):
@@ -65,6 +84,7 @@ class Employee(models.Model):
     is_deleted = models.PositiveSmallIntegerField(default=0)
     dismiss_date = models.DateField(null=True)
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=3)
+    reviews = models.ManyToManyField(to=Review)
 
     objects = managers.EmployeeManager()
 

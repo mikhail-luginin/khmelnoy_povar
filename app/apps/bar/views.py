@@ -24,6 +24,7 @@ from apps.iiko.models import Storage
 from apps.lk.services import catalog, positions, employees, bars
 from apps.lk.services.item_deficit import ItemDeficitService
 from apps.repairer.services import RepairerService
+from ..iiko.services.storage import StorageService
 
 
 class IndexView(BaseView):
@@ -216,7 +217,20 @@ class MalfunctionsView(BaseView):
         return context
 
     def post(self, request):
-        return MalfunctionService().malfunction_create(request)
+        storage_id = StorageService().storage_get(code=request.GET.get('code')).id
+
+        photo = request.FILES.get('malfunction-photo')
+        fault_object = request.POST.get('fault-object')
+        description = request.POST.get('malfunction-description')
+
+        try:
+            MalfunctionService().malfunction_create(storage_id=storage_id, photo=photo,
+                                                    fault_object=fault_object, description=description)
+            messages.success(request, 'Неисправность успешно занесена в список.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+            messages.error(request, error)
+
+        return redirect('/brand_chief/malfunctions')
 
 
 class MalfunctionCompleteView(BaseView):
