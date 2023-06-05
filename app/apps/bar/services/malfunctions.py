@@ -1,30 +1,24 @@
-from django.shortcuts import redirect
-from django.contrib import messages
+from core import validators
 
-from apps.iiko.models import Storage
-from apps.iiko.services.storage import StorageService
 from apps.repairer.models import Malfunction
-
-from typing import List
 
 
 class MalfunctionService:
     model = Malfunction
 
-    def malfunction_create(self, request):
-        storage = StorageService().storage_get(code=request.GET.get('code'))
+    def all(self) -> list[model]:
+        return self.model.objects.all()
 
-        photo = request.FILES.get('malfunction-photo')
-        fault_object = request.POST.get('fault-object')
-        description = request.POST.get('malfunction-description')
+    def malfunction_create(self, storage_id: int, photo, fault_object: str, description: str) -> None:
+        validators.validate_field(storage_id, 'заведение')
+        validators.validate_field(photo, 'фото')
+        validators.validate_field(fault_object, 'объект неисправности')
+        validators.validate_field(description, 'описание')
 
-        self.model.objects.create(storage=storage,
+        self.model.objects.create(storage_id=storage_id,
                                   photo=photo,
                                   fault_object=fault_object,
                                   description=description)
 
-        messages.success(request, 'Неисправность успешно занесена в список :)')
-        return redirect(request.META.get('HTTP_REFERER'))
-
-    def malfunctions_get(self, storage: Storage) -> List[model]:
-        return Malfunction.objects.filter(storage=storage)
+    def malfunctions_get(self, storage_id: int) -> list[model]:
+        return self.model.objects.filter(storage_id=storage_id)
