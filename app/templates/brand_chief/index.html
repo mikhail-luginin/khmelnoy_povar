@@ -9,7 +9,7 @@
                         <div class="card-header card-header-light"><b>{{ data.storage.district }}</b> ({{ date }})</div>
                         <div class="list-group list-group-flush">
                             {% for row in data.cookers %}
-                                <a class="list-group-item list-group-item-action {% if row.employee.status == 2 %}text-danger{% elif row.work_now %}{% if row.work_now.position.args.is_called %}text-primary{% else %}text-success{% endif %}{% endif %}">
+                                <a class="list-group-item list-group-item-action {% if row.employee.status == 2 %}text-danger{% elif row.work_now %}{% if row.work_now.position.args.is_called %}text-primary{% else %}text-success{% endif %}{% endif %}" href="/bar/employee?employee_code={{ row.employee.code }}">
                                     <div class="text-truncate">
                                         <i class="fa fa-bell-concierge"></i> {{ row.employee.fio }}
                                     </div>
