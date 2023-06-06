@@ -8,8 +8,7 @@ from core.telegram import send_message_to_telegram
 
 class BarActionsService:
 
-    def send_message_on_bar(self, storage: int | str, message: str, profile: Profile) -> None:
-        bar_actions_telegram_message.delay(storage=storage, 
-                                           message=f'{message}\n\n{profile.user.first_name} {profile.user.last_name}')
-
-        send_message_to_telegram(settings.TELEGRAM_CHAT_ID_FOR_ERRORS, '<b>[Admin]</b> Сообщение отправлено в чат(-ы).')
+    def send_message_on_bar(self, storages: list, message: str, profile: Profile) -> None:
+        bar_actions_telegram_message.delay(storages=storages,
+                                           message=f'{message}\n\n<b>{profile.user.first_name} '
+                                                   f'{profile.user.last_name}</b>')

@@ -1,7 +1,4 @@
-{% extends 'base.html' %}
-
-{% block title %}Действия бары{% endblock %}
-{% block page_title %}Действия с барами{% endblock %}
+{% extends 'brand_chief/base.html' %}
 
 {% block body %}
     <div class="container-xl">
@@ -14,8 +11,8 @@
                         <select class="form-select" name="storage_id" placeholder="Выберите заведение" multiple>
                             <option></option>
                             <option value="all">Все</option>
-                            {% for setting in settings %}
-                                <option value="{{ setting.storage.id }}">{{ setting.storage.name }}</option>
+                            {% for storage in storages %}
+                                <option value="{{ storage.id }}">{{ storage.name }}</option>
                             {% endfor %}
                         </select>
                     </div>

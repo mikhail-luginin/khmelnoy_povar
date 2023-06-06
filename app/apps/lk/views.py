@@ -973,17 +973,18 @@ class SendMessageOnBar(BaseLkView):
     def post(self, request):
         context = self.get_context_data(request)
         
-        storage = request.POST.get('storage_id')
+        storages = request.POST.getlist('storages')
         message = request.POST.get('message')
 
         try:
             profile = context.get('profile')
-            BarActionsService().send_message_on_bar(storage=storage, message=message, profile=profile)
+            BarActionsService().send_message_on_bar(storages=storages, message=message, profile=profile)
             messages.success(request, 'Сообщение успешно отправлено.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
             messages.error(request, str(error))
 
-        return redirect('/lk/bars/actions')
+        url = request.META.get('HTTP_REFERER')
+        return redirect(url if url else '/lk/bars/actions')
 
 
 class MalfunctionsView(BaseLkView):
