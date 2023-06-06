@@ -935,7 +935,7 @@ class TimetableUpdateView(BaseLkView):
 
 
 class ItemDeficitView(BaseLkView):
-    template_name = 'lk/need_items.html'
+    template_name = 'lk/need_items/index.html'
 
 
 class ItemDeficitSendView(BaseLkView):
@@ -1053,7 +1053,7 @@ def review_link_to_employee(request):
         return redirect('/lk/reviews')
 
 
-class MalfunctionCreateView(BaseLkView):
+class MalfunctionCreateView(ObjectCreateMixin):
     template_name = 'lk/malfunctions/create.html'
 
     def get_context_data(self, request, **kwargs) -> dict:
@@ -1078,3 +1078,28 @@ class MalfunctionCreateView(BaseLkView):
             messages.error(request, error)
 
         return redirect('/lk/malfunctions')
+
+
+class NeedItemsCreateView(ObjectCreateMixin):
+    template_name = 'lk/need_items/create.html'
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context.update({
+            "storages": StorageService().storages_all()
+        })
+
+        return context
+
+    def post(self, request):
+        item = request.POST.get('need_item')
+        amount = request.POST.get('amount_need_item')
+        storage_id = request.POST.get('storage_id')
+
+        try:
+            ItemDeficitService().create(storage_id=storage_id, item=item, amount=amount)
+            messages.success(request, 'Заявка на нехватку успешно создана.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/need_items')

@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}Нехватка{% endblock %}
+
+{% block page_title %}Нехватка{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-header">
+                Нехватка
+                <div class="card-actions">
+                    <a href="{% url 'LK:need_items_create' %}" class="btn w-100">Создать запись</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="card-title mb-2">Невыполненные нехватки</div>
+                <table id="need-items-without-success-table" class="table">
+                    <thead>
+                    <tr class="column-filter dt-column-filter">
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Заведение</th>
+                        <th>Владелец</th>
+                        <th>Предмет</th>
+                        <th>Кол-во</th>
+                        <th>Дата получения</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                </table><br>
+                <div class="card-title mb-2">Выполненные нехватки</div>
+                <table id="need-items-with-success-table" class="table">
+                    <thead>
+                    <tr class="column-filter dt-column-filter">
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Заведение</th>
+                        <th>Владелец</th>
+                        <th>Предмет</th>
+                        <th>Кол-во</th>
+                        <th>Дата получения</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        run_datatable('need-items-without-success-table', '/api/item_deficit?without_success=1', '/lk/need_items', [
+            {data: 'created_at'},
+            {data: 'storage_name'},
+            {data: 'owner_fio'},
+            {data: 'item'},
+            {data: 'amount'},
+            {data: 'receive_date'},
+            {
+                data: null,
+                render: function (data, type, row) {
+                    if (row.status === 1) {
+                        url = '"/lk/need_items/send?id=' + row.id + '"'
+                        return "<button onclick='window.location.href = " + url + "' class='btn w-100'>Отправить</button>"
+                    } else if (row.status === 2) {
+                        return '<i class="fa fa-long-arrow-down"></i>'
+                    } else if (row.status === 3) {
+                        return '<i class="fa fa-check-circle"></i>'
+                    }
+                }
+            }
+        ], has_delete = false, has_update = false, has_dismiss = false, has_edit = false, has_actions = false, custom_dict = {
+            createdRow: function (row, data, dataIndex) {
+                if (data.status === 1) {
+                    $(row).addClass('table-danger');
+                } else if (data.status === 2) {
+                    $(row).addClass('table-warning');
+                } else if (data.status === 3) {
+                    $(row).addClass('table-success');
+                }
+            }
+        })
+    </script>
+    <script>
+        run_datatable('need-items-with-success-table', '/api/item_deficit?without_success=0', '/lk/need_items', [
+            {data: 'created_at'},
+            {data: 'storage_name'},
+            {data: 'owner_fio'},
+            {data: 'item'},
+            {data: 'amount'},
+            {data: 'receive_date'},
+            {
+                data: null,
+                render: function (data, type, row) {
+                    if (row.status === 1) {
+                        url = '"/lk/need_items/send?id=' + row.id + '"'
+                        return "<button onclick='window.location.href = " + url + "' class='btn w-100'>Отправить</button>"
+                    } else if (row.status === 2) {
+                        return '<i class="fa fa-long-arrow-down"></i>'
+                    } else if (row.status === 3) {
+                        return '<i class="fa fa-check-circle"></i>'
+                    }
+                }
+            }
+        ], has_delete = false, has_update = false, has_dismiss = false, has_edit = false, has_actions = false, custom_dict = {
+            createdRow: function (row, data, dataIndex) {
+                if (data.status === 1) {
+                    $(row).addClass('table-danger');
+                } else if (data.status === 2) {
+                    $(row).addClass('table-warning');
+                } else if (data.status === 3) {
+                    $(row).addClass('table-success');
+                }
+            }
+        })
+    </script>
+    <script>
+        $(document).ready(function () {
+            let first_tab = $('#btn-tab-top-1')
+            let second_tab = $('#btn-tab-top-2')
+            first_tab.click(function () {
+                $('.tab-top').removeClass('active')
+                first_tab.addClass('active')
+            })
+            second_tab.click(function () {
+                $('.tab-top').removeClass('active')
+                second_tab.addClass('active')
+            })
+        })
+    </script>
+{% endblock %}
