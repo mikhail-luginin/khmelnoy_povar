@@ -1,15 +1,10 @@
-from django.contrib import messages
-from django.shortcuts import redirect
-
 from core import validators
 from core.total_values import get_total_expenses_by_date_and_storage, \
     get_total_payin_by_date_and_storage, get_total_payout_by_date_and_storage, get_total_salary_by_date_and_storage
 
 from apps.bar.models import Money
-from apps.iiko.models import PaymentType
+from apps.iiko.models import PaymentType, Session
 from apps.iiko.services.api import IikoService
-
-from typing import List
 
 import json
 
@@ -42,6 +37,10 @@ class MoneyService:
             yandex = 0
             total_cashshifts = 0
 
+            open_date = None
+            close_date = None
+            session_number = None
+
             cashshifts_data = json.loads(IikoService().get_cashshifts(str(date_at), str(date_at)))
 
             for i in range(len(cashshifts_data)):
@@ -49,6 +48,15 @@ class MoneyService:
                     first_data = IikoService().get_sales_by_department(cashshifts_data[i]["id"])
                     data = json.loads(first_data)
                     total_day += cashshifts_data[i]["payOrders"]
+
+                    open_date = cashshifts_data[i]["openDate"]
+                    if open_date is not None:
+                        open_date = f'{open_date.split("T")[0]} {open_date.split("T")[1]}'
+                    close_date = cashshifts_data[i]["closeDate"]
+                    if close_date is not None:
+                        close_date = f'{close_date.split("T")[0]} {close_date.split("T")[1]}'
+
+                    session_number = cashshifts_data[i]["sessionNumber"]
 
                     for a in range(len(data["cashlessRecords"])):
                         row = PaymentType.objects.get(payment_id=data["cashlessRecords"][a]["info"]["paymentTypeId"])
@@ -78,6 +86,23 @@ class MoneyService:
             money_record.total_payout = payout
             money_record.calculated = calculated
             money_record.difference = calculated - money_record.sum_cash_end_day
+
+            if money_record.session:
+                money_record.session.storage = storage
+                money_record.session.date_at = date_at
+                money_record.session.session_number = session_number
+                money_record.session.open_date = open_date
+                money_record.session.close_date = close_date
+                money_record.session.cash = cash
+                money_record.session.cash_point = cash_point
+                money_record.session.yandex = yandex
+                money_record.session.delivery = delivery
+            else:
+                session = Session.objects.create(storage_id=storage.id, date_at=date_at,
+                                                 session_number=session_number, open_date=open_date,
+                                                 close_date=close_date, cash=cash, cash_point=cash_point,
+                                                 yandex=yandex, delivery=delivery)
+                money_record.session_id = session.id
             money_record.save()
         else:
             raise self.model.DoesNotExist('Запись с указанным идентификатором не найдена.')
@@ -93,7 +118,7 @@ class MoneyService:
         #     )
         #     fine.save()
 
-    def get_all(self) -> List[model]:
+    def get_all(self) -> list[model]:
         return self.model.objects.all()
 
     def money_edit(self, row_id: int | None, sum_cash_morning: int | None, sum_cash_end_day: int | None) -> None:
