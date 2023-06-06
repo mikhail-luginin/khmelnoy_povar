@@ -230,7 +230,7 @@ class MalfunctionsView(BaseView):
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
             messages.error(request, error)
 
-        return redirect('/brand_chief/malfunctions')
+        return redirect(f'/bar/malfunctions?code={request.GET.get("code")}')
 
 
 class MalfunctionCompleteView(BaseView):
