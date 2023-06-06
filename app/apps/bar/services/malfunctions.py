@@ -1,6 +1,7 @@
 from core import validators
 
 from apps.repairer.models import Malfunction
+from core.logs import create_log
 
 
 class MalfunctionService:
@@ -15,10 +16,12 @@ class MalfunctionService:
         validators.validate_field(fault_object, 'объект неисправности')
         validators.validate_field(description, 'описание')
 
-        self.model.objects.create(storage_id=storage_id,
-                                  photo=photo,
-                                  fault_object=fault_object,
-                                  description=description)
+        row = self.model.objects.create(storage_id=storage_id,
+                                        photo=photo,
+                                        fault_object=fault_object,
+                                        description=description)
+        create_log(owner=f'CRM {row.storage.name}', entity=row.storage.name, row=row,
+                   action='create', additional_data='Неисправность добавлена')
 
     def malfunctions_get(self, storage_id: int) -> list[model]:
         return self.model.objects.filter(storage_id=storage_id)

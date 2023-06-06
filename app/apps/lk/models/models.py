@@ -193,13 +193,31 @@ class Expense(models.Model):
     objects = managers.ExpenseManager()
 
 
-class Logs(models.Model):
-    created_at = models.DateTimeField(auto_now=True)
-    username = models.CharField(max_length=128)
-    page = models.CharField(max_length=128)
-    action = models.CharField(max_length=32)
-    comment = models.CharField(max_length=128, null=True)
-    is_bar = models.BooleanField(default=False)
+class Log(models.Model):
+    """
+        Example:
+            created_at = 2023-06-07 12:20:35
+            owner = CRM Гаражная 83/1 | admin | some_user_name
+            entity = Иван Иванов
+            row = Timetable 12 | Expense 14
+            action = 1
+            additional_data = Вышел на смену | Получил зарплату за Апрель с 1 по 15 число
+    """
+
+    ACTION_CHOICES = [
+        (1, 'Создание записи'),
+        (2, 'Редактирование записи'),
+        (3, 'Удаление записи'),
+        (4, 'Обновление записи'),
+        (5, 'Копирование записи')
+    ]
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    owner = models.CharField(max_length=255)
+    entity = models.CharField(max_length=255)
+    row = models.CharField(max_length=255)
+    action = models.PositiveIntegerField(choices=ACTION_CHOICES)
+    additional_data = models.CharField(max_length=255)
 
 
 class ItemDeficit(models.Model):

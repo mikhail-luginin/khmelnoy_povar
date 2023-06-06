@@ -4,7 +4,7 @@ from ..serializers import NavbarSerializer, RoleSerializer, ProfileSerializer, J
     FineSerializer, ExpenseSerializer, LogsSerializer, ItemDeficitSerializer, MalfunctionSerializer, ReviewSerializer
 from ..utils import ModelViewSetMixin
 
-from apps.lk.models import Navbar, Role, Profile, JobPlace, Position, Employee, Catalog, CatalogType, Logs, Expense, \
+from apps.lk.models import Navbar, Role, Profile, JobPlace, Position, Employee, Catalog, CatalogType, Log, Expense, \
     Fine, Statement, Card, Partner, TelegramChat, TestResult, Test, TestQuestion, ItemDeficit, Review
 from ...repairer.models import Malfunction
 
@@ -103,7 +103,7 @@ class ExpenseViewSet(ModelViewSetMixin):
 
 
 class LogsViewSet(ModelViewSetMixin):
-    queryset = Logs.objects.all()
+    queryset = Log.objects.all()
     serializer_class = LogsSerializer
 
 

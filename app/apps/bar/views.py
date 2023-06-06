@@ -24,7 +24,7 @@ from apps.iiko.models import Storage
 from apps.lk.services import catalog, positions, employees, bars
 from apps.lk.services.item_deficit import ItemDeficitService
 from apps.repairer.services import RepairerService
-from ..iiko.services.storage import StorageService
+from apps.iiko.services.storage import StorageService
 
 
 class IndexView(BaseView):

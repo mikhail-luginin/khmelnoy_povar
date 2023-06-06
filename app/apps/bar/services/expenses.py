@@ -64,7 +64,7 @@ class ExpensesPageService:
         for row in CatalogService().get_catalog_by_type(settings.EXPENSE_TYPE_CATEGORY):
             expense_sum = request.POST.get(f'sum[{row.id}]')
             if len(expense_sum) > 0:
-                Expense.objects.create(
+                expense = Expense.objects.create(
                     writer=storage.name + ' CRM',
                     date_at=today_date(),
                     storage=storage,
@@ -74,8 +74,8 @@ class ExpensesPageService:
                     sum=expense_sum,
                     comment=request.POST.get(f'comment[{row.id}]')
                 )
-                create_log(barmen if type(barmen) is str else barmen.fio, request.path, 'Добавление расхода',
-                           comment=storage.name, is_bar=True)
+                create_log(owner=f'CRM {storage.name}', entity=storage.name, row=expense,
+                           action='create', additional_data='Расход создан')
 
         messages.success(request, f'Расход успешно добавлен :)')
         return redirect('/bar/expenses?code=' + code)

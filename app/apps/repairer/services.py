@@ -4,6 +4,7 @@ from django.contrib import messages
 from core import validators
 
 from apps.repairer.models import Malfunction
+from core.logs import create_log
 
 
 class RepairerService:
@@ -35,8 +36,12 @@ class RepairerService:
                 validators.validate_field(comment, 'комментарий')
                 malfunction.status = 0
                 malfunction.comment = comment
+                create_log(owner=f'CRM {malfunction.storage.name}', entity=malfunction.storage.name, row=malfunction,
+                           action='edit', additional_data='Неисправность не подтверждена')
             else:
                 malfunction.status = 2
+                create_log(owner=f'CRM {malfunction.storage.name}', entity=malfunction.storage.name, row=malfunction,
+                           action='edit', additional_data='Неисправность подтверждена')
             malfunction.save()
         else:
             raise self.model.DoesNotExist('Запись с указанным идентификатором не найдена.')
