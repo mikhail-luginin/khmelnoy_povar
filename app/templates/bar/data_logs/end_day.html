@@ -3,43 +3,63 @@
 {% block body %}
     <div class="container-xl">
         <div class="card rounded-3 mb-2">
-            <div class="card-header card-header-light rounded-top-3">Конец дня</div>
-            <div class="card-table">
-                <table class="table table-sm table-striped nowrap w-100">
-                    <thead>
-                        <tr>
-                            <th>Дата</th>
-                            <th>Касса утро</th>
-                            <th>Касса вечер</th>
-                            <th>Выручка</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for row in rows %}
-                            <tr>
-                                <td>{{ row.date_at }}</td>
-                                <td>{{ row.sum_cash_morning }}</td>
-                                <td>{% if row.sum_cash_end_day %}{{ row.sum_cash_end_day }}{% else %}Не заполнено{% endif %}</td>
-                                <td>{% if row.total_day %}{{ row.total_day }}{% else %}Не загружено{% endif %}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+            {% if information.today and information.close_date is None%}
+                <div class="card-header card-header-light"><b>Смена еще не закрыта</b>
+                <div class="card-actions">
+                    <a href="{% url 'Bar:end_day' %}?code={{ code }}" id="update_timetable" class="btn btn-tabler">Текущий конец дня</a>
+                </div>
+                </div>
+            {% else %}
+                <div class="card-header card-header-light"><b>Конец дня (№{{ information.session_number }})</b></div>
+                <div class="card-body">
+                    <p class="mb-3">
+                        Смена открыта: {{ information.open_date }}
+                        {% if information.close_date is not None %}<br> Смена закрыта:
+                            {{ information.close_date }}{% endif %}
+                    </p>
+                    <p class="mb-3">
+                        Выручка: {{ information.total_day }}<br>
+                        Наличные: {{ information.total_cash }} ({{ information.cash }}
+                        + {{ information.cash_point }})<br>
+                        Оплата картой: {{ information.total_bn }}<br>
+                        Яндекс ЕДА: {{ information.yandex }}<br>
+                        Delivery Club: {{ information.delivery }}<br>
+                        Сумма для начисления процентов: {{ information.sum_for_percent }}<br>
+                    </p>
+                    <p class="mb-3">
+                        Касса утро: {{ information.sum_cash_morning }}<br>
+                        Расходы (из кассы): {{ information.expenses_nal }}<br>
+                        Зарплата аванс: {{ information.salary_prepayment }}<br>
+                        Зарплата расчет: {{ information.salary_month }}<br>
+                        Внесения: {{ information.payin }}<br>
+                        Изъятия: {{ information.payout }}
+                    </p>
+                </div>
+                </div>
+                {% if not information.error %}
+                    <div class="card rounded-3">
+                        <div class="card-body">
+                            <b>Сумма для заполнения в IIKO:</b> {{ information.cash }}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
         <div class="card rounded-3">
             <div class="card-body">
                 <div class="row">
                     {% if is_current %}
                         <div class="col-6">
-                            <a href="{% url 'Bar:data_log_end_day' %}?code={{ code }}&date={{ previous }}" class="btn btn-tabler w-100">Предыдущий день</a>
+                            <a href="{% url 'Bar:data_log_end_day' %}?code={{ code }}&date={{ previous }}"
+                               class="btn btn-tabler w-100">Предыдущий день</a>
                         </div>
                         <div class="col-6">
-                            <a href="{% url 'Bar:data_log_end_day' %}?code={{ code }}&date={{ next }}" class="btn btn-tabler w-100">Следующий день</a>
+                            <a href="{% url 'Bar:data_log_end_day' %}?code={{ code }}&date={{ next }}"
+                               class="btn btn-tabler w-100">Следующий день</a>
                         </div>
                     {% else %}
                         <div class="col-12">
-                            <a href="{% url 'Bar:data_log_end_day' %}?code={{ code }}&date={{ previous }}" class="btn btn-tabler w-100">Предыдущий день</a>
+                            <a href="{% url 'Bar:data_log_end_day' %}?code={{ code }}&date={{ previous }}"
+                               class="btn btn-tabler w-100">Предыдущий день</a>
                         </div>
                     {% endif %}
                 </div>
