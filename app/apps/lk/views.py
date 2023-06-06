@@ -31,6 +31,7 @@ from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee, 
 from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest, Setting
 from apps.iiko.models import Product, Supplier
 from apps.repairer.models import Malfunction
+from ..bar.services.malfunctions import MalfunctionService
 
 
 class IndexView(BaseLkView):
@@ -988,7 +989,7 @@ class SendMessageOnBar(BaseLkView):
 
 
 class MalfunctionsView(BaseLkView):
-    template_name = 'lk/malfunctions.html'
+    template_name = 'lk/malfunctions/index.html'
 
 
 class MalfunctionDeleteView(ObjectDeleteMixin):
@@ -1050,3 +1051,30 @@ def review_link_to_employee(request):
             messages.error(request, str(error))
             
         return redirect('/lk/reviews')
+
+
+class MalfunctionCreateView(BaseLkView):
+    template_name = 'lk/malfunctions/create.html'
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context.update({
+            "storages": StorageService().storages_all()
+        })
+
+        return context
+
+    def post(self, request):
+        photo = request.FILES.get('malfunction-photo')
+        fault_object = request.POST.get('fault-object')
+        description = request.POST.get('malfunction-description')
+        storage_id = request.POST.get('storage_id')
+
+        try:
+            MalfunctionService().malfunction_create(storage_id=storage_id, photo=photo,
+                                                    fault_object=fault_object, description=description)
+            messages.success(request, 'Неисправность успешно занесена в список.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/malfunctions')

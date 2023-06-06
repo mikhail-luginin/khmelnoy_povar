@@ -85,7 +85,8 @@ urlpatterns = [
     path('send_message_on_bar', SendMessageOnBar.as_view(), name="send_message_on_bar"),
 
     path('malfunctions', MalfunctionsView.as_view(), name="malfunctions"),
-    path('malfunctions/delete', MalfunctionDeleteView.as_view(), name="malfunctions_delete"),
+    path('malfunctions/create', MalfunctionCreateView.as_view(), name="malfunction_create"),
+    path('malfunctions/delete', MalfunctionDeleteView.as_view(), name="malfunction_delete"),
 
     path('reviews', ReviewsView.as_view(), name="reviews"),
     path('reviews/create', review_create, name="review_create"),
