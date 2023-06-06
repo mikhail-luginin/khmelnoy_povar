@@ -1,8 +1,17 @@
 {% extends 'base.html' %}
 
+{% block title %}Неисправности{% endblock %}
+{% block page_title %}Неисправности{% endblock %}
+
 {% block body %}
     <div class="container-xl">
         <div class="card rounded-3">
+            <div class="card-header">
+                Неисправности
+                <div class="card-actions">
+                    <a href="{% url 'LK:malfunction_create' %}" class="btn w-100">Создать запись</a>
+                </div>
+            </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-sm table-striped table-hover table-bordered nowrap w-100"
