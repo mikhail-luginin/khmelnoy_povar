@@ -69,6 +69,18 @@ class ItemDeficitView(BaseLkView):
             ItemDeficitService().create(storage_id=storage_id, item=item, amount=amount)
             messages.success(request, 'Заявка на нехватку успешно создана.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
-            messages.error(request, error)
+            messages.error(request, str(error))
 
         return redirect('/brand_chief/item_deficit')
+    
+    
+class SendMessageView(BaseLkView):
+    template_name = "brand_chief/send_message.html"
+    
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context.update({
+            "storages": StorageService().storages_all()
+        })
+        
+        return context
