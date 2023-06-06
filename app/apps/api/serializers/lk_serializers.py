@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from apps.lk.models import Navbar, Role, Profile, JobPlace, Position, Employee, Catalog, CatalogType, Logs, Expense, \
+from apps.lk.models import Navbar, Role, Profile, JobPlace, Position, Employee, Catalog, CatalogType, Log, Expense, \
     Fine, Statement, Card, Partner, TelegramChat, TestResult, Test, TestQuestion, ItemDeficit, Review
 from apps.repairer.models import Malfunction
 
@@ -158,7 +158,7 @@ class ExpenseSerializer(serializers.ModelSerializer):
 class LogsSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Logs
+        model = Log
         fields = '__all__'
 
 

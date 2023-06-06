@@ -1,6 +1,7 @@
 from apps.bar.models import Money, TovarRequest, Setting, Timetable
 from apps.bar.services.bar_info import get_full_information_of_day
 from apps.iiko.services.storage import StorageService
+from core.logs import create_log
 from core.telegram import send_message_to_telegram
 
 from core.time import today_date
@@ -74,5 +75,7 @@ def complete_day(request):
         end_day_message += f'{timetable.employee.fio} ({timetable.position.name}): <b>{salary["oklad"] + salary["percent"] + salary["premium"]}</b>\n'
     send_message_to_telegram(chat_id=bar_setting.tg_chat_id,
                              message=end_day_message)
+    create_log(owner=f'CRM {storage.name}', entity=storage.name, row=row,
+               action='create', additional_data='Конец дня заполнен')
 
     return redirect('/bar/end_day?code=' + code)

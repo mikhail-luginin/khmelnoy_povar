@@ -1,3 +1,4 @@
+from core.logs import create_log
 from core.telegram import send_message_to_telegram
 from core.time import today_date, get_current_time
 
@@ -67,12 +68,13 @@ class HomePageService:
                 if check_employee_on_work:
                     raise EmployeeAlreadyWorkingToday(f'{employee.fio} уже работает сегодня')
 
-                oklad = employee.job_place.gain_shift_oklad if position.args['is_usil'] else employee.job_place.main_shift_oklad
+                oklad = employee.job_place.gain_shift_oklad if position.args[
+                    'is_usil'] else employee.job_place.main_shift_oklad
 
                 if position.args['is_trainee']:
                     oklad = 500
 
-                Timetable.objects.create(
+                row = Timetable.objects.create(
                     date_at=today_date(),
                     storage=storage,
                     employee=employee,
@@ -81,12 +83,16 @@ class HomePageService:
                 )
                 send_message_to_telegram(chat_id=bar_setting.tg_chat_id,
                                          message=f'{position.name} {employee.fio} вышел(-а) на смену.')
+                create_log(owner=f'CRM {storage.name}', entity=employee.fio, row=row,
+                           action='create', additional_data='Вышел на смену')
 
         if self.morning_cashbox_today(storage) is False:
             sum_cash_morning = request.POST.get('sum_cash_morning')
             if sum_cash_morning:
-                Money.objects.create(date_at=today_date(), storage=storage,
-                                     sum_cash_morning=sum_cash_morning, barmen_percent=bar_setting.percent)
+                row = Money.objects.create(date_at=today_date(), storage=storage,
+                                           sum_cash_morning=sum_cash_morning, barmen_percent=bar_setting.percent)
+                create_log(owner=f'CRM {storage.name}', entity=storage.name, row=row,
+                           action='create', additional_data='Смена открыта')
 
     def morning_cashbox_today(self, storage_id: Storage) -> int | bool:
         row = Money.objects.filter(storage=storage_id, date_at=today_date())

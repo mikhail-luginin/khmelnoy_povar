@@ -2,6 +2,7 @@ from django.db.models import Sum
 from django.shortcuts import redirect
 from django.contrib import messages
 
+from core.logs import create_log
 from core.time import today_date, get_current_time, monthdelta, get_months
 
 from apps.bar.models import Timetable, Salary, Money
@@ -216,7 +217,7 @@ class SalaryService:
 
     def _accrue_salary(self, storage: Storage, employee: Employee, salary_type: int, oklad: int, percent: int = 0,
                        premium: int = 0, month: int = 0, period: int = None) -> None:
-        Salary.objects.create(
+        row = Salary.objects.create(
             date_at=today_date(),
             employee=employee,
             storage=storage,
@@ -227,6 +228,18 @@ class SalaryService:
             month=month,
             period=period
         )
+
+        additional_data = ''
+        match salary_type:
+            case 1:
+                additional_data = 'Зарплата аванс получена'
+            case 2:
+                additional_data = f'Зарплата расчет за {get_months(month)} {row.get_period_name()} получена'
+            case 3:
+                additional_data = 'Зарплата при увольнении получена'
+
+        create_log(owner=f'CRM {storage.name}', entity=employee.fio, row=row,
+                   action='create', additional_data=additional_data)
 
     def accrue_salary_prepayment(self, request) -> redirect:
         bar = StorageService().storage_get(code=request.GET.get('code'))
