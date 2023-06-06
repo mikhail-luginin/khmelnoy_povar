@@ -23,3 +23,9 @@ class StopListManager(models.Manager):
 
     def get_queryset(self):
         return super().get_queryset().select_related('product', 'storage')
+
+
+class SessionManager(models.Manager):
+
+    def get_queryset(self):
+        return super().get_queryset().select_related('storage')

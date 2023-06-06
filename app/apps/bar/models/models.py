@@ -3,7 +3,7 @@ from django.db import models
 from . import managers
 
 from apps.lk.models import Employee, Position, Catalog
-from apps.iiko.models import Storage, Product, Supplier
+from apps.iiko.models import Storage, Product, Supplier, Session
 
 
 class Money(models.Model):
@@ -23,6 +23,7 @@ class Money(models.Model):
     sum_cash_end_day = models.IntegerField(null=True)
     calculated = models.IntegerField(null=True)
     difference = models.IntegerField(null=True)
+    session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True)
 
     objects = managers.MoneyManager()
 
