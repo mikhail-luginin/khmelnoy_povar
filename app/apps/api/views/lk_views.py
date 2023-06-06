@@ -112,12 +112,12 @@ class ItemDeficitViewSet(ModelViewSetMixin):
     serializer_class = ItemDeficitSerializer
 
     def get_queryset(self):
-        status = self.request.query_params.get('status')
+        without_success = self.request.query_params.get('without_success')
 
-        if status:
-            return ItemDeficit.objects.filter(status=int(status))
+        if without_success and without_success == '1':
+            return ItemDeficit.objects.exclude(status=3)
         else:
-            return ItemDeficit.objects.all()
+            return ItemDeficit.objects.filter(status=3)
 
 
 class MalfunctionViewSet(ModelViewSetMixin):
