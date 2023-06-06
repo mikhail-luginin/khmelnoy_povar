@@ -29,7 +29,7 @@ from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, T
 from apps.iiko.models import Product, Supplier
 from .services.timetable import TimetableService
 
-from .tasks import calculate_percent_premium_for_all
+from .tasks import calculate_percent_premium_for_all, update_all_money
 
 
 class IndexView(BaseLkView):
@@ -314,6 +314,13 @@ class BankCardEditView(ObjectEditMixin):
 
 class MoneyView(BaseLkView):
     template_name = 'lk/money/index.html'
+
+
+@login_required
+def update_all_money_and_sessions(request):
+    update_all_money.delay()
+    messages.success(request, 'Кассовые смены успешно обновлены.')
+    return redirect('/lk/money')
 
 
 @login_required
