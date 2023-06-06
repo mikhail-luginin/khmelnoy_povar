@@ -53,8 +53,16 @@ class ItemDeficitView(BaseLkView):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
+
+        storage_id = request.GET.get('storage_id')
+        if storage_id:
+            need_items = ItemDeficitService().deficit_by_storage(storage_id=storage_id)
+        else:
+            need_items = ItemDeficitService().all()
+
         context.update({
-            "need_items": ItemDeficitService().all(),
+            "is_filter": storage_id,
+            "need_items": need_items,
             "storages": StorageService().storages_all()
         })
 
