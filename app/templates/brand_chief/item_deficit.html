@@ -40,6 +40,7 @@
                         <th>Заведение</th>
                         <th>Предмет</th>
                         <th>Кол-во</th>
+                        <th></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -50,6 +51,11 @@
                                 <td>{{ item.storage.name }}</td>
                                 <td>{{ item.item }}</td>
                                 <td>{{ item.amount }}</td>
+                                <td>
+                                    {% if item.status == 1 %}
+                                        <a href="/lk/need_items/send?id={{ item.id }}" class="btn w-100">Отправить</a>
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endif %}
                     {% endfor %}

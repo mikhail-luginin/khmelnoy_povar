@@ -954,7 +954,8 @@ class ItemDeficitSendView(BaseLkView):
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, ItemDeficit.DoesNotExist) as error:
             messages.error(request, str(error))
 
-        return redirect('/lk/need_items')
+        url = request.META.get('HTTP_REFERER')
+        return redirect(url if url else '/lk/item_deficit')
 
 
 class BarActionsView(BaseLkView):
