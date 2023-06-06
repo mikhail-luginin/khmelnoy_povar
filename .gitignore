@@ -4,3 +4,5 @@
 media
 celerybeat-schedule
 db.sqlite3
+.vscode
+.devcontainer
