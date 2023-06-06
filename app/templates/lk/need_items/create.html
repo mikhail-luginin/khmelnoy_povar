@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Нехватка{% endblock %}
+{% block page_title %}Cоздание нехватки{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-body">
+                <form action="{% url 'LK:need_items_create' %}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label">Заведение</label>
+                        <select class="form-select" name="storage_id" placeholder="Выберите заведение">
+                            <option></option>
+                            {% for storage in storages %}
+                                <option value="{{ storage.id }}">{{ storage.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Предмет дефицита</label>
+                        <input class="form-control" name="need_item" placeholder="Введите предмет дефицита">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Количество нехватки</label>
+                        <input class="form-control" name="amount_need_item" placeholder="Введите количество нехватки">
+                    </div>
+                    <div class="mb-2">
+                        <button type="submit" class="btn w-100">Отправить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

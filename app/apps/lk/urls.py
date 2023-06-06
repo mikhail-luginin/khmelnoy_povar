@@ -79,6 +79,7 @@ urlpatterns = [
     path('tovar/requests/delete', TovarRequestDeleteView.as_view(), name="tovar_request_delete"),
 
     path('need_items', ItemDeficitView.as_view(), name="need_items"),
+    path('need_items/create', NeedItemsCreateView.as_view(), name="need_items_create"),
     path('need_items/send', ItemDeficitSendView.as_view(), name="receive_need_item"),
 
     path('bars/actions', BarActionsView.as_view()),

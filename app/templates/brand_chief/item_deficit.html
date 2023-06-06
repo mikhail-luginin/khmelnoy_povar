@@ -4,6 +4,9 @@
 
 {% block body %}
     <div class="container-xl">
+        {% if is_filter %}
+            <a href="{% url 'BrandChief:item_deficit' %}" class="btn btn-tabler w-100 mb-2">Сбросить фильтр</a>
+        {% endif %}
         <div class="card rounded-3 mb-2">
             <div class="card-body">
                 <form action="{% url 'BrandChief:item_deficit' %}" method="post">
@@ -40,6 +43,7 @@
                         <th>Заведение</th>
                         <th>Предмет</th>
                         <th>Кол-во</th>
+                        <th></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -47,9 +51,14 @@
                         {% if item.status != 3 %}
                             <tr class="table-{% if item.status == 1 %}danger{% elif item.status == 2 %}warning{% endif %}">
                                 <td>{{ item.created_at|date:'F d G:i' }}</td>
-                                <td>{{ item.storage.name }}</td>
+                                <td><a href="{% url 'BrandChief:item_deficit' %}?storage_id={{ item.storage.id }}">{{ item.storage.name }}</a></td>
                                 <td>{{ item.item }}</td>
                                 <td>{{ item.amount }}</td>
+                                <td>
+                                    {% if item.status == 1 %}
+                                        <a href="/lk/need_items/send?id={{ item.id }}" class="btn w-100">Отправить</a>
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endif %}
                     {% endfor %}
