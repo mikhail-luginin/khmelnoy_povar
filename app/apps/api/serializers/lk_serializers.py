@@ -156,6 +156,7 @@ class ExpenseSerializer(serializers.ModelSerializer):
 
 
 class LogsSerializer(serializers.ModelSerializer):
+    action_name = serializers.CharField(source='get_action_display')
 
     class Meta:
         model = Log
