@@ -1104,3 +1104,7 @@ class NeedItemsCreateView(ObjectCreateMixin):
             messages.error(request, error)
 
         return redirect('/lk/need_items')
+
+
+class LogsView(BaseLkView):
+    template_name = 'lk/logs.html'
