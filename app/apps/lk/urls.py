@@ -92,6 +92,8 @@ urlpatterns = [
     path('reviews', ReviewsView.as_view(), name="reviews"),
     path('reviews/create', review_create, name="review_create"),
     path('reviews/link_to_employee', review_link_to_employee, name="review_to_employee"),
-
-    path('logs', LogsView.as_view(), name="logs")
+  
+    path('logs', LogsView.as_view(), name="logs"),
+    path('logs/update', update_logs_view, name="update_logs"),
+    path('logs/filter', LogsWithFilterView.as_view(), name="logs_with_filter")
 ]

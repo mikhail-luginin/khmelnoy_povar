@@ -1,9 +1,10 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 
+from core.logs import LogsService
 from core.time import get_months
 from core.utils import BaseLkView, ObjectEditMixin, ObjectCreateMixin, ObjectDeleteMixin
 from core import exceptions
@@ -1108,3 +1109,14 @@ class NeedItemsCreateView(ObjectCreateMixin):
 
 class LogsView(BaseLkView):
     template_name = 'lk/logs.html'
+
+
+def update_logs_view(request):
+    if request.method == 'GET':
+        data = LogsService().update(timestamp=request.GET.get('timestamp'))
+
+        return JsonResponse({"data": data}, status=200, safe=False)
+
+
+class LogsWithFilterView(BaseLkView):
+    template_name = 'lk/logs_with_filter.html'
