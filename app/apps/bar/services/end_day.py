@@ -1,5 +1,6 @@
 from apps.bar.models import Money, TovarRequest, Setting, Timetable
 from apps.bar.services.bar_info import get_full_information_of_day
+from apps.iiko.models import Session
 from apps.iiko.services.storage import StorageService
 from core.logs import create_log
 from core.telegram import send_message_to_telegram
@@ -47,6 +48,16 @@ def complete_day(request):
     row.sum_cash_end_day = sum_cash_end_day
     row.calculated = calculated
     row.difference = difference
+    session = Session.objects.create(storage_id=storage.id, date_at=information_of_day['date_at'],
+                                    session_number=information_of_day['session_number'],
+                                    open_date=information_of_day['open_date'],
+                                    close_date=information_of_day['close_date'],
+                                    cash=information_of_day['cash'],
+                                    cash_point=information_of_day['cash_point'],
+                                    yandex=information_of_day['yandex'],
+                                    delivery=information_of_day['delivery'])
+
+    row.session_id = session.id
     row.save()
 
     add_percent_and_premium_to_timetable.delay(today_date(), storage.id)

@@ -95,3 +95,17 @@ class StopList(models.Model):
     storage = models.ForeignKey(to=Storage, on_delete=models.SET_NULL, null=True)
 
     objects = managers.StopListManager()
+
+
+class Session(models.Model):
+    storage = models.ForeignKey(to=Storage, on_delete=models.SET_NULL, null=True)
+    date_at = models.DateField(null=True)
+    session_number = models.CharField(max_length=255)
+    open_date = models.DateTimeField(null=True)
+    close_date = models.DateTimeField(null=True)
+    cash = models.IntegerField(null=True)
+    cash_point = models.IntegerField(null=True)
+    yandex = models.IntegerField(null=True)
+    delivery = models.IntegerField(null=True)
+
+    objects = managers.SessionManager()

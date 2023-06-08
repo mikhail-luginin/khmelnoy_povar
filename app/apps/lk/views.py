@@ -24,15 +24,16 @@ from .services.pays import PaysService
 from .services.fines import FineService
 from .services.index_page import IndexPageService
 from .services.timetable import TimetableService
-from .tasks import calculate_percent_premium_for_all
+
+from .tasks import calculate_percent_premium_for_all, update_all_money
 
 from apps.iiko.services.storage import StorageService
+from apps.bar.services.malfunctions import MalfunctionService
 
 from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee, ItemDeficit, Partner, Profile
 from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest, Setting
-from apps.iiko.models import Product, Supplier
 from apps.repairer.models import Malfunction
-from ..bar.services.malfunctions import MalfunctionService
+from apps.iiko.models import Product, Supplier
 
 
 class IndexView(BaseLkView):
@@ -367,6 +368,13 @@ class BankCardEditView(ObjectEditMixin):
 
 class MoneyView(BaseLkView):
     template_name = 'lk/money/index.html'
+
+
+@login_required
+def update_all_money_and_sessions(request):
+    update_all_money.delay()
+    messages.success(request, 'Кассовые смены успешно обновлены.')
+    return redirect('/lk/money')
 
 
 @login_required

@@ -13,7 +13,7 @@ from .services.expenses import ExpensesPageService
 from .services.end_day import complete_day
 from .services.malfunctions import MalfunctionService
 from .services.fines import get_fines_on_storage_by_month
-from .services.bar_info import get_full_information_of_day, get_bar_settings
+from .services.bar_info import get_full_information_of_day, get_bar_settings, get_full_information_of_day_for_data_logs
 from .exceptions import EmployeeAlreadyWorkingToday
 
 from apps.bar.models import Timetable, TovarRequest, Arrival, Pays, Salary, Money, Setting
@@ -301,6 +301,12 @@ class EndDayDataLogView(DataLogsMixin):
     model = Money
     template_name = 'bar/data_logs/end_day.html'
     type = 1
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context['information'] = get_full_information_of_day_for_data_logs(request.GET.get('date'), context['bar'])
+
+        return context
 
 
 class NeedItemsView(BaseView):

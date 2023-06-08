@@ -3,7 +3,9 @@ from django.conf import settings
 from config.celery import app
 from core.telegram import send_message_to_telegram
 
-from apps.bar.models import Timetable, Setting
+from apps.bar.models import Timetable, Setting, Money
+
+from apps.lk.services.money import MoneyService
 
 from apps.bar.tasks import add_percent_and_premium_to_timetable
 
@@ -29,9 +31,16 @@ def bar_actions_telegram_message(storages: list, message: str):
         for storage_id in storages:
             bar_setting = Setting.objects.filter(storage_id=storage_id)
             row = bar_setting.first()
-            if row:
-                if row.tg_chat_id:
-                    send_message_to_telegram(chat_id=row.tg_chat_id, message=message)
-                else:
-                    send_message_to_telegram(chat_id=settings.TELEGRAM_CHAT_ID_FOR_ERRORS,
-                                             message=f'<b>[Admin]</b> ID телеграмм чата не указан для заведения {row.storage.name}')
+            if row.tg_chat_id:
+                send_message_to_telegram(chat_id=row.tg_chat_id, message=message)
+            else:
+                send_message_to_telegram(chat_id=settings.TELEGRAM_CHAT_ID_FOR_ERRORS,
+                                         message=f'<b>[Admin]</b> ID телеграмм чата не указан для заведения {row.storage.name}')
+
+
+@app.task
+def update_all_money():
+    for money in Money.objects.all():
+        MoneyService().update(row_id=money.id)
+
+    send_message_to_telegram(chat_id=settings.TELEGRAM_CHAT_ID_FOR_ERRORS, message=f'<b>[Admin]</b> Кассовые смены обновлены.')

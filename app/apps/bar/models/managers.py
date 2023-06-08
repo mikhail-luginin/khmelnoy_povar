@@ -4,7 +4,7 @@ from django.db import models
 class MoneyManager(models.Manager):
 
     def get_queryset(self):
-        return super().get_queryset().select_related('storage')
+        return super().get_queryset().select_related('storage', 'session')
 
 
 class SalaryManager(models.Manager):
