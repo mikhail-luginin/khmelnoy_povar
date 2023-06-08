@@ -1,33 +1,90 @@
 {% extends 'base.html' %}
 
 {% block title %}Настройки заведений{% endblock %}
-{% block page_title %}Настройки заведений{% endblock %}
+{% block page_title %}Настройки заведения {{ row.storage.name }}{% endblock %}
 
 {% block body %}
     <div class="container-xl">
-        <div class="card">
-            <div class="card-header card-header-light rounded-top-3">
-                <h3 class="card-title">Настройки {{ row.storage.name }}</h3>
+        <div class="card rounded-3">
+            <!-- Cards navigation -->
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs nav-fill">
+                    <li class="nav-item"><a href="#tab-top-1" id="btn-tab-top-1" class="tab-top nav-link active"
+                                            data-bs-toggle="tab">Настройка параметров</a></li>
+                    <li class="nav-item"><a href="#tab-top-2" id="btn-tab-top-2" class="tab-top nav-link"
+                                            data-bs-toggle="tab">Вопросы</a></li>
+                </ul>
             </div>
-            <div class="card-body">
-                <form action="{% url 'LK:bars_settings' %}?id={{ row.id }}" method="post">
-                    {% csrf_token %}
-                    <div class="mb-2">
-                        <label class="form-label" for="percent">Процент барменов</label>
-                        <input class="form-control" type="tel" id="percent" name="percent"
-                               placeholder="Введите процент для барменов целым числом, либо через . (2.5, 3.0 итд.)"
-                               value="{{ row.percent }}">
+            <div class="tab-content">
+                <!-- Content of card #1 -->
+                <div id="tab-top-1" class="card tab-pane active show">
+                    <div class="card-body">
+                        <div class="card-title mb-2">Настройка параметров</div>
+                        <form action="{% url 'LK:bars_settings' %}?id={{ row.id }}" method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label">Процент</label>
+                                <input class="form-control" name="percent" placeholder="Введите процент для барменов"
+                                       value="{{ row.percent }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">ID телеграм чата заведения</label>
+                                <input class="form-control" name="tg_chat_id"
+                                       placeholder="Введите ID телеграм чата заведения"
+                                       value="{% if row.tg_chat_id %}{{ row.tg_chat_id }}{% endif %}">
+                            </div>
+                            <div class="mb-2">
+                                <button type="submit" class="btn bg-dark-lt w-100">Сохранить</button>
+                            </div>
+                        </form>
                     </div>
-                    <div class="mb-2">
-                        <label class="form-label">ID телеграм чата заведения
-                            <a href="#"
-                               data-bs-toggle="modal"
-                               data-bs-target="#how-to-chat-id">Как
-                                узнать ID чата?</a></label>
-                        <input type="text" class="form-control" name="chat-id" placeholder="Введите ID чата" value="{{ row.tg_chat_id }}">
+                </div>
+                <!-- Content of card #2 -->
+                <div id="tab-top-2" class="card tab-pane">
+                    <div class="card-body">
+                        <div class="card-title">Вопросы на конце дня</div>
+                        <table class="table table-sm table-bordered table-striped table-hover nowrap w-100 mb-4">
+                            <thead>
+                            <tr>
+                                <th>Сообщение</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for question in row.end_day_questions.all %}
+                                <tr>
+                                    <td>{{ question.text }}</td>
+                                    <td></td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        <form action="{% url 'LK:link_question_to_bar_setting' %}?id={{ row.id }}" method="post">
+                            {% csrf_token %}
+                            <div class="mb-1">
+                                <label class="form-label">Существующие вопросы</label>
+                                <select class="form-select" placeholder="Выберите вопрос из существующих"
+                                        name="question_id">
+                                    <option></option>
+                                    {% for question in questions %}
+                                        {% if question not in row.end_day_questions.all %}
+                                            <option value="{{ question.id }}">{{ question.text }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <p class="text-muted mb-1">или</p>
+                            <div class="mb-3">
+                                <label class="form-label">Новый вопрос</label>
+                                <input class="form-control" name="question_text"
+                                       placeholder="Введите текст нового вопроса">
+                            </div>
+                            <div class="mb-2">
+                                <button type="submit" class="btn bg-dark-lt w-100">Сохранить</button>
+                            </div>
+                        </form>
                     </div>
-                    <button type="submit" class="btn w-100">Сохранить</button>
-                </form>
+                </div>
             </div>
         </div>
     </div>
@@ -68,9 +125,22 @@
             </div>
         </div>
     </div>
-    {% for chat in telegram_chats %}
-        {{ chat.id }}
-        {{ chat.name }}
-    {% endfor %}
 
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(document).ready(function () {
+            let first_tab = $('#btn-tab-top-1')
+            let second_tab = $('#btn-tab-top-2')
+            first_tab.click(function () {
+                $('.tab-top').removeClass('active')
+                first_tab.addClass('active')
+            })
+            second_tab.click(function () {
+                $('.tab-top').removeClass('active')
+                second_tab.addClass('active')
+            })
+        })
+    </script>
 {% endblock %}

@@ -18,6 +18,7 @@ urlpatterns = [
 
     path('bars', BarsView.as_view(), name="bars"),
     path('bars/settings', BarsSettingsView.as_view(), name="bars_settings"),
+    path('link_question_to_bar_setting', link_question_to_bar_setting, name="link_question_to_bar_setting"),
 
     path('positions', PositionsView.as_view(), name="positions"),
     path('positions/edit', PositionsEditView.as_view(), name="position_edit"),
@@ -28,6 +29,7 @@ urlpatterns = [
     path('bank', BankView.as_view(), name="bank"),
     path('bank/update', bank_update, name="update_bank"),
     path('bank/partners', BankPartnersView.as_view(), name="bank_partners"),
+    path('bank/partners/edit', BankPartnerEditView.as_view(), name="edit_bank_partner"),
     path('bank/cards', BankCardsView.as_view(), name="bank_cards"),
     path('bank/cards/create', BankCardCreateView.as_view(), name="create_bank_card"),
     path('bank/cards/edit', BankCardEditView.as_view(), name="edit_bank_card"),
@@ -78,8 +80,21 @@ urlpatterns = [
     path('tovar/requests/delete', TovarRequestDeleteView.as_view(), name="tovar_request_delete"),
 
     path('need_items', ItemDeficitView.as_view(), name="need_items"),
+    path('need_items/create', NeedItemsCreateView.as_view(), name="need_items_create"),
     path('need_items/send', ItemDeficitSendView.as_view(), name="receive_need_item"),
 
     path('bars/actions', BarActionsView.as_view()),
-    path('send_message_on_bar', send_message_on_bar, name="send_message_on_bar")
+    path('send_message_on_bar', SendMessageOnBar.as_view(), name="send_message_on_bar"),
+
+    path('malfunctions', MalfunctionsView.as_view(), name="malfunctions"),
+    path('malfunctions/create', MalfunctionCreateView.as_view(), name="malfunction_create"),
+    path('malfunctions/delete', MalfunctionDeleteView.as_view(), name="malfunction_delete"),
+
+    path('reviews', ReviewsView.as_view(), name="reviews"),
+    path('reviews/create', review_create, name="review_create"),
+    path('reviews/link_to_employee', review_link_to_employee, name="review_to_employee"),
+  
+    path('logs', LogsView.as_view(), name="logs"),
+    path('logs/update', update_logs_view, name="update_logs"),
+    path('logs/filter', LogsWithFilterView.as_view(), name="logs_with_filter")
 ]

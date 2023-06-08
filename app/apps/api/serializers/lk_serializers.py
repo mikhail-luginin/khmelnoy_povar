@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
-from apps.lk.models import Navbar, Role, Profile, JobPlace, Position, Employee, Catalog, CatalogType, Logs, Expense, \
-    Fine, Statement, Card, Partner, TelegramChat, TestResult, Test, TestQuestion, ItemDeficit
+from apps.lk.models import Navbar, Role, Profile, JobPlace, Position, Employee, Catalog, CatalogType, Log, Expense, \
+    Fine, Statement, Card, Partner, TelegramChat, TestResult, Test, TestQuestion, ItemDeficit, Review
+from apps.repairer.models import Malfunction
 
 
 class NavbarSerializer(serializers.ModelSerializer):
@@ -33,10 +34,6 @@ class JobPlaceSerializer(serializers.ModelSerializer):
 
 
 class PositionSerializer(serializers.ModelSerializer):
-    oklad = serializers.SerializerMethodField()
-
-    def get_oklad(self, obj):
-        return obj.args['oklad']
 
     class Meta:
         model = Position
@@ -44,17 +41,24 @@ class PositionSerializer(serializers.ModelSerializer):
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
-    job = serializers.CharField(source='job_place.name')
-    storage_name = serializers.CharField(source='storage.name')
-    active_status = serializers.SerializerMethodField()
-    status = serializers.CharField(source='get_status_display')
+    job = serializers.CharField(source='job_place.name', default='Не привязана', allow_null=True)
+    storage_name = serializers.CharField(source='storage.name', default='Не привязано', allow_null=True)
+    active_status = serializers.SerializerMethodField(allow_null=True)
+    status = serializers.CharField(source='get_status_display', default='Сотрудник', allow_null=True)
     employee_fio = serializers.SerializerMethodField()
+    photo = serializers.SerializerMethodField()
+    reviews_count = serializers.CharField(source='reviews.count', default=0)
 
     def get_active_status(self, obj):
         if obj.is_deleted == 0:
             return 'Активный'
         else:
             return f'Уволен ({obj.dismiss_date})'
+
+    def get_photo(self, obj):
+        if obj.photo:
+            return obj.photo.url
+        return ''
 
     def get_employee_fio(self, obj):
         return f'<a href="/bar/employee?employee_code={obj.code}">{obj.fio}</a>'
@@ -115,7 +119,7 @@ class PartnerSerializer(serializers.ModelSerializer):
 
 
 class CardSerializer(serializers.ModelSerializer):
-    storage_name = serializers.CharField(source='storage.name')
+    storage_name = serializers.CharField(source='storage.name', allow_null=True, default='Не привязано')
 
     class Meta:
         model = Card
@@ -123,7 +127,7 @@ class CardSerializer(serializers.ModelSerializer):
 
 
 class StatementSerializer(serializers.ModelSerializer):
-    linked = serializers.CharField(source='linked.name', allow_null=True, default='Не привязана')
+    linked = serializers.CharField(source='linked.name', allow_null=True, default='Не привязано')
     payer_name = serializers.CharField(source='payer.name', allow_null=True, default='Не привязан')
     recipient_name = serializers.CharField(source='recipient.name', allow_null=True, default='Не привязан')
 
@@ -152,9 +156,10 @@ class ExpenseSerializer(serializers.ModelSerializer):
 
 
 class LogsSerializer(serializers.ModelSerializer):
+    action_name = serializers.CharField(source='get_action_display')
 
     class Meta:
-        model = Logs
+        model = Log
         fields = '__all__'
 
 
@@ -165,4 +170,22 @@ class ItemDeficitSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ItemDeficit
+        fields = '__all__'
+
+
+class MalfunctionSerializer(serializers.ModelSerializer):
+    storage_name = serializers.CharField(source='storage.name')
+    photo_link = serializers.CharField(source='photo.url')
+
+    class Meta:
+        model = Malfunction
+        fields = '__all__'
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    storage_name = serializers.CharField(source='storage.name')
+    photo_link = serializers.CharField(source='photo.url')
+
+    class Meta:
+        model = Review
         fields = '__all__'

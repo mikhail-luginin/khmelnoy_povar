@@ -7,8 +7,12 @@
     <div class="container-xl">
         <div class="card rounded-3">
             <div class="card-body">
-                <form action="{% url 'LK:create_employee' %}" method="post" type="multipart/from_data">
+                <form action="{% url 'LK:create_employee' %}" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
+                    <div class="mb-4">
+                        <label for="photo" class="form-label">Фото</label>
+                        <input class="form-control" type="file" name="employee_photo" id="employee_photo">
+                    </div>
                     <div class="mb-4">
                         <label class="form-label">Фамилия</label>
                         <input class="form-control" name="last-name" placeholder="Введите фамилию" required>

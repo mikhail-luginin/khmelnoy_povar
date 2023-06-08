@@ -36,6 +36,9 @@ class JobPlace(models.Model):
     main_shift_oklad = models.IntegerField(default=0)
     gain_shift_oklad = models.IntegerField(default=0)
 
+    def __str__(self):
+        return self.name
+
 
 class Position(models.Model):
     name = models.CharField(max_length=32)
@@ -44,6 +47,22 @@ class Position(models.Model):
     priority_id = models.IntegerField()
 
     objects = managers.PositionManager()
+    
+    
+class Review(models.Model):
+    STATUS_CHOICES = [
+        (1, 'Создан'),
+        (2, 'Закрыт')
+    ]
+    
+    created_at = models.DateField(auto_now_add=True)
+    review_date = models.DateField()
+    storage = models.ForeignKey(to=Storage, on_delete=models.CASCADE)
+    jobs = models.ManyToManyField(to=JobPlace)
+    photo = models.ImageField(upload_to='reviews_photo')
+    status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=1)
+
+    objects = managers.ReviewManager()
 
 
 class Employee(models.Model):
@@ -55,7 +74,7 @@ class Employee(models.Model):
     ]
 
     code = models.CharField(max_length=64)
-    photo = models.IntegerField(default=0)
+    photo = models.ImageField(upload_to='employee_photo', null=True)
     fio = models.CharField(max_length=64)
     birth_date = models.DateField(null=True)
     address = models.CharField(max_length=64, null=True)
@@ -65,6 +84,7 @@ class Employee(models.Model):
     is_deleted = models.PositiveSmallIntegerField(default=0)
     dismiss_date = models.DateField(null=True)
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=3)
+    reviews = models.ManyToManyField(to=Review)
 
     objects = managers.EmployeeManager()
 
@@ -79,6 +99,7 @@ class CatalogType(models.Model):
 class Catalog(models.Model):
     name = models.CharField(max_length=32)
     catalog_types = models.ManyToManyField(CatalogType)
+    args = models.JSONField(default=dict)
 
     objects = managers.CatalogManager()
 
@@ -116,8 +137,8 @@ class Partner(models.Model):
     name = models.CharField(max_length=128)
     inn = models.CharField(max_length=12)
     friendly_name = models.CharField(max_length=64)
-    expense_type = models.ManyToManyField(Catalog)
-    storage = models.ManyToManyField(Storage)
+    expense_types = models.ManyToManyField(Catalog)
+    storages = models.ManyToManyField(Storage)
 
     objects = managers.PartnerManager()
 
@@ -172,13 +193,31 @@ class Expense(models.Model):
     objects = managers.ExpenseManager()
 
 
-class Logs(models.Model):
-    created_at = models.DateTimeField(auto_now=True)
-    username = models.CharField(max_length=128)
-    page = models.CharField(max_length=128)
-    action = models.CharField(max_length=32)
-    comment = models.CharField(max_length=128, null=True)
-    is_bar = models.BooleanField(default=False)
+class Log(models.Model):
+    """
+        Example:
+            created_at = 2023-06-07 12:20:35
+            owner = CRM Гаражная 83/1 | admin | some_user_name
+            entity = Иван Иванов
+            row = Timetable 12 | Expense 14
+            action = 1
+            additional_data = Вышел на смену | Получил зарплату за Апрель с 1 по 15 число
+    """
+
+    ACTION_CHOICES = [
+        (1, 'Создание записи'),
+        (2, 'Редактирование записи'),
+        (3, 'Удаление записи'),
+        (4, 'Обновление записи'),
+        (5, 'Копирование записи')
+    ]
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    owner = models.CharField(max_length=255)
+    entity = models.CharField(max_length=255)
+    row = models.CharField(max_length=255)
+    action = models.PositiveIntegerField(choices=ACTION_CHOICES)
+    additional_data = models.CharField(max_length=255)
 
 
 class ItemDeficit(models.Model):

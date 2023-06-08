@@ -22,7 +22,7 @@ class PositionManager(models.Manager):
 class EmployeeManager(models.Manager):
 
     def get_queryset(self):
-        return super().get_queryset().select_related('job_place', 'storage')
+        return super().get_queryset().select_related('job_place', 'storage').prefetch_related('reviews')
 
 
 class CatalogManager(models.Manager):
@@ -46,7 +46,7 @@ class TestResultManager(models.Manager):
 class PartnerManager(models.Manager):
 
     def get_queryset(self):
-        return super().get_queryset().prefetch_related('expense_type', 'storage')
+        return super().get_queryset().prefetch_related('expense_types', 'storages')
 
 
 class CardManager(models.Manager):
@@ -77,3 +77,9 @@ class ItemDeficitManager(models.Manager):
 
     def get_queryset(self):
         return super().get_queryset().select_related('owner', 'storage')
+
+
+class ReviewManager(models.Manager):
+
+    def get_queryset(self):
+        return super().get_queryset().select_related('storage').prefetch_related('jobs')

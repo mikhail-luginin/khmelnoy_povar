@@ -31,6 +31,7 @@
                             <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                             <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                             <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                             <th></th>
                         </tr>
                         <tr>
@@ -48,11 +49,13 @@
                             <th>Касса вечер</th>
                             <th>Расчетный</th>
                             <th>Разница</th>
+                            <th>Процент</th>
                             <th></th>
                         </tr>
                         </thead>
                         <tfoot>
                         <tr>
+                            <th></th>
                             <th></th>
                             <th></th>
                             <th></th>
@@ -93,7 +96,8 @@
             {data: 'total_expenses'},
             {data: 'sum_cash_end_day'},
             {data: 'calculated'},
-            {data: 'difference'}
+            {data: 'difference'},
+            {data: 'barmen_percent'},
         ], false, true)
     </script>
 {% endblock %}

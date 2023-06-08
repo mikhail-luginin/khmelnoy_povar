@@ -2,9 +2,10 @@ from django.db.models import Sum
 from django.shortcuts import redirect
 from django.contrib import messages
 
+from core.logs import create_log
 from core.time import today_date, get_current_time, monthdelta, get_months
 
-from apps.bar.models import Timetable, Salary
+from apps.bar.models import Timetable, Salary, Money
 from apps.iiko.models import Storage
 from apps.lk.models import Employee, Fine, Expense
 
@@ -21,7 +22,10 @@ class SalaryService:
     def calculate_prepayment_salary_by_timetable_object(self, timetable_object: Timetable) -> dict[
         Literal["oklad", "percent", "premium"], int
     ]:
-        percent_num = get_bar_settings(storage_id=timetable_object.storage_id).percent
+        try:
+            percent_num = Money.objects.get(storage_id=timetable_object.storage_id, date_at=timetable_object.date_at).barmen_percent
+        except Money.DoesNotExist:
+            percent_num = get_bar_settings(storage_id=timetable_object.storage_id).percent
 
         percent = 0
         premium = 0
@@ -59,6 +63,8 @@ class SalaryService:
 
     def get_money_data_employee(self, request) -> dict:
         data = dict()
+        data['amount_main_shifts'] = 0
+        data['amount_gain_shifts'] = 0
 
         employee_code = request.GET.get('employee_code')
         previous = request.GET.get('previous')
@@ -76,6 +82,34 @@ class SalaryService:
         accrued_prepayed_data = []
         accrued_month_data = []
         session_data = []
+
+        entire_salary_data = []
+        work_months = []
+
+        for timetable in Timetable.objects.filter(employee=employee).order_by('-date_at'):
+            row = dict()
+            row['year'] = timetable.date_at.year
+            row['month'] = timetable.date_at.month
+            if row not in work_months:
+                work_months.append(row)
+
+        for date in work_months:
+            row = {'year': date['year'], 'month': get_months(date['month']),
+                   'received_salary': 0, 'accrued_salary': 0}
+
+            for salary in Salary.objects.filter(date_at__month=date['month'], date_at__year=date['year'], employee=employee, type=1):
+                row['received_salary'] += int(salary.get_total_sum())
+
+            for salary in Salary.objects.filter(date_at__month=date['month'], date_at__year=date['year'],employee=employee, type=2):
+                row['received_salary'] += salary.oklad
+
+            for timetable in Timetable.objects.filter(date_at__month=date['month'], date_at__year=date['year'],employee=employee).order_by('-date_at'):
+                calculated_salary = SalaryService().calculate_prepayment_salary_by_timetable_object(
+                    timetable_object=timetable)
+                row['accrued_salary'] += calculated_salary['oklad'] + calculated_salary['percent'] + calculated_salary['premium'] - timetable.fine
+
+            entire_salary_data.append(row)
+
 
         for salary in Salary.objects.filter(date_at__month=month, employee=employee, type=1).order_by('-date_at'):
             row = dict()
@@ -107,6 +141,11 @@ class SalaryService:
             row['fine'] = timetable.fine
             session_data.append(row)
 
+            if timetable.position.args["is_usil"]:
+                data['amount_gain_shifts'] += 1
+            else:
+                data['amount_main_shifts'] += 1
+
         data['accrued_prepayed_data'] = accrued_prepayed_data
         data['session_data'] = session_data
         data['accrued_month_data'] = accrued_month_data
@@ -114,6 +153,7 @@ class SalaryService:
         data['month_name'] = get_months(month)
         data['first_period'] = self.calculate_salary(employee, current_date.year, month, 1)
         data['second_period'] = self.calculate_salary(employee, current_date.year, month, 2)
+        data['entire_salary_data'] = entire_salary_data
 
         return data
 
@@ -177,7 +217,7 @@ class SalaryService:
 
     def _accrue_salary(self, storage: Storage, employee: Employee, salary_type: int, oklad: int, percent: int = 0,
                        premium: int = 0, month: int = 0, period: int = None) -> None:
-        Salary.objects.create(
+        row = Salary.objects.create(
             date_at=today_date(),
             employee=employee,
             storage=storage,
@@ -189,27 +229,17 @@ class SalaryService:
             period=period
         )
 
-        total_sum = oklad + percent + premium
-        comment = f'ЗП {salary_type} '
-        if salary_type == 2:
-            if period == 1:
-                period = 'С 1 по 15 число'
-            elif period == 2:
-                period = 'С 16 по 31 число'
-            elif period == 3:
-                period = 'Расчет для уволенного'
-            comment += get_months(month) + ' ' + period
+        additional_data = ''
+        match salary_type:
+            case 1:
+                additional_data = 'Зарплата аванс получена'
+            case 2:
+                additional_data = f'Зарплата расчет за {get_months(month)} {row.get_period_name()} получена'
+            case 3:
+                additional_data = 'Зарплата при увольнении получена'
 
-        Expense.objects.create(
-            writer=get_main_barmen(today_date(), storage),
-            date_at=today_date(),
-            storage=storage,
-            expense_type=CatalogService().get_catalog_by_name('Зарплата'),
-            expense_source=CatalogService().get_catalog_by_name('Наличные'),
-            payment_receiver=employee.fio,
-            sum=total_sum,
-            comment=comment
-        )
+        create_log(owner=f'CRM {storage.name}', entity=employee.fio, row=row,
+                   action='create', additional_data=additional_data)
 
     def accrue_salary_prepayment(self, request) -> redirect:
         bar = StorageService().storage_get(code=request.GET.get('code'))

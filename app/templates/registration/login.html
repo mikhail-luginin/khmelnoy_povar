@@ -44,6 +44,7 @@
                 <h2 class="h2 text-center mb-4">Войдите в свой аккаунт</h2>
                 <form action="{% url 'login' %}" method="post">
                     {% csrf_token %}
+                    <input name="next" type="hidden" value="{{ next }}">
                     <div class="mb-3">
                         <label class="form-label" for="username">Имя пользователя</label>
                         <input type="text" class="form-control" placeholder="Введите имя пользователя" id="username" name="username">

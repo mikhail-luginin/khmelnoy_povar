@@ -24,8 +24,6 @@ import xml.etree.ElementTree as ET
 from apps.lk.models import Expense, Catalog
 from apps.lk.services.catalog import CatalogService
 
-from typing import List
-
 
 class BaseView(View):
     template_name = None
@@ -52,20 +50,16 @@ class ObjectDeleteMixin(BaseView):
     model = None
 
     def get(self, request):
-        error = False
         try:
             row = self.model.objects.get(id=request.GET.get('id'))
             row.delete()
-            today_main_barmen = get_main_barmen(today_date(), row.storage)
-            username_for_logs = 'Основной бармен отсутствует' if not today_main_barmen else today_main_barmen.fio
-            create_log(username_for_logs, request.path, f'Удаление записи в модели {str(self.model)}',
-                       comment=row.storage.name, is_bar=True)
+            create_log(owner=f'CRM {row.storage.name}', entity=row.storage.name, row=row,
+                       action='delete', additional_data='Запись удалена')
         except self.model.DoesNotExist:
-            messages.error(request, 'Данная запись не найдена :(')
-            error = True
+            messages.error(request, 'Данная запись не найдена.')
+            return redirect(request.META.get('HTTP_REFERER'))
 
-        if error is False:
-            messages.success(request, 'Запись успешно удалена :)')
+        messages.success(request, 'Запись успешно удалена.')
         return redirect(request.META.get('HTTP_REFERER'))
 
 
@@ -107,9 +101,11 @@ class TovarRequestMixin(ProductsMovementMixin):
     model = TovarRequest
 
     def post(self, request):
+        context = self.get_context_data(request)
+
         for product in self.get_category_products():
             if request.POST.get(f'{product.id}') is not None:
-                self.model.objects.create(
+                row = self.model.objects.create(
                     date_at=today_date(),
                     storage=StorageService().storage_get(code=request.GET.get('code')),
                     product=product,
@@ -117,8 +113,10 @@ class TovarRequestMixin(ProductsMovementMixin):
                     product_main_unit=product.main_unit,
                     supplier=product.supplier
                 )
+                create_log(owner=f'CRM {context.get("bar").name}', entity=product.name, row=row,
+                           action='create', additional_data=f'Заявка пополнена ({product.name})')
 
-        messages.success(request, 'Заявка пополнена :)')
+        messages.success(request, 'Заявка пополнена.')
         return redirect(request.META.get('HTTP_REFERER'))
 
 
@@ -194,6 +192,8 @@ class ArrivalMixin(ProductsMovementMixin):
             expense.save()
 
         arrival.save()
+        create_log(owner=f'CRM {storage.name}', entity=product.name, row=arrival,
+                   action='create', additional_data=f'Приход товара заполнен ({product.name})')
 
         messages.success(request, 'Поступление успешно записано :)')
         return redirect(request.META.get('HTTP_REFERER'))
@@ -230,10 +230,14 @@ class InventoryMixin(BaseView):
             for product in item.findall('product'):
                 name = product.find('name').text
                 code = product.find('code').text
-                if code:
+                if code and len(code) > 0:
                     code = int(code)
+                else:
+                    continue
             expected_amount = item.find('expectedAmount').text
             count = request.POST.get(str(code))
+            if len(count) == 0:
+                count = 0
             difference = int(count) - int(round(float(expected_amount)))
             row[name] = {'fact': count, 'iiko': int(round(float(expected_amount))), 'difference': difference}
             if difference < 0:
@@ -271,7 +275,8 @@ class DataLogsMixin(BaseView):
         match self.type:
             case 1:
                 day = (current_date + datetime.timedelta(days=obj)) if obj else current_date.day
-                filter_args = {"date_at__day": day if type(day) is int else day.day, "date_at__month": day.month if obj else current_date.month}
+                filter_args = {"date_at__day": day if type(day) is int else day.day,
+                               "date_at__month": day.month if obj else current_date.month}
             case 2:
                 obj = monthdelta(current_date, obj).month if obj else current_date.month
                 filter_args = {"date_at__month": obj}

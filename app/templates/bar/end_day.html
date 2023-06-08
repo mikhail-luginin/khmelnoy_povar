@@ -1,7 +1,37 @@
 {% extends 'bar_base.html' %}
 
+{% load prepare_question_id %}
+
 {% block body %}
     {% if information.close_date is not None and information.sum_cash_end_day is None %}
+        {% for question in data.questions_list %}
+            <div class="modal modal-blur fade" id="{{ question.id }}-question-modal" tabindex="-1" role="dialog"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Вопрос-{{ question.id }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row mb-3 align-items-end">
+                                <div class="col">
+                                    {{ question.text }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn me-auto" data-bs-dismiss="modal">Нет</button>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#{% if data.questions_count == question.id %}close-day
+                                        {% else %}{{ question.id|prepare_id }}-question-modal{% endif %}">Да
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
         <div class="modal modal-blur fade" id="close-day" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
@@ -96,8 +126,12 @@
     {% if information.sum_cash_end_day is None and information.close_date is not None %}
         <script>
             $(document).ready(function () {
-                if (document.getElementById('close-day') !== null) {
-                    $('#close-day').modal('show');
+                if (document.getElementById('1-question-modal') !== null) {
+                    $('#1-question-modal').modal('show');
+                } else {
+                    if (document.getElementById('close-day') !== null) {
+                        $('#close-day').modal('show');
+                    }
                 }
             })
         </script>

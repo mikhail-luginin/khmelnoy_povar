@@ -1,0 +1,69 @@
+{% extends 'brand_chief/base.html' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="/assets/css/magnific-popup.css">
+{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3 mb-2">
+            <div class="card-header card-header-light rounded-top-3">
+                Неисправности
+            </div>
+            <div class="card-body">
+                <form action="{% url 'BrandChief:malfunctions' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label for="malfunction-photo" class="form-label">Фото</label>
+                        <input class="form-control" type="file" name="malfunction-photo" id="malfunction-photo"
+                               required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Заведение</label>
+                        <select class="form-select" name="storage_id" placeholder="Выберите заведение">
+                            <option></option>
+                            {% for storage in storages %}
+                                <option value="{{ storage.id }}">{{ storage.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="fault-object" class="form-label">Объект неисправности</label>
+                        <input class="form-control" name="fault-object" id="fault-object"
+                               placeholder="Укажите объект неисправности" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="malfunction-description" class="form-label">Описание неисправности</label>
+                        <textarea
+                                name="malfunction-description" id="malfunction-description"
+                                class="form-control" placeholder="Введите описание неисправности" required></textarea>
+                    </div>
+                    <div class="mb-1">
+                        <button type="submit" class="btn btn-success w-100">Добавить неисправность</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% for row in rows %}
+            {% if row.status != 2 %}
+                <div class="mb-3">
+                    <div class="card rounded-3">
+                        <div class="card-body">
+                            <a class="image-popup btn btn-tabler w-100" title="Фото" href="{{ row.photo.url }}">
+                                Посмотреть фото
+                            </a><br><br>
+                            Дата: {{ row.date_at|date:'Y-m-d H:i' }}<br>
+                            Заведение: {{ row.storage.name }}<br>
+                            Объект неисправности: {{ row.fault_object }}<br>
+                            Описание: {{ row.description }}<br><br>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="/assets/js/jquery.magnific-popup.min.js"></script>
+{% endblock %}

@@ -1,11 +1,12 @@
 from ..serializers import NavbarSerializer, RoleSerializer, ProfileSerializer, JobPlaceSerializer, PositionSerializer, \
     EmployeeSerializer, CatalogTypeSerializer, CatalogSerializer, TestQuestionSerializer, TestSerializer, \
     TestResultSerializer, TelegramChatSerializer, CardSerializer, PartnerSerializer, StatementSerializer, \
-    FineSerializer, ExpenseSerializer, LogsSerializer, ItemDeficitSerializer
+    FineSerializer, ExpenseSerializer, LogsSerializer, ItemDeficitSerializer, MalfunctionSerializer, ReviewSerializer
 from ..utils import ModelViewSetMixin
 
-from apps.lk.models import Navbar, Role, Profile, JobPlace, Position, Employee, Catalog, CatalogType, Logs, Expense, \
-    Fine, Statement, Card, Partner, TelegramChat, TestResult, Test, TestQuestion, ItemDeficit
+from apps.lk.models import Navbar, Role, Profile, JobPlace, Position, Employee, Catalog, CatalogType, Log, Expense, \
+    Fine, Statement, Card, Partner, TelegramChat, TestResult, Test, TestQuestion, ItemDeficit, Review
+from ...repairer.models import Malfunction
 
 
 class NavbarViewSet(ModelViewSetMixin):
@@ -102,7 +103,7 @@ class ExpenseViewSet(ModelViewSetMixin):
 
 
 class LogsViewSet(ModelViewSetMixin):
-    queryset = Logs.objects.all()
+    queryset = Log.objects.all()
     serializer_class = LogsSerializer
 
 
@@ -111,9 +112,19 @@ class ItemDeficitViewSet(ModelViewSetMixin):
     serializer_class = ItemDeficitSerializer
 
     def get_queryset(self):
-        status = self.request.query_params.get('status')
+        without_success = self.request.query_params.get('without_success')
 
-        if status:
-            return ItemDeficit.objects.filter(status=int(status))
+        if without_success and without_success == '1':
+            return ItemDeficit.objects.exclude(status=3)
         else:
-            return ItemDeficit.objects.all()
+            return ItemDeficit.objects.filter(status=3)
+
+
+class MalfunctionViewSet(ModelViewSetMixin):
+    queryset = Malfunction.objects.all()
+    serializer_class = MalfunctionSerializer
+
+
+class ReviewViewSet(ModelViewSetMixin):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer

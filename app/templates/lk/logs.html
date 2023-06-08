@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}События{% endblock %}
+{% block page_title %}События{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-table table-responsive rounded-3">
+                <table class="table" id="logs-table">
+                    <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Владелец</th>
+                        <th>Сущность</th>
+                        <th>Запись</th>
+                        <th>Действие</th>
+                        <th>Информация</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        function addRowInTable(tableID, data) {
+            let table = document.getElementById(tableID);
+
+			let rowCount = table.rows.length;
+
+			data.forEach(function(log) {
+                let row = table.insertRow(1);
+                rowCount += 1;
+
+                let createdAt = log["created_at"];
+                let owner = log["owner"];
+                let entity = log["entity"];
+                let row_n = log["row"];
+                let actionName = log["action_name"];
+                let additionalData = log["additional_data"];
+
+                let cell = row.insertCell(0);
+                let element = document.createTextNode(createdAt);
+                cell.appendChild(element);
+
+                cell = row.insertCell(1);
+                element = document.createTextNode(owner);
+                cell.appendChild(element);
+
+                cell = row.insertCell(2);
+                element = document.createTextNode(entity);
+                cell.appendChild(element);
+
+                cell = row.insertCell(3);
+                element = document.createTextNode(row_n);
+                cell.appendChild(element);
+
+                cell = row.insertCell(4);
+                element = document.createTextNode(actionName);
+                cell.appendChild(element);
+
+                cell = row.insertCell(5);
+                element = document.createTextNode(additionalData);
+                cell.appendChild(element);
+            })
+        }
+        $(document).ready(function () {
+            function updateLogs(is_first=false) {
+                let date = new Date()
+                let url = "{% url 'LK:update_logs' %}"
+                if(is_first === false) {
+                    url = url + "?timestamp=" + date.toISOString()
+                }
+                $.ajax({
+                    data: $(this).serialize(),
+                    type: 'get',
+                    url: url,
+                    success: function (response) {
+                        let data = response.data
+                        if(data.length > 0) {
+                            console.log('logs was updated')
+                            addRowInTable('logs-table', data)
+                        }
+                    },
+                    error: function (response) {
+                        notification(false)
+                    }
+                });
+                setTimeout(updateLogs, 5000)
+                return false;
+            }
+            updateLogs(true)
+        })
+    </script>
+{% endblock %}

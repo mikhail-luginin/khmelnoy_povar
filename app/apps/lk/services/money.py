@@ -1,9 +1,15 @@
+from django.contrib import messages
+from django.shortcuts import redirect
+
+from apps.bar.tasks import add_percent_and_premium_to_timetable
+
 from core import validators
 from core.total_values import get_total_expenses_by_date_and_storage, \
     get_total_payin_by_date_and_storage, get_total_payout_by_date_and_storage, get_total_salary_by_date_and_storage
 
-from apps.bar.models import Money
+from apps.bar.models import Money, Timetable
 from apps.iiko.models import PaymentType, Session
+
 from apps.iiko.services.api import IikoService
 
 import json
@@ -121,17 +127,23 @@ class MoneyService:
     def get_all(self) -> list[model]:
         return self.model.objects.all()
 
-    def money_edit(self, row_id: int | None, sum_cash_morning: int | None, sum_cash_end_day: int | None) -> None:
+    def money_edit(self, row_id: int | None, sum_cash_morning: int | None,
+                   sum_cash_end_day: int | None, barmen_percent: float | None) -> None:
         validators.validate_field(row_id, 'идентификатор записи')
         validators.validate_field(sum_cash_morning, 'касса утро')
         validators.validate_field(sum_cash_end_day, 'касса вечер')
+        validators.validate_field(barmen_percent, 'процент бармена')
 
         money_record = self.model.objects.filter(id=row_id)
         if money_record.exists():
             money_record = money_record.first()
             money_record.sum_cash_morning = sum_cash_morning
             money_record.sum_cash_end_day = sum_cash_end_day
+            money_record.barmen_percent = barmen_percent
             money_record.save()
             self.update(row_id=money_record.id)
+            if barmen_percent:
+                add_percent_and_premium_to_timetable(date_at=money_record.date_at,
+                                                     storage_id=money_record.storage_id)
         else:
             raise self.model.DoesNotExist('Запись с указанным идентификатором не найдена.')

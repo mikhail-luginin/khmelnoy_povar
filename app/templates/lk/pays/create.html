@@ -28,9 +28,15 @@
                             <option></option>
                             <option value="1">Внесение</option>
                             <option value="2">Изъятие</option>
-                            <option value="4">Закупщик</option>
-                            <option value="5">Масло</option>
-                            <option value="6">Данил</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Получатель/отправитель</label>
+                        <select class="form-select" name="from_to_id" placeholder="Выберите отправителя или получателя">
+                            <option></option>
+                            {% for from_to in pays %}
+                                <option value="{{ from_to.id }}">{{ from_to.name }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="mb-4">
@@ -40,12 +46,7 @@
                     </div>
                     <div class="mb-4">
                         <label class="form-label">Комментарий</label>
-                        <select class="form-select" name="comment" placeholder="Выберите комментарий" required>
-                            <option></option>
-                            {% for comment in pays %}
-                                <option value="{{ comment.id }}">{{ comment.name }}</option>
-                            {% endfor %}
-                        </select>
+                        <input class="form-control" name="comment" placeholder="Введите комментарий">
                     </div>
                     <div class="mb-1">
                         <button type="submit" class="btn btn-success w-100">Создать</button>

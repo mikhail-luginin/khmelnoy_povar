@@ -1,30 +1,30 @@
 from django.contrib import messages
 from django.shortcuts import redirect
+from django.conf import settings
+from django.db.models import Sum
 
 from core import exceptions
 from core.time import today_date, get_months, get_current_time
 from global_services.salary import SalaryService
 
 from .utils import BaseView, ObjectDeleteMixin, TovarRequestMixin, ArrivalMixin, InventoryMixin, DataLogsMixin
-
 from .services.index import HomePageService
 from .services.expenses import ExpensesPageService
 from .services.end_day import complete_day
 from .services.malfunctions import MalfunctionService
 from .services.fines import get_fines_on_storage_by_month
 from .services.bar_info import get_full_information_of_day, get_bar_settings, get_full_information_of_day_for_data_logs
+from .exceptions import EmployeeAlreadyWorkingToday
 
-from apps.bar.models import Timetable, TovarRequest, Arrival, Pays, Salary, Money
+from apps.bar.models import Timetable, TovarRequest, Arrival, Pays, Salary, Money, Setting
 from apps.lk.models import Expense, Fine, ItemDeficit
-
-from apps.lk.services import catalog, positions, employees
-
-from django.conf import settings
-
-from django.db.models import Sum
-
+from apps.repairer.models import Malfunction
 from apps.iiko.models import Storage
-from ..lk.services.item_deficit import ItemDeficitService
+
+from apps.lk.services import catalog, positions, employees, bars
+from apps.lk.services.item_deficit import ItemDeficitService
+from apps.repairer.services import RepairerService
+from apps.iiko.services.storage import StorageService
 
 
 class IndexView(BaseView):
@@ -34,13 +34,18 @@ class IndexView(BaseView):
         context = super().get_context_data(request, **kwargs)
         context['rows'] = HomePageService().get_timetable_today(context['bar'])
         context['positions'] = HomePageService().positions_on_storage()
-        context['is_morning_cashbox_filled'] = HomePageService().validate_today_morning_cashbox(context['bar'])
+        context['is_morning_cashbox_filled'] = HomePageService().morning_cashbox_today(context['bar'])
         context['evening_cashbox_previous_day'] = HomePageService().evening_cashbox_previous_day(context['bar'])
 
         return context
 
     def post(self, request):
-        return HomePageService().timetable_add(request)
+        try:
+            HomePageService().timetable_add(request)
+            messages.success(request, 'Данные смены успешно обновлены.')
+        except (EmployeeAlreadyWorkingToday, Setting.DoesNotExist) as error:
+            messages.error(request, error)
+        return redirect('/bar?code=' + request.GET.get('code'))
 
 
 class TimetableDeleteView(ObjectDeleteMixin):
@@ -112,6 +117,7 @@ class EndDayView(BaseView):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context['information'] = get_full_information_of_day(today_date(), context['bar'])
+        context['data'] = bars.BarSettingService().get_question_on_end_day_by_storage_id(storage_id=context['bar'].id)
 
         return context
 
@@ -211,7 +217,46 @@ class MalfunctionsView(BaseView):
         return context
 
     def post(self, request):
-        return MalfunctionService().malfunction_create(request)
+        storage_id = StorageService().storage_get(code=request.GET.get('code')).id
+
+        photo = request.FILES.get('malfunction-photo')
+        fault_object = request.POST.get('fault-object')
+        description = request.POST.get('malfunction-description')
+
+        try:
+            MalfunctionService().malfunction_create(storage_id=storage_id, photo=photo,
+                                                    fault_object=fault_object, description=description)
+            messages.success(request, 'Неисправность успешно занесена в список.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+            messages.error(request, error)
+
+        return redirect(f'/bar/malfunctions?code={request.GET.get("code")}')
+
+
+class MalfunctionCompleteView(BaseView):
+
+    def get(self, request):
+        malfunction_id = request.GET.get('id')
+
+        try:
+            RepairerService().malfunction_complete(malfunction_id=malfunction_id)
+            messages.success(request, 'Ваш ответ был успешно отправлен.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Malfunction.DoesNotExist) as error:
+            messages.error(request, error)
+
+        return redirect('/bar/malfunctions?code=' + request.GET.get('code'))
+
+    def post(self, request):
+        malfunction_id = request.GET.get('id')
+        comment = request.POST.get('comment')
+
+        try:
+            RepairerService().malfunction_complete(malfunction_id=malfunction_id, comment=comment)
+            messages.success(request, 'Ваш ответ был успешно отправлен.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Malfunction.DoesNotExist) as error:
+            messages.error(request, error)
+
+        return redirect('/bar/malfunctions?code=' + request.GET.get('code'))
 
 
 class PaysAddView(BaseView):

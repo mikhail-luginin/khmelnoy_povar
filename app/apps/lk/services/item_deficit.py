@@ -1,6 +1,7 @@
 from core import validators
 
 from apps.lk.models import ItemDeficit, Profile
+from core.logs import create_log
 from core.time import today_datetime
 
 
@@ -17,13 +18,15 @@ class ItemDeficitService:
         validators.validate_field(item, 'предмет дефицита')
         validators.validate_field(amount, 'кол-во нехватки')
 
-        self.model.objects.create(
+        row = self.model.objects.create(
             created_at=today_datetime(),
             storage_id=storage_id,
             item=item,
             amount=amount,
             status=1
         )
+        create_log(owner=f'CRM {row.storage.name}', entity=row.storage.name, row=row,
+                   action='create', additional_data='Нехватка создана')
 
     def send(self, request_id: int | None, user: Profile) -> bool:
         validators.validate_field(request_id, 'идентификатор запроса')
@@ -56,6 +59,8 @@ class ItemDeficitService:
                 request.receive_date = today_datetime()
                 request.status = 3
                 request.save()
+                create_log(owner=f'CRM {request.storage.name}', entity=request.storage.name, row=request,
+                           action='edit', additional_data='Нехватка получена')
         else:
             raise self.model.DoesNotExist('Запрос с указанным идентификатором не найден.')
 

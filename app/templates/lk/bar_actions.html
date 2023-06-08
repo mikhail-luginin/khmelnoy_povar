@@ -11,7 +11,7 @@
                     {% csrf_token %}
                     <div class="mb-4">
                         <label class="form-label">Заведение</label>
-                        <select class="form-select" name="storage_id" placeholder="Выберите заведение">
+                        <select class="form-select" name="storages" placeholder="Выберите заведение" multiple>
                             <option></option>
                             <option value="all">Все</option>
                             {% for setting in settings %}

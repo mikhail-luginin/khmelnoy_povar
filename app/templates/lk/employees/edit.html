@@ -9,8 +9,18 @@
     <div class="container-xl">
         <div class="card rounded-3">
             <div class="card-body">
-                <form action="{% url 'LK:edit_employee' %}?id={{ row.id }}" method="post" type="multipart/from_data">
+                <form action="{% url 'LK:edit_employee' %}?id={{ row.id }}" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
+                    <div class="mb-4">
+                        {% if row.photo.url is not None %}
+                            <div class="mb-4">
+                                <label for="old_employee_photo" class="form-label">Фото сотрудника</label>
+                                <img style="width: 100px; height: 100px;" src="{{ row.photo.url }}" id="old_employee_photo">
+                            </div>
+                        <label for="employee_photo" class="form-label">Изменить</label>
+                        {% else %} <label for="employee_photo" class="form-label">Фото</label> {% endif %}
+                        <input class="form-control" type="file" name="employee_photo" id="employee_photo">
+                    </div>
                     <div class="mb-4">
                         <label class="form-label">Фамилия</label>
                         <input class="form-control" name="last-name" placeholder="Введите фамилию" value="{{ row.fio|last_name }}">

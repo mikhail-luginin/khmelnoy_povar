@@ -64,7 +64,7 @@ class ExpensesPageService:
         for row in CatalogService().get_catalog_by_type(settings.EXPENSE_TYPE_CATEGORY):
             expense_sum = request.POST.get(f'sum[{row.id}]')
             if len(expense_sum) > 0:
-                Expense.objects.create(
+                expense = Expense.objects.create(
                     writer=storage.name + ' CRM',
                     date_at=today_date(),
                     storage=storage,
@@ -74,8 +74,8 @@ class ExpensesPageService:
                     sum=expense_sum,
                     comment=request.POST.get(f'comment[{row.id}]')
                 )
-                create_log(barmen if type(barmen) is str else barmen.fio, request.path, 'Добавление расхода',
-                           comment=storage.name, is_bar=True)
+                create_log(owner=f'CRM {storage.name}', entity=storage.name, row=expense,
+                           action='create', additional_data='Расход создан')
 
         messages.success(request, f'Расход успешно добавлен :)')
         return redirect('/bar/expenses?code=' + code)
@@ -92,15 +92,23 @@ class ExpensesPageService:
         purchaser_sum = request.POST.get('purchaser_sum')
         purchaser_comment = request.POST.get('purchaser_comment')
 
+        danil_sum = request.POST.get('danil_sum')
+        danil_comment = request.POST.get('danil_comment')
+
         if len(oil_sum) > 0:
             if not oil_comment:
                 messages.error(request, 'Комментарий к внесению не указан.')
                 return redirect(redirect_url)
 
+            from_to_id = CatalogService().get_catalog_by_name(catalog_name='Масло -')
+            if from_to_id:
+                from_to_id = from_to_id.id
+
             Pays.objects.create(
                 date_at=today_date(),
                 storage=storage,
-                type=5,
+                type=1,
+                from_to_id=from_to_id,
                 sum=oil_sum,
                 comment=oil_comment
             )
@@ -110,12 +118,35 @@ class ExpensesPageService:
                 messages.error(request, 'Комментарий к изъятию закупщика не указан.')
                 return redirect(redirect_url)
 
+            from_to_id = CatalogService().get_catalog_by_name(catalog_name='Закупщик')
+            if from_to_id:
+                from_to_id = from_to_id.id
+
             Pays.objects.create(
                 date_at=today_date(),
                 storage=storage,
-                type=4,
+                type=2,
+                from_to_id=from_to_id,
                 sum=purchaser_sum,
                 comment=purchaser_comment
+            )
+
+        if len(danil_sum) > 0:
+            if not danil_comment:
+                messages.error(request, 'Комментарий к изъятию Данила не указан.')
+                return redirect(redirect_url)
+
+            from_to_id = CatalogService().get_catalog_by_name(catalog_name='Данил')
+            if from_to_id:
+                from_to_id = from_to_id.id
+
+            Pays.objects.create(
+                date_at=today_date(),
+                storage=storage,
+                type=2,
+                from_to_id=from_to_id,
+                sum=danil_sum,
+                comment=danil_comment
             )
 
         messages.success(request, 'Запись успешно добавлена.')

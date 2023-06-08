@@ -3,10 +3,9 @@ from django.shortcuts import redirect
 from django.contrib import messages
 
 from apps.lk.models import Statement, Partner, Card
+from core import validators
 
 from core.time import today_datetime
-
-from typing import List
 
 import time
 
@@ -23,7 +22,7 @@ class StatementUpdateService:
 
         return file_text
 
-    def _parse_file(self, file_text) -> List[dict]:
+    def _parse_file(self, file_text) -> list[dict]:
         exceptions = [
             'ВидПлатежа',
             'ВидОплаты',
@@ -102,35 +101,28 @@ class StatementUpdateService:
         for document in documents:
             linked = None
             if Statement.objects.filter(document_number=document['document_number']).count() == 0:
-                try:
-                    payer = Partner.objects.get(inn=document['payer_info']['ПлательщикИНН'])
-                except Partner.DoesNotExist:
-                    payer = None
+                payer = Partner.objects.filter(inn=document['payer_info']['ПлательщикИНН']).first()
+                recipient = Partner.objects.filter(inn=document['recipient_info']['ПолучательИНН']).first()
 
-                try:
-                    recipient = Partner.objects.get(inn=document['recipient_info']['ПолучательИНН'])
-                except Partner.DoesNotExist:
-                    recipient = None
-
-                if payer is None:
+                if not payer:
                     payer_created = Partner(name=document['payer_info']['Плательщик'],
                                             inn=document['payer_info']['ПлательщикИНН'],
                                             friendly_name=document['payer_info']['Плательщик'])
                     payer_created.save()
                     document.pop('payer_info')
-                    document['payer_id'] = str(payer_created.id)
+                    document['payer_id'] = payer_created.id
                 else:
-                    document['payer_id'] = str(payer.id)
+                    document['payer_id'] = payer.id
 
-                if recipient is None:
+                if not recipient:
                     recipient_created = Partner(name=document['recipient_info']['Получатель'],
                                                 inn=document['recipient_info']['ПолучательИНН'],
                                                 friendly_name=document['recipient_info']['Получатель'])
                     recipient_created.save()
                     document.pop('recipient_info')
-                    document['recipient_id'] = str(recipient_created.id)
+                    document['recipient_id'] = recipient_created.id
                 else:
-                    document['recipient_id'] = str(recipient.id)
+                    document['recipient_id'] = recipient.id
 
                 document['date'] = time.strftime('%Y-%m-%d', time.strptime(document['date'], '%d.%m.%Y')) if document[
                                                                                                                  'date'] != '' else None
@@ -153,8 +145,8 @@ class StatementUpdateService:
                     date_write_off=document['date_write_off'],
                     date_receipt=document['date_receipt'],
                     sum=document['sum'],
-                    payer=document['payer_id'],
-                    recipient=document['recipient_id'],
+                    payer_id=document['payer_id'],
+                    recipient_id=document['recipient_id'],
                     payment_purpose=document['payment_purpose'],
                 )
                 self._create_statement(data)
@@ -168,46 +160,55 @@ class StatementUpdateService:
         return redirect('/lk/statement')
 
 
-def statement_all() -> List[Statement]:
-    return Statement.objects.all()
+class PartnerService:
+    model = Partner
 
+    def all(self) -> list[model]:
+        return self.model.objects.all()
 
-def partners_all() -> List[Partner]:
-    return Partner.objects.all()
+    def edit(self, partner_id: int, friendly_name: str, expense_types: list[int], storages: list[int]) -> None:
+        validators.validate_field(partner_id, 'идентификатор записи')
+        validators.validate_field(friendly_name, 'имя для отображения')
+
+        partner = self.model.objects.filter(id=partner_id)
+        if partner.exists():
+            partner = partner.first()
+            partner.friendly_name = friendly_name
+            partner.storages.set(storages)
+            partner.expense_types.set(expense_types)
+            partner.save()
+        else:
+            raise self.model.DoesNotExist('Запись с указанным идентификатором не найдена.')
 
 
 class CardService:
     model = Card
 
-    def cards_all(self) -> List[model]:
+    def cards_all(self) -> list[model]:
         return self.model.objects.all()
 
-    def validate_card(self, num: str, undefined_cards: List[str]) -> bool:
-        if num and num not in undefined_cards:
-            try:
-                self.model.objects.get(num=num)
-            except self.model.DoesNotExist:
-                undefined_cards.append(num)
-                return True
-        return False
+    def _validate_card(self, num: str) -> bool:
+        return self.model.objects.filter(num=num).exists()
 
-    def get_undefined_cards(self) -> List[str]:
+    def get_undefined_cards(self) -> list[str]:
         undefined_cards = []
 
-        for statement in statement_all():
+        for statement in Statement.objects.all():
             line = statement.payment_purpose.split(' ')
+            num = ''
 
             if 'мерчант' in statement.payment_purpose.lower():
-                merchant = line[6][1:13]
-                if self.validate_card(merchant, undefined_cards):
+                num = line[6][1:13]
+                if self._validate_card(num):
                     continue
 
             if 'отражено' in statement.payment_purpose.lower():
-                card_number = line[9][11:]
-                if self.validate_card(card_number, undefined_cards):
+                num = line[9][11:]
+                if self._validate_card(num):
                     continue
 
-            undefined_cards.append("Undefined card")
+            if num not in undefined_cards:
+                undefined_cards.append(num)
 
         return undefined_cards
 
@@ -215,22 +216,31 @@ class CardService:
         name = request.POST.get('name')
         num = request.POST.get('num')
         storage_id = request.POST.get('storage_id')
-        undefined_cards = []
 
-        card = self.model.objects.create(
-            name=name,
-            num=num,
-            type=1 if len(num) == 4 else 2,
-            storage=storage_id)
+        card = self.model.objects.create(name=name, num=num, type=1 if len(num) == 4 else 2,
+                                         storage_id=storage_id if storage_id != '-1' else None)
 
-        for statement in statement_all():
+        for statement in Statement.objects.all():
             n = f'**{num}' if len(num) == 4 else num
             if n in statement.payment_purpose and not statement.linked:
-                statement.linked = card.id
+                statement.linked_id = card.id
                 statement.save()
 
-        if self.validate_card(num, undefined_cards):
+        if self._validate_card(num):
             messages.success(request, 'Карта не найдена.')
         else:
             messages.success(request, 'Карта успешно создана и привязана к уже созданным с ней записям.')
         return redirect('/lk/bank/cards')
+
+    def edit(self, card_id: int, name: str, storage_id: int) -> None:
+        validators.validate_field(card_id, 'идентификатор записи')
+        validators.validate_field(name, 'наименование')
+
+        card = self.model.objects.filter(id=card_id)
+        if card.exists():
+            card = card.first()
+            card.name = name
+            card.storage_id = storage_id
+            card.save()
+        else:
+            raise self.model.DoesNotExist('Запись с указанным идентфикатором не найдена.')
