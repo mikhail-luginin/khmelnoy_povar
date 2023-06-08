@@ -100,7 +100,7 @@ class StopList(models.Model):
 class Session(models.Model):
     storage = models.ForeignKey(to=Storage, on_delete=models.SET_NULL, null=True)
     date_at = models.DateField(null=True)
-    session_number = models.CharField(max_length=255)
+    session_number = models.CharField(max_length=255, null=True)
     open_date = models.DateTimeField(null=True)
     close_date = models.DateTimeField(null=True)
     cash = models.IntegerField(null=True)
