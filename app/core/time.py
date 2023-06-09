@@ -1,3 +1,5 @@
+from django.utils import timezone
+
 import datetime
 
 import calendar
@@ -6,8 +8,7 @@ from typing import Union, Dict
 
 
 def get_current_time() -> datetime.date:
-    delta = datetime.timedelta(hours=3, minutes=0)
-    return datetime.datetime.now(datetime.timezone.utc) - delta
+    return timezone.now() - datetime.timedelta(hours=2)
 
 
 def today_date() -> str:
