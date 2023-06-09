@@ -10,7 +10,7 @@ services:
       - ./app/.env
     command: >
       sh -c "python manage.py migrate
-             gunicorn --bind 0.0.0.0:8000 config.wsgi"
+             gunicorn --bind 0.0.0.0:8000 config.wsgi --log-level=debug"
 
   redis:
     image: redis:7.0.5-alpine
