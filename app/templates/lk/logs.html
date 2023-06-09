@@ -30,9 +30,9 @@
         function addRowInTable(tableID, data) {
             let table = document.getElementById(tableID);
 
-			let rowCount = table.rows.length;
+            let rowCount = table.rows.length;
 
-			data.forEach(function(log) {
+            data.forEach(function (log) {
                 let row = table.insertRow(1);
                 rowCount += 1;
 
@@ -40,6 +40,7 @@
                 let owner = log["owner"];
                 let entity = log["entity"];
                 let row_n = log["row"];
+                let action = log["action"]
                 let actionName = log["action_name"];
                 let additionalData = log["additional_data"];
 
@@ -66,13 +67,19 @@
                 cell = row.insertCell(5);
                 element = document.createTextNode(additionalData);
                 cell.appendChild(element);
+
+                if (action === 3) {
+                    row.classList.add("table-danger");
+                }
+
             })
         }
+
         $(document).ready(function () {
-            function updateLogs(is_first=false) {
+            function updateLogs(is_first = false) {
                 let date = new Date()
                 let url = "{% url 'LK:update_logs' %}"
-                if(is_first === false) {
+                if (is_first === false) {
                     url = url + "?timestamp=" + date.toISOString()
                 }
                 $.ajax({
@@ -81,7 +88,7 @@
                     url: url,
                     success: function (response) {
                         let data = response.data
-                        if(data.length > 0) {
+                        if (data.length > 0) {
                             console.log('logs was updated')
                             addRowInTable('logs-table', data)
                         }
@@ -93,6 +100,7 @@
                 setTimeout(updateLogs, 5000)
                 return false;
             }
+
             updateLogs(true)
         })
     </script>

@@ -8,7 +8,7 @@ from django.conf import settings
 
 from core.telegram import send_message_to_telegram
 
-from apps.bar.models import TovarRequest, Arrival
+from apps.bar.models import TovarRequest, Arrival, Timetable
 
 from .services.bar_info import get_bar, get_main_barmen
 
@@ -52,9 +52,14 @@ class ObjectDeleteMixin(BaseView):
     def get(self, request):
         try:
             row = self.model.objects.get(id=request.GET.get('id'))
+
+            if type(row).__name__ == 'Timetable':
+                create_log(owner=f'CRM {row.storage.name}', entity=row.employee.fio, row=row,
+                           action='delete', additional_data='Удален со смены')
+            else:
+                create_log(owner=f'CRM {row.storage.name}', entity=row.storage.name, row=row,
+                           action='delete', additional_data='Запись удалена')
             row.delete()
-            create_log(owner=f'CRM {row.storage.name}', entity=row.storage.name, row=row,
-                       action='delete', additional_data='Запись удалена')
         except self.model.DoesNotExist:
             messages.error(request, 'Данная запись не найдена.')
             return redirect(request.META.get('HTTP_REFERER'))

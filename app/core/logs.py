@@ -38,5 +38,6 @@ class LogsService:
             "entity": log.entity,
             "row": log.row,
             "action_name": log.get_action_display(),
-            "additional_data": log.additional_data
+            "additional_data": log.additional_data,
+            "action": log.action
         } for log in logs_queryset]
