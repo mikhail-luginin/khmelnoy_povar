@@ -345,11 +345,13 @@ class NeedItemsView(BaseView):
 
 class NeedItemsReceiveView(BaseView):
 
-    def get(self, request):
+    def post(self, request):
         request_id = request.GET.get('id')
 
         try:
-            receive_status = ItemDeficitService().receive(request_id=request_id)
+            receive_status = ItemDeficitService().receive(request_id=request_id,
+                                                          arrived_amount=request.POST.get('arrived_amount'),
+                                                          comment=request.POST.get('comment'))
             if receive_status:
                 messages.success(request, 'Статус успешно обновлен.')
             else:

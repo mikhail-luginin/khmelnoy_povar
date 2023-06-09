@@ -234,5 +234,8 @@ class ItemDeficit(models.Model):
     amount = models.CharField(max_length=32)
     receive_date = models.DateTimeField(null=True)
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES)
+    sended_amount = models.CharField(max_length=255, null=True)
+    arrived_amount = models.CharField(max_length=255, null=True)
+    comment = models.CharField(max_length=255, null=True)
 
     objects = managers.ItemDeficitManager()

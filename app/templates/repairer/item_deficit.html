@@ -16,8 +16,52 @@
                             {% if row.status == 2 %}Привязано к: {{ row.owner.user.username }}<br>{% endif %}
                             <br>
                             {% if row.status == 1 %}
-                                <a href="{% url 'Repairer:item_deficit_send' %}?code={{ code }}&id={{ row.id }}"
+                                <a data-bs-toggle="modal" data-bs-target="#need-items-send-modal-{{ row.id }}"
                                    class="btn w-100">Отправить</a>
+                                <div class="modal modal-blur fade" id="need-items-send-modal-{{ row.id }}"
+                                     tabindex="-1" role="dialog" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                            <form action="{% url 'Repairer:item_deficit_send' %}?code={{ code }}&id={{ row.id }}"
+                                                  method="post">
+                                                {% csrf_token %}
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                <div class="modal-body text-center py-4">
+                                                    <h3>Заполните информацию</h3>
+                                                    <div class="text-muted" id="confirm-text">
+                                                        <div class="mb-4">
+                                                            <input type="tel" inputmode="numeric"
+                                                                   class="form-control" name="sended_amount"
+                                                                   placeholder="Введите отправленное количество предметов">
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <input class="form-control" name="comment"
+                                                                   placeholder="Введите комментарий (необязательно)">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <div class="w-100">
+                                                        <div class="row">
+                                                            <div class="col"><a href="#" class="btn w-100"
+                                                                                data-bs-dismiss="modal">
+                                                                Отмена
+                                                            </a></div>
+                                                            <div class="col">
+                                                                <button id="confirm-delete1"
+                                                                        class="btn btn-tabler w-100"
+                                                                        data-bs-dismiss="modal">
+                                                                    Отправить
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             {% else %}
                                 <button class="btn w-100" disabled>Отправлено</button>
                             {% endif %}

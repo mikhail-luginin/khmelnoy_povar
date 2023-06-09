@@ -28,17 +28,19 @@ class ItemDeficitService:
         create_log(owner=f'CRM {row.storage.name}', entity=row.storage.name, row=row,
                    action='create', additional_data='Нехватка создана')
 
-    def send(self, request_id: int | None, user: Profile) -> bool:
+    def send(self, request_id: int | None, user: Profile, sended_amount: int, comment: str | None) -> bool:
         validators.validate_field(request_id, 'идентификатор запроса')
+        validators.validate_field(sended_amount, 'кол-во отправленного предмета')
 
-        request = self.model.objects.filter(id=request_id)
-        if request.exists():
-            request = request.first()
-
+        request = self.model.objects.filter(id=request_id).first()
+        if request:
             if request.status != 1:
                 return False
             else:
                 request.owner = user
+                request.sended_amount = sended_amount
+                if comment:
+                    request.comment = comment
                 request.status = 2
                 request.save()
         else:
@@ -46,17 +48,19 @@ class ItemDeficitService:
 
         return True
 
-    def receive(self, request_id: int | None) -> bool:
+    def receive(self, request_id: int | None, arrived_amount: int, comment: str | None) -> bool:
         validators.validate_field(request_id, 'идентификатор запроса')
 
-        request = self.model.objects.filter(id=request_id)
-        if request.exists():
-            request = request.first()
+        request = self.model.objects.filter(id=request_id).first()
+        if request:
 
             if request.status != 2:
                 return False
             else:
                 request.receive_date = today_datetime()
+                request.arrived_amount = arrived_amount
+                if comment:
+                    request.comment += ' / ' + comment
                 request.status = 3
                 request.save()
                 create_log(owner=f'CRM {request.storage.name}', entity=request.storage.name, row=request,

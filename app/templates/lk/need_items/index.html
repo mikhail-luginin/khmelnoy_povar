@@ -31,8 +31,8 @@
                         <th>Заведение</th>
                         <th>Владелец</th>
                         <th>Предмет</th>
-                        <th>Кол-во</th>
-                        <th>Дата получения</th>
+                        <th>Факт | Отпр | Получ</th>
+                        <th>Комментарий</th>
                         <th></th>
                     </tr>
                     </thead>
@@ -47,6 +47,7 @@
                         <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                         <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                         <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                         <th></th>
                     </tr>
                     <tr>
@@ -54,8 +55,9 @@
                         <th>Заведение</th>
                         <th>Владелец</th>
                         <th>Предмет</th>
-                        <th>Кол-во</th>
+                        <th>Факт | Отпр | Получ</th>
                         <th>Дата получения</th>
+                        <th>Комментарий</th>
                         <th></th>
                     </tr>
                     </thead>
@@ -72,14 +74,63 @@
             {data: 'storage_name'},
             {data: 'owner_fio'},
             {data: 'item'},
-            {data: 'amount'},
-            {data: 'receive_date'},
+            {
+                data: 'amount',
+                render: function (data, type, row) {
+                    let sended_amount = 0;
+                    if(row.sended_amount != null) {
+                        sended_amount = row.sended_amount
+                    }
+                    let arrived_amount = 0;
+                    if(row.arrived_amount != null) {
+                        arrived_amount = row.arrived_amount
+                    }
+                    return row.amount + ' | ' + sended_amount + ' | ' + arrived_amount
+                }
+            },
+            {data: 'comment'},
             {
                 data: null,
                 render: function (data, type, row) {
                     if (row.status === 1) {
-                        url = '"/lk/need_items/send?id=' + row.id + '"'
-                        return "<button onclick='window.location.href = " + url + "' class='btn w-100'>Отправить</button>"
+                        {#return "<button onclick='window.location.href = " + url + "' class='btn w-100'>Отправить</button>"#}
+                        return '<a data-bs-toggle="modal" data-bs-target="#need-items-send-modal-' + row.id + '" class="btn w-100">Отправить</a>' +
+                            '<div class="modal modal-blur fade" id="need-items-send-modal-' + row.id + '" tabindex="-1" role="dialog" aria-hidden="true">' +
+                                '<div class="modal-dialog modal-dialog-centered" role="document">' +
+                                    '<div class="modal-content">' +
+                                        '<form action="/lk/need_items/send?id=' + row.id + '" method="post">' +
+                                                    '{% csrf_token %}' +
+                                        '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'+
+                                        '<div class="modal-body text-center py-4">' +
+                                            '<h3>Заполните информацию</h3>' +
+                                            '<div class="text-muted" id="confirm-text">' +
+                                                    '<div class="mb-4">' +
+                                                        '<input type="tel" inputmode="numeric" class="form-control" name="sended_amount" placeholder="Введите привезенное количество предметов">' +
+                                                    '</div>' +
+                                                    '<div class="mb-2">' +
+                                                        '<input class="form-control" name="comment" placeholder="Введите комментарий (необязательно)">' +
+                                                    '</div>' +
+                                            '</div>' +
+                                        '</div>' +
+                                        '<div class="modal-footer">' +
+                                            '<div class="w-100">' +
+                                                '<div class="row">' +
+                                                    '<div class="col"><a href="#" class="btn w-100" data-bs-dismiss="modal">' +
+                                                        'Отмена' +
+                                                    '</a></div>' +
+                                                    '<div class="col">' +
+                                                        '<button id="confirm-delete1" class="btn btn-tabler w-100"' +
+                                                                'data-bs-dismiss="modal">' +
+                                                            'Отправить' +
+                                                        '</button>' +
+                                                    '</div>' +
+                                                '</div>' +
+                                            '</div>' +
+                                        '</div>' +
+                                        '</form>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>'
                     } else if (row.status === 2) {
                         return '<i class="fa fa-long-arrow-down"></i>'
                     } else if (row.status === 3) {
@@ -105,8 +156,22 @@
             {data: 'storage_name'},
             {data: 'owner_fio'},
             {data: 'item'},
-            {data: 'amount'},
+            {
+                data: 'amount',
+                render: function (data, type, row) {
+                    let sended_amount = 0;
+                    if(row.sended_amount != null) {
+                        sended_amount = row.sended_amount
+                    }
+                    let arrived_amount = 0;
+                    if(row.arrived_amount != null) {
+                        arrived_amount = row.arrived_amount
+                    }
+                    return row.amount + ' | ' + sended_amount + ' | ' + arrived_amount
+                }
+            },
             {data: 'receive_date'},
+            {data: 'comment'},
             {
                 data: null,
                 render: function (data, type, row) {

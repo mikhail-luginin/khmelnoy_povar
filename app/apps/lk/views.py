@@ -949,13 +949,15 @@ class ItemDeficitView(BaseLkView):
 
 class ItemDeficitSendView(BaseLkView):
 
-    def get(self, request):
+    def post(self, request):
         context = self.get_context_data(request)
 
         request_id = request.GET.get('id')
 
         try:
-            receive_status = ItemDeficitService().send(request_id=request_id, user=context.get('profile'))
+            receive_status = ItemDeficitService().send(request_id=request_id, user=context.get('profile'),
+                                                       sended_amount=request.POST.get('sended_amount'),
+                                                       comment=request.POST.get('comment'))
             if receive_status:
                 messages.success(request, 'Статус успешно обновлен.')
             else:
