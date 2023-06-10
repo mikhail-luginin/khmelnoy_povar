@@ -11,6 +11,8 @@ from apps.iiko.services.api import IikoService
 
 import datetime
 
+from core.time import today_datetime
+
 
 @app.task
 def iiko_stoplist_items():
@@ -28,28 +30,30 @@ def iiko_stoplist_items():
 
             product_id = row['productId']
 
-            try:
-                product = Product.objects.get(product_id=product_id)
-            except Product.DoesNotExist:
+            product = Product.objects.filter(product_id=product_id).first()
+            if product:
                 send_message_to_telegram(settings.TELEGRAM_CHAT_ID_FOR_ERRORS,
                                          f'[CeleryTask: stoplist ({today_datetime()})] '
                                          f'Продукт с идентификатором {product_id} не найден.')
                 continue
 
             if row['type'] == 'stopListItemRemoved':
-                try:
-                    stoplist_item_for_delete = StopList.objects.get(storage=storage,
-                                                                    product=product)
+                print('removed enter')
+                stoplist_item_for_delete = StopList.objects.filter(storage=storage,
+                                                                   product=product).first()
+                if stoplist_item_for_delete:
                     stoplist_item_for_delete.delete()
-                except StopList.DoesNotExist:
+                else:
                     continue
-                try:
-                    tovar_request_for_delete = TovarRequest.objects.filter(storage=storage,
-                                                                           product=product,
-                                                                           date_at=date.strftime('%Y-%m-%d'))
+
+                tovar_request_for_delete = TovarRequest.objects.filter(storage=storage,
+                                                                       product=product,
+                                                                       date_at=date.strftime('%Y-%m-%d')).first()
+                if tovar_request_for_delete:
                     tovar_request_for_delete.delete()
-                except TovarRequest.DoesNotExist:
+                else:
                     continue
+
             if row['type'] == 'stopListItemAdded':
                 stoplist_item = StopList.objects.filter(storage=storage,
                                                         product=product).exists()
@@ -63,11 +67,12 @@ def iiko_stoplist_items():
                                             product=product)
 
                 if not tovar_request:
-                    TovarRequest.objects.create(
-                        date_at=date.strftime('%Y-%m-%d'),
-                        storage=storage,
-                        product=product,
-                        product_amount=1,
-                        product_main_unit='task',
-                        supplier=product.supplier
-                    )
+                    if 'иво разливное' in product.category.name:
+                        TovarRequest.objects.create(
+                            date_at=date.strftime('%Y-%m-%d'),
+                            storage=storage,
+                            product=product,
+                            product_amount=1,
+                            product_main_unit='task',
+                            supplier=product.supplier
+                        )

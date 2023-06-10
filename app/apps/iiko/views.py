@@ -179,6 +179,7 @@ class PaymentTypeEdit(ObjectEditMixin):
 
         return redirect(url)
 
+
 class StopListView(BaseLkView):
     template_name = 'iiko/stoplist.html'
 
