@@ -31,7 +31,7 @@ def iiko_stoplist_items():
             product_id = row['productId']
 
             product = Product.objects.filter(product_id=product_id).first()
-            if product:
+            if not product:
                 send_message_to_telegram(settings.TELEGRAM_CHAT_ID_FOR_ERRORS,
                                          f'[CeleryTask: stoplist ({today_datetime()})] '
                                          f'Продукт с идентификатором {product_id} не найден.')
