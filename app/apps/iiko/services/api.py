@@ -82,8 +82,8 @@ class IikoService:
 
     def _get_iiko_events(self) -> str:
         return self._iiko_request('/resto/api/events',
-                                  f'&from_time=2023-06-01T09:00:00.000'
-                                  f'&to_time=2023-06-10T02:00:00.000').text
+                                  f'&from_time={time.get_current_time().strftime("%Y-%m-%d")}T09:00:00.000'
+                                  f'&to_time={time.get_current_time() + datetime.timedelta(days=1)}T02:00:00.000').text
 
     def get_stop_list_events(self):
         rows = []
