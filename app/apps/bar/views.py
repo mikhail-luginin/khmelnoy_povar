@@ -139,7 +139,7 @@ class AddEmployeeView(BaseView):
 
 
 class TovarRequestBeerView(TovarRequestMixin):
-    category = settings.TOVAR_BEER_CATEGORY
+    category = 'Пиво разливное.Меню'
 
 
 class TovarRequestBarView(TovarRequestMixin):
