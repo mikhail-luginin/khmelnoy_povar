@@ -48,7 +48,8 @@ RUN mkdir $APP_HOME/mediafiles
 WORKDIR $APP_HOME
 
 # install dependencies
-RUN apk update && apk add libpq
+RUN apk add mariadb-dev
+RUN apk add --update --no-cache --virtual .tmp-build-deps gcc libc-dev linux-headers
 COPY --from=builder /usr/src/app/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
