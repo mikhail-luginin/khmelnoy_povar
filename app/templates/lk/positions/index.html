@@ -54,8 +54,10 @@
                     <thead>
                     <tr>
                         <th>Должность</th>
-                        <th>Оклад в основную</th>
-                        <th>Оклад в усиление</th>
+                        <th>Оклад в основную (начис)</th>
+                        <th>Оклад в усиление (начис)</th>
+                        <th>Оклад в основную (получ)</th>
+                        <th>Оклад в усиление (получ)</th>
                         <th></th>
                     </tr>
                     </thead>
@@ -218,7 +220,8 @@
                 return false;
             } else document.getElementById('position-add-ctrl-alert').setAttribute('style', '')
             var table = run_datatable('table', '/api/positions', '/lk/positions', [{data: 'name'}, {data: 'args.oklad'}])
-            var table2 = run_datatable('table2', '/api/jobplaces', '/lk/jobs', [{data: 'name'}, {data: 'main_shift_oklad'}, {data: 'gain_shift_oklad'}])
+            var table2 = run_datatable('table2', '/api/jobplaces', '/lk/jobs', [{data: 'name'}, {data: 'main_shift_oklad_accrual'}, {data: 'gain_shift_oklad_accrual'},
+                                                                                {data: 'main_shift_oklad_receiving'}, {data: 'gain_shift_oklad_receiving'}])
         });
     </script>
 {% endblock %}
