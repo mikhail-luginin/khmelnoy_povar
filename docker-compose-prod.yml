@@ -2,24 +2,29 @@ services:
   app:
     build:
       context: .
+      dockerfile: Dockerfile.prod
     restart: always
-    ports:
-      - "80:80"
+    expose:
+      - 8080
     volumes:
-      - ./app:/app
+      - static_volume:/home/app/web/staticfiles
+      - media_volume:/home/app/web/mediafiles
     env_file:
       - ./app/.env
     command: >
       sh -c "python manage.py migrate
-             gunicorn --bind 0.0.0.0:80 config.wsgi -w 20 --timeout 120"
+             gunicorn --bind 0.0.0.0:8080 config.wsgi -w 20 --timeout 120"
 
   nginx:
     image: nginx:1.19.8-alpine
     restart: on-failure
+    volumes:
+      - static_volume:/home/app/web/staticfiles
+      - media_volume:/home/app/web/mediafiles
     depends_on:
       - app
     ports:
-      - "8080:8080"
+      - "1337:80"
     env_file:
       - ./app/.env
 
@@ -55,3 +60,7 @@ services:
       - redis
     depends_on:
       - redis
+
+volumes:
+  static_volume:
+  media_volume:

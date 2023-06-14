@@ -1,5 +1,5 @@
 upstream app {
-    server app:80;
+    server app:8080;
 }
 
 server {
@@ -15,7 +15,11 @@ server {
     }
 
     location /assets/ {
-        alias app/assets/;
+        alias /home/app/web/staticfiles/;
+    }
+
+    location /media/ {
+        alias /home/app/web/mediafiles/;
     }
 
 }
