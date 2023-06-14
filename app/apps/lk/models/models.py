@@ -33,8 +33,10 @@ class Profile(models.Model):
 
 class JobPlace(models.Model):
     name = models.CharField(max_length=32)
-    main_shift_oklad = models.IntegerField(default=0)
-    gain_shift_oklad = models.IntegerField(default=0)
+    main_shift_oklad_accrual = models.IntegerField(default=0)
+    gain_shift_oklad_accrual = models.IntegerField(default=0)
+    main_shift_oklad_receiving = models.IntegerField(default=0)
+    gain_shift_oklad_receiving = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name

@@ -68,8 +68,8 @@ class HomePageService:
                 if check_employee_on_work:
                     raise EmployeeAlreadyWorkingToday(f'{employee.fio} уже работает сегодня')
 
-                oklad = employee.job_place.gain_shift_oklad if position.args[
-                    'is_usil'] else employee.job_place.main_shift_oklad
+                oklad = employee.job_place.gain_shift_oklad_accrual if position.args[
+                    'is_usil'] else employee.job_place.main_shift_oklad_accrual
 
                 if position.args['is_trainee']:
                     oklad = 500

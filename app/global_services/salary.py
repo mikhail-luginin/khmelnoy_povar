@@ -7,11 +7,10 @@ from core.time import today_date, get_current_time, monthdelta, get_months
 
 from apps.bar.models import Timetable, Salary, Money
 from apps.iiko.models import Storage
-from apps.lk.models import Employee, Fine, Expense
+from apps.lk.models import Employee, Fine
 
-from apps.bar.services.bar_info import get_full_information_of_day, get_main_barmen, get_bar_settings
+from apps.bar.services.bar_info import get_full_information_of_day, get_bar_settings
 from apps.iiko.services.storage import StorageService
-from apps.lk.services.catalog import CatalogService
 
 from calendar import monthrange
 from typing import Literal
@@ -110,7 +109,6 @@ class SalaryService:
 
             entire_salary_data.append(row)
 
-
         for salary in Salary.objects.filter(date_at__month=month, employee=employee, type=1).order_by('-date_at'):
             row = dict()
             row['salary'] = salary
@@ -179,6 +177,7 @@ class SalaryService:
                 salary = Salary.objects.get(employee=timetable.employee, type=1, date_at=today_date())
                 is_accrued = True
             except Salary.DoesNotExist:
+                salary = None
                 is_accrued = False
 
             row['employee'] = timetable.employee
@@ -191,18 +190,16 @@ class SalaryService:
                 row['premium'] = salary.premium
                 data['issued_sum'] += salary.oklad + salary.percent + salary.premium
             else:
-                if (timetable.position.args['is_called']
-                    or timetable.position.args['is_usil']
-                    or 'овар' in timetable.position.name
-                    or 'служащий' in timetable.position.name) and not timetable.position.args['is_trainee']:
-                    if 'служащий' in timetable.position.name and not timetable.position.args['is_called']:
-                        row['oklad'] = 800
-                    elif 'овар' in timetable.position.name and not timetable.position.args['is_called']:
-                        row['oklad'] = timetable.employee.job_place.gain_shift_oklad
+                if timetable.position.args['is_called']:
+                    if timetable.position.args['is_usil']:
+                        row['oklad'] = timetable.employee.job_place.gain_shift_oklad_accrual
                     else:
-                        row['oklad'] = timetable.oklad
+                        row['oklad'] = timetable.employee.job_place.main_shift_oklad_accrual
                 else:
-                    row['oklad'] = 0
+                    if timetable.position.args['is_usil']:
+                        row['oklad'] = timetable.employee.job_place.gain_shift_oklad_receiving
+                    else:
+                        row['oklad'] = timetable.employee.job_place.main_shift_oklad_receiving
                 row['percent'] = percent if timetable.position.args['has_percent'] is True else 0
                 row['premium'] = premium if timetable.position.args['is_called'] else 0
 

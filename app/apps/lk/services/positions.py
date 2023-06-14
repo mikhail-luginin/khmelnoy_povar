@@ -73,15 +73,21 @@ class JobsService:
     def jobs_all(self) -> List[jobs_model]:
         return self.jobs_model.objects.all()
 
-    def job_create(self, job_name: str | None, job_gain_oklad: int | None, job_main_oklad: int | None) -> None:
+    def job_create(self, job_name: str,
+                   job_gain_oklad_accrual: int, job_main_oklad_accrual: int,
+                   job_gain_oklad_receiving: int, job_main_oklad_receiving: int) -> None:
         validators.validate_field(job_name, 'наименование должности')
-        validators.validate_field(job_main_oklad, 'оклад должности в основную смену')
-        validators.validate_field(job_gain_oklad, 'оклад должности в смену усиление')
+        validators.validate_field(job_main_oklad_accrual, 'оклад должности в основную смену (начисление)')
+        validators.validate_field(job_gain_oklad_accrual, 'оклад должности в смену усиление (начисление)')
+        validators.validate_field(job_main_oklad_receiving, 'оклад должности в основную смену (получение)')
+        validators.validate_field(job_gain_oklad_receiving, 'оклад должности в смену усиление (начисление)')
 
         self.jobs_model.objects.create(
             name=job_name,
-            gain_shift_oklad=job_gain_oklad,
-            main_shift_oklad=job_main_oklad
+            gain_shift_oklad_accrual=job_gain_oklad_accrual,
+            main_shift_oklad_accrual=job_main_oklad_accrual,
+            gain_shift_oklad_receiving=job_gain_oklad_receiving,
+            main_shift_oklad_receiving=job_main_oklad_receiving
         )
 
     def job_get(self, **kwargs) -> jobs_model:
