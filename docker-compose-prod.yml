@@ -12,7 +12,8 @@ services:
     env_file:
       - ./app/.env
     command: >
-      sh -c "python manage.py migrate
+      sh -c "python manage.py migrate --noinput
+             python manage.py collectstatic --noinput
              gunicorn --bind 0.0.0.0:8080 config.wsgi -w 20 --timeout 120"
 
   nginx:
@@ -36,12 +37,11 @@ services:
   worker:
     build:
       context: .
+      dockerfile: Dockerfile.prod
     restart: always
     hostname: worker
     entrypoint: celery
     command: -A config.celery.app worker --loglevel=info
-    volumes:
-      - ./app:/app
     links:
       - redis
     depends_on:
@@ -50,12 +50,11 @@ services:
   beat_worker:
     build:
       context: .
+      dockerfile: Dockerfile.prod
     restart: always
     hostname: beat_worker
     entrypoint: celery
     command: -A config.celery.app beat -s /tmp/celerybeat-schedule --loglevel=info
-    volumes:
-      - ./app:/app
     links:
       - redis
     depends_on:
