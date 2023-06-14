@@ -260,12 +260,17 @@ class JobAddView(BaseLkView):
 
     def post(self, request):
         job_name = request.POST.get('job-name')
-        job_gain_oklad = request.POST.get('job-gain-oklad')
-        job_main_oklad = request.POST.get('job-main-oklad')
+        job_gain_oklad_accrual = request.POST.get('job-gain-oklad-accrual')
+        job_main_oklad_accrual = request.POST.get('job-main-oklad-accrual')
+        job_gain_oklad_receiving = request.POST.get('job-gain-oklad-receiving')
+        job_main_oklad_receiving = request.POST.get('job-main-oklad-receiving')
 
         try:
-            JobsService().job_create(job_name=job_name, job_gain_oklad=job_gain_oklad,
-                                     job_main_oklad=job_main_oklad)
+            JobsService().job_create(job_name=job_name,
+                                     job_gain_oklad_accrual=job_gain_oklad_accrual,
+                                     job_main_oklad_accrual=job_main_oklad_accrual,
+                                     job_main_oklad_receiving=job_main_oklad_receiving,
+                                     job_gain_oklad_receiving=job_gain_oklad_receiving)
             messages.success(request, 'Должность успешно создана.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
             messages.error(request, str(error))
