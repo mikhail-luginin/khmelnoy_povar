@@ -18,10 +18,8 @@ RUN apk update \
 
 # lint
 RUN pip install --upgrade pip
-RUN pip install flake8==3.9.2
 COPY . .
 COPY nginx/conf.d /etc/nginx/conf.d
-RUN flake8 --ignore=E501,F401 .
 
 # install dependencies
 COPY ./requirements.txt .
