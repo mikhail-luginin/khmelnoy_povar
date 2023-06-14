@@ -13,7 +13,7 @@
                     {% csrf_token %}
                     <div class="row mb-2">
                         <div class="col-6">
-                            <input class="form-control date-at" name="date_at" placeholder="Дата">
+                            <input class="form-control date-at" name="date_at" placeholder="Дата" value="{{ date }}">
                         </div>
                         <div class="col-6">
                             <select class="form-select" name="category" placeholder="Категория">
@@ -34,11 +34,13 @@
                         <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                         <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                         <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                     </tr>
                     <tr>
                         <th>Заведение</th>
                         <th>Продукт</th>
                         <th>Кол-во</th>
+                        <th>Поставщик</th>
                     </tr>
                     </thead>
                 </table>
@@ -66,7 +68,8 @@
         let table = run_datatable_with_json('remains-table', [], [
             {data: 'storage_name'},
             {data: 'name'},
-            {data: 'amount'}
+            {data: 'amount'},
+            {data: 'supplier_name'}
         ]);
         $(document).ready(function () {
             $('#text-generate-button').click(function () {
@@ -92,7 +95,8 @@
                         table = run_datatable_with_json('remains-table', response.data, [
                             {data: 'storage_name'},
                             {data: 'name'},
-                            {data: 'amount'}
+                            {data: 'amount'},
+                            {data: 'supplier_name'}
                         ]);
                     },
                     error: function (response) {

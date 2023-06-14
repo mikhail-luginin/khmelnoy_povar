@@ -23,12 +23,18 @@ class ProductRequestService:
         for item in items.findall('items/item'):
             name = None
             product_id = None
+            supplier_name = None
             for product in item.findall('product'):
                 name = product.find('name').text
                 product_id = product.find('id').text
             expected_amount = round(float(item.find('expectedAmount').text))
 
-            remains.append({"id": product_id, "name": name, "amount": expected_amount, "storage_name": storage.name})
+            product = ProductService().product_get(product_id=product_id)
+            if product:
+                supplier_name = f'{product.supplier.name} ({product.supplier.friendly_name})'
+
+            remains.append({"id": product_id, "name": name, "amount": expected_amount, "storage_name": storage.name,
+                            "supplier_name": supplier_name})
 
         return remains
 
