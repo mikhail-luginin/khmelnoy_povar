@@ -11,6 +11,8 @@ import requests
 
 import xml.etree.ElementTree as ET
 
+from core.time import today_date
+
 
 class IikoService:
 
@@ -53,13 +55,10 @@ class IikoService:
     def get_sales_by_department(self, session_id: str) -> str:
         return self._iiko_request(f'/resto/api/v2/cashshifts/payments/list/{session_id}', '&hideAccepted=false').text
 
-    def check_inventory(self, storage_id: str, category_name: str) -> str:
+    def check_inventory(self, storage_id: str, category_name: str, date_at: str = today_date()) -> str:
         token = self._iiko_connect()
 
         send_text = settings.IIKO_API_URL + '/resto/api/documents/check/incomingInventory?key=' + token
-        year = time.get_current_time().strftime('%Y')
-        month = time.get_current_time().strftime('%m')
-        day = time.get_current_time().strftime('%d')
         category = Category.objects.get(name=category_name)
         items = Product.objects.filter(category=category)
         items_str = '<items>'
@@ -67,7 +66,7 @@ class IikoService:
             items_str += f'<item><productId>{item.product_id}</productId><amountContainer>0</amountContainer></item>'
         items_str += '</items>'
 
-        data = f"<?xml version=\"1.0\"?>\r\n<document>\r\n  <documentNumber>{time.get_current_time().strftime('%Y%m%d%H%M%S')}</documentNumber>\r\n  <dateIncoming>{datetime.date(int(year), int(month), int(day)) - datetime.timedelta(days=0)}T23:59:59</dateIncoming>\r\n  <status>NEW</status>\r\n  <storeId>{storage_id}</storeId>\r\n  <comment> </comment>\r\n{items_str}</document>"
+        data = f"<?xml version=\"1.0\"?>\r\n<document>\r\n  <documentNumber>{time.get_current_time().strftime('%Y%m%d%H%M%S')}</documentNumber>\r\n  <dateIncoming>{date_at}T23:59:59</dateIncoming>\r\n  <status>NEW</status>\r\n  <storeId>{storage_id}</storeId>\r\n  <comment> </comment>\r\n{items_str}</document>"
         r = requests.post(send_text, data=data, headers={'Content-Type': 'application/xml;charset=UTF-8'})
 
         self._iiko_disconnect(token)

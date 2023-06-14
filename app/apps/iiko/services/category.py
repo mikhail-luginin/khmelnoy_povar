@@ -63,3 +63,6 @@ class CategoryService:
 
     def categories_all(self) -> List[model]:
         return self.model.objects.all()
+
+    def remain_categories(self):
+        return self.model.objects.filter(is_remains=True)

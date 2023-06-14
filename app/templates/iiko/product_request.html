@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Остатки товаров{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3 mb-2">
+            <div class="card-header card-header-light">
+                <b>Остатки на текущий момент</b>
+            </div>
+            <div class="card-body">
+                <form id="remains-get-form" method="post">
+                    {% csrf_token %}
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <input class="form-control date-at" name="date_at" placeholder="Дата">
+                        </div>
+                        <div class="col-6">
+                            <select class="form-select" name="category" placeholder="Категория">
+                                <option></option>
+                                {% for category in categories %}
+                                    <option value="{{ category.name }}">{{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn w-100">Загрузить остатки</button>
+                </form>
+            </div>
+            <div class="card-table">
+                <table class="table" id="remains-table">
+                    <thead>
+                    <tr class="column-filter dt-column-filter">
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                    </tr>
+                    <tr>
+                        <th>Заведение</th>
+                        <th>Продукт</th>
+                        <th>Кол-во</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+        <div class="card rounded-3 mb-2">
+            <div class="card-header card-header-light">
+                <b>Генератор сообщений</b>
+            </div>
+            <div class="card-body">
+                <button id="text-generate-button" class="btn w-100 mb-2">Сгенерировать сообщение</button>
+                <form method="post">
+                    {% csrf_token %}
+                    <textarea class="form-control mb-3" id="message" name="message"
+                              placeholder="Здесь будет сгенерирован текст"></textarea>
+                    <button class="btn btn-azure w-100" type="submit">Отправить сообщение</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        let table = run_datatable_with_json('remains-table', [], [
+            {data: 'storage_name'},
+            {data: 'name'},
+            {data: 'amount'}
+        ]);
+        $(document).ready(function () {
+            $('#text-generate-button').click(function () {
+                notification(true, 'Генерация сообщения началась.');
+                $.ajax({
+                    url: '{% url 'IIKO:product_request_generate_message' %}',
+                    method: 'get',
+                    success: function (response) {
+                        document.getElementById('message').innerHTML = response.message;
+                        notification(true, 'Генерация сообщения успешно завершена.');
+                    }
+                });
+            });
+            $('#remains-get-form').submit(function () {
+                notification(true, 'Загрузка остатков началась.');
+                $.ajax({
+                    data: $(this).serialize(),
+                    type: $(this).attr('method'),
+                    url: "{% url 'IIKO:product_request' %}",
+                    success: function (response) {
+                        notification(true, 'Остатки успешно загружены.');
+                        table.destroy();
+                        table = run_datatable_with_json('remains-table', response.data, [
+                            {data: 'storage_name'},
+                            {data: 'name'},
+                            {data: 'amount'}
+                        ]);
+                    },
+                    error: function (response) {
+                        notification(false);
+                    }
+                });
+                return false;
+            });
+        });
+    </script>
+{% endblock %}

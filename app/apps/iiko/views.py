@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import redirect
 
+from apps.iiko.services.product_request import ProductRequestService
 from core.exceptions import FieldNotFoundError, FieldCannotBeEmptyError
 from core.utils import ObjectEditMixin, BaseLkView
 
@@ -205,3 +206,34 @@ def terminals_update_view(request):
     TerminalService().update()
     messages.success(request, 'Терминалы успешно обновлены.')
     return redirect('/iiko/terminals')
+
+
+class ProductRequestView(BaseLkView):
+    template_name = 'iiko/product_request.html'
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context.update({
+            "categories": CategoryService().remain_categories()
+        })
+
+        return context
+
+    def post(self, request):
+        category = request.POST.get('category')
+        date_at = request.POST.get('date_at')
+
+        print(ProductRequestService().remain_products(category=category, date_at=date_at))
+
+        return JsonResponse({
+            "data": ProductRequestService().remain_products(category=category, date_at=date_at)
+        }, status=200)
+
+
+class ProductRequestGenerateMessageView(BaseLkView):
+
+    def get(self, request):
+        date_at = request.GET.get('date_at')
+
+        message = ProductRequestService().generate_message(date_at=date_at)
+        return JsonResponse({"message": message}, status=200)

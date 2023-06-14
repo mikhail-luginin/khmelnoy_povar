@@ -26,5 +26,9 @@ urlpatterns = [
     path('stoplist', StopListView.as_view()),
     path('stoplist/update', StopListUpdateView.as_view(), name="stoplist_update"),
 
-    path('terminals/update', terminals_update_view, name="terminals_update")
+    path('terminals/update', terminals_update_view, name="terminals_update"),
+
+    path('requests/product', ProductRequestView.as_view(), name="product_request"),
+    path('requests/product/generate_message', ProductRequestGenerateMessageView.as_view(),
+         name="product_request_generate_message")
 ]

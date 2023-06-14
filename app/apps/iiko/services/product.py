@@ -11,7 +11,6 @@ import xml.etree.ElementTree as ET
 from typing import List
 
 
-
 class ProductService:
     model = Product
 
@@ -70,7 +69,6 @@ class ProductService:
     def nomenclature_all(self) -> List[model]:
         return self.model.objects.all()
 
-
     def nomenclature_edit(self, row_id: str | None, minimal: int | None, for_order: int | None,
                           category_id: str | None, supplier_id: str | None):
 
@@ -92,3 +90,13 @@ class ProductService:
             row.save()
         else:
             raise self.model.DoesNotExist(f'Запись в справочнике с идентификатором {row.id} не найдена.')
+
+    def product_get(self, product_id: str = None, row_id: int = None) -> model | None:
+        data = {}
+
+        if product_id:
+            data['product_id'] = product_id
+        if row_id:
+            data['id'] = row_id
+
+        return self.model.objects.filter(**data).first()
