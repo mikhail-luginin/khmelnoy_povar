@@ -7,7 +7,7 @@ services:
     expose:
       - 8080
     volumes:
-      - app_volume:/home/app/web/app/
+      - ./app/:/usr/src/app/
       - static_volume:/home/app/web/staticfiles
       - media_volume:/home/app/web/mediafiles
     env_file:
@@ -44,7 +44,7 @@ services:
     entrypoint: celery
     command: -A config.celery.app worker --loglevel=info
     volumes:
-      - app_volume:/home/app/web/app/
+      - ./app/:/usr/src/app/
     links:
       - redis
     depends_on:
@@ -59,7 +59,7 @@ services:
     entrypoint: celery
     command: -A config.celery.app beat -s /tmp/celerybeat-schedule --loglevel=info
     volumes:
-      - app_volume:/home/app/web/app/
+      - ./app/:/usr/src/app/
     links:
       - redis
     depends_on:
