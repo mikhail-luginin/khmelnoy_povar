@@ -166,7 +166,11 @@ class SalaryService:
         bar = StorageService().storage_get(code=code)
 
         for timetable in Timetable.objects.filter(storage=bar, date_at=today_date()):
-            row = dict()
+            row = {
+                "oklad": 0,
+                "percent": 0,
+                "premium": 0
+            }
 
             employee_money_information = self.calculate_prepayment_salary_by_timetable_object(
                 timetable_object=timetable)
@@ -190,18 +194,19 @@ class SalaryService:
                 row['premium'] = salary.premium
                 data['issued_sum'] += salary.oklad + salary.percent + salary.premium
             else:
-                if timetable.position.args['is_called']:
-                    if timetable.position.args['is_usil']:
-                        row['oklad'] = timetable.employee.job_place.gain_shift_oklad_accrual
+                if not timetable.position.args['is_trainee']:
+                    if timetable.position.args['is_called']:
+                        if timetable.position.args['is_usil']:
+                            row['oklad'] = timetable.employee.job_place.gain_shift_oklad_accrual
+                        else:
+                            row['oklad'] = timetable.employee.job_place.main_shift_oklad_accrual
                     else:
-                        row['oklad'] = timetable.employee.job_place.main_shift_oklad_accrual
-                else:
-                    if timetable.position.args['is_usil']:
-                        row['oklad'] = timetable.employee.job_place.gain_shift_oklad_receiving
-                    else:
-                        row['oklad'] = timetable.employee.job_place.main_shift_oklad_receiving
-                row['percent'] = percent if timetable.position.args['has_percent'] is True else 0
-                row['premium'] = premium if timetable.position.args['is_called'] else 0
+                        if timetable.position.args['is_usil']:
+                            row['oklad'] = timetable.employee.job_place.gain_shift_oklad_receiving
+                        else:
+                            row['oklad'] = timetable.employee.job_place.main_shift_oklad_receiving
+                    row['percent'] = percent if timetable.position.args['has_percent'] is True else 0
+                    row['premium'] = premium if timetable.position.args['is_called'] else 0
 
             row['has_percent'] = timetable.position.args['has_percent']
             row['has_premium'] = timetable.position.args['has_premium']
