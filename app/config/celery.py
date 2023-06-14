@@ -1,7 +1,6 @@
 from django.conf import settings
 
 import os
-
 from celery import Celery
 from celery.schedules import crontab
 
@@ -17,5 +16,9 @@ if settings.DEBUG is False:
         'iiko-stoplist': {
             'task': 'apps.iiko.tasks.iiko_stoplist_items',
             'schedule': crontab(minute='*/15')
+        },
+        'update_money_every_day': {
+            'task': 'apps.lk.tasks.update_money_every_day',
+            'schedule': crontab(hour=1, minute=0)
         }
     }
