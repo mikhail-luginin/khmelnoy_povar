@@ -23,7 +23,7 @@ COPY nginx/conf.d /etc/nginx/conf.d
 
 # install dependencies
 COPY ./requirements.txt .
-RUN pip install --no-cache-dir -r /temp/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 
 #########
