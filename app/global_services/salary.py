@@ -410,17 +410,12 @@ class SalaryService:
             premium += employee_money_information['premium']
 
             try:
-                salary = Salary.objects.get(employee=employee, date_at=timetable.date_at, type=1)
-                oklad -= salary.oklad
-                percent -= salary.percent
-                premium -= salary.premium
-            except Salary.DoesNotExist:
-                pass
-            except Salary.MultipleObjectsReturned:
                 for salary in Salary.objects.filter(employee=employee, date_at=timetable.date_at, type=1):
                     oklad -= salary.oklad
                     percent -= salary.percent
                     premium -= salary.premium
+            except Salary.DoesNotExist:
+                pass
 
             try:
                 fines = Fine.objects.filter(employee=employee, date_at=timetable.date_at)
