@@ -76,7 +76,6 @@ class ObjectDeleteMixin(AccessMixin, BaseLkView):
             return redirect(self.success_url)
 
         row.delete()
-        create_log(request.user.username, request.path, f'Удаление записи в модели {str(self.model)}')
 
         messages.success(request, 'Объект успешно удален :)')
         return redirect(self.success_url)
