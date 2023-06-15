@@ -97,7 +97,7 @@ class SalaryService:
                    'received_salary': 0, 'accrued_salary': 0}
 
             for salary in Salary.objects.filter(date_at__month=date['month'], date_at__year=date['year'], employee=employee, type=1):
-                row['received_salary'] += int(salary.get_total_sum())
+                row['received_salary'] += salary.oklad + salary.percent + salary.premium
 
             for salary in Salary.objects.filter(date_at__month=date['month'], date_at__year=date['year'],employee=employee, type=2):
                 row['received_salary'] += salary.oklad
@@ -112,7 +112,7 @@ class SalaryService:
         for salary in Salary.objects.filter(date_at__month=month, employee=employee, type=1).order_by('-date_at'):
             row = dict()
             row['salary'] = salary
-            row['total'] = salary.get_total_sum()
+            row['total'] = salary.oklad + salary.percent + salary.premium
             accrued_prepayed_data.append(row)
 
         for salary in Salary.objects.filter(date_at__month=month, employee=employee, type=2).order_by('-date_at'):
@@ -409,20 +409,14 @@ class SalaryService:
             percent += employee_money_information['percent']
             premium += employee_money_information['premium']
 
-            try:
-                for salary in Salary.objects.filter(employee=employee, date_at=timetable.date_at, type=1):
-                    oklad -= salary.oklad
-                    percent -= salary.percent
-                    premium -= salary.premium
-            except Salary.DoesNotExist:
-                pass
+            for salary in Salary.objects.filter(employee=employee, date_at=timetable.date_at, type=1):
+                oklad -= salary.oklad
+                percent -= salary.percent
+                premium -= salary.premium
 
-            try:
-                fines = Fine.objects.filter(employee=employee, date_at=timetable.date_at)
-                for row in fines:
-                    fine += row.sum
-            except Fine.DoesNotExist:
-                pass
+            fines = Fine.objects.filter(employee=employee, date_at=timetable.date_at)
+            for row in fines:
+                fine += row.sum
 
             calculated_sum += oklad + percent + premium - fine
 
