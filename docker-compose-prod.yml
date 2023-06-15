@@ -24,7 +24,7 @@ services:
       - static_volume:/app/assets
       - media_volume:/app/media
     ports:
-      - "1337:80"
+      - "80:80"
     env_file:
       - ./app/.env
 
