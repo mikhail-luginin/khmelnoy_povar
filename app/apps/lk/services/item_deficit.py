@@ -2,6 +2,7 @@ from core import validators
 
 from apps.lk.models import ItemDeficit, Profile
 from core.logs import create_log
+from core.telegram import send_message_to_telegram
 from core.time import today_datetime
 
 
@@ -25,6 +26,7 @@ class ItemDeficitService:
             amount=amount,
             status=1
         )
+        send_message_to_telegram('-914595897', f'<b>[{row.storage.name}]</b> Добавлена нехватка: {item} ({amount})')
         create_log(owner=f'CRM {row.storage.name}', entity=row.storage.name, row=row,
                    action='create', additional_data='Нехватка создана')
 

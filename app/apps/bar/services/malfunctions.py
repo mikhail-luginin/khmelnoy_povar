@@ -2,6 +2,7 @@ from core import validators
 
 from apps.repairer.models import Malfunction
 from core.logs import create_log
+from core.telegram import send_message_to_telegram
 
 
 class MalfunctionService:
@@ -20,6 +21,7 @@ class MalfunctionService:
                                         photo=photo,
                                         fault_object=fault_object,
                                         description=description)
+        send_message_to_telegram('-928409973', f'<b>[{row.storage.name}]</b> Добавлена неисправность: {fault_object}')
         create_log(owner=f'CRM {row.storage.name}', entity=row.storage.name, row=row,
                    action='create', additional_data='Неисправность добавлена')
 
