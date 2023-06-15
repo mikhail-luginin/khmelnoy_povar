@@ -15,11 +15,11 @@ server {
     }
 
     location /assets/ {
-        alias /app/assets;
+        alias /app/assets/;
     }
 
     location /media/ {
-        alias /app/media;
+        alias /app/media/;
     }
 
 }
