@@ -132,7 +132,7 @@ LOGOUT_REDIRECT_URL = '/login'
 LOGIN_REDIRECT_URL = '/lk'
 
 STATIC_URL = "/assets/"
-STATIC_ROOT = BASE_DIR / "assets"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 # STATICFILES_DIRS = [os.path.join(BASE_DIR, 'assets')]
 
 MEDIA_URL = '/media/'
