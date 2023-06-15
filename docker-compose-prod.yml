@@ -1,27 +1,31 @@
 services:
   app:
     build:
-      context: .
+      context: ./app
+      dockerfile: Dockerfile.prod
     restart: always
-    ports:
-      - "80:80"
     volumes:
-      - ./app:/app
+      - static_volume:/home/app/web/staticfiles
+      - media_volume:/home/app/web/mediafiles
+    ports:
+      - "8000:8000"
+    expose:
+      - 8000
     env_file:
       - ./app/.env
     command: >
       sh -c "python manage.py migrate
-             gunicorn --bind 0.0.0.0:80 config.wsgi -w 20 --timeout 120"
+             gunicorn --bind 0.0.0.0:8000 config.wsgi -w 20 --timeout 120"
 
   nginx:
-    image: nginx:1.19.8-alpine
-    restart: on-failure
+    build: ./nginx
+    volumes:
+      - static_volume:/home/app/web/staticfiles
+      - media_volume:/home/app/web/mediafiles
+    ports:
+      - "80:80"
     depends_on:
       - app
-    ports:
-      - "8080:8080"
-    env_file:
-      - ./app/.env
 
   redis:
     image: redis:7.0.5-alpine
@@ -30,13 +34,12 @@ services:
 
   worker:
     build:
-      context: .
+      context: ./app
+      dockerfile: Dockerfile.prod
     restart: always
     hostname: worker
     entrypoint: celery
     command: -A config.celery.app worker --loglevel=info
-    volumes:
-      - ./app:/app
     links:
       - redis
     depends_on:
@@ -44,14 +47,17 @@ services:
 
   beat_worker:
     build:
-      context: .
+      context: ./app
+      dockerfile: Dockerfile.prod
     restart: always
     hostname: beat_worker
     entrypoint: celery
     command: -A config.celery.app beat -s /tmp/celerybeat-schedule --loglevel=info
-    volumes:
-      - ./app:/app
     links:
       - redis
     depends_on:
       - redis
+
+volumes:
+  static_volume:
+  media_volume:

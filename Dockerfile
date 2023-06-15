@@ -9,7 +9,7 @@ COPY app /app
 COPY nginx/conf.d /etc/nginx/conf.d
 
 WORKDIR /app
-EXPOSE 8000
+EXPOSE 8080
 
 RUN apk add mariadb-dev
 RUN apk add --update --no-cache --virtual .tmp-build-deps gcc libc-dev linux-headers

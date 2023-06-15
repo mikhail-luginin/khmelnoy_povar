@@ -17,9 +17,6 @@ urlpatterns = [
     path('admin/', include('apps.admin.urls')),
     path('brand_chief/', include('apps.brand_chief.urls')),
 
-    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
-    re_path(r'^assets/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
-
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout')
 ]
