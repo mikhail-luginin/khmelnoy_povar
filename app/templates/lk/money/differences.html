@@ -25,7 +25,10 @@
                                 <td>{{ row.sum_cash_end_day }}</td>
                                 <td>{{ row.calculated }}</td>
                                 <td>{{ row.difference }}</td>
-                                <td><a href="/lk/money/edit?id={{ row.id }}"><i class="fa fa-edit"></i></a></td>
+                                <td>
+                                    <a href="/lk/money/edit?id={{ row.id }}"><i class="fa fa-edit"></i></a>
+                                    <a href="/lk/money/update?id={{ row.id }}"><i class="fa fa-cloud-upload"></i></a>
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
