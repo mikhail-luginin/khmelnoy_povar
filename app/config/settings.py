@@ -132,11 +132,13 @@ LOGOUT_REDIRECT_URL = '/login'
 LOGIN_REDIRECT_URL = '/lk'
 
 STATIC_URL = "/assets/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
-# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'assets')]
-
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "mediafiles"
+if DEBUG:
+    STATIC_ROOT = BASE_DIR / "assets"
+    MEDIA_ROOT = BASE_DIR / "media"
+else:
+    STATIC_ROOT = BASE_DIR / "staticfiles"
+    MEDIA_ROOT = BASE_DIR / "mediafiles"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
