@@ -34,6 +34,7 @@
                             <th>Описание</th>
                             <th>Комментарий</th>
                             <th></th>
+                            <th></th>
                         </tr>
                         </thead>
                     </table>
@@ -60,7 +61,13 @@
             {data: 'storage_name'},
             {data: 'fault_object'},
             {data: 'description'},
-            {data: 'comment'}
+            {data: 'comment'},
+            {
+                data: null,
+                render: function(data, type, row) {
+                    return '<a href="/lk/malfunctions/complete?id=' + row.id + '"><i class="fa fa-check-double"></i></a>'
+                }
+            }
         ], has_delete=true, has_update=false, has_dismiss=false, has_edit=false, has_actions=true, custom_dict = {
             createdRow: function (row, data, dataIndex) {
                 if (data.status === 0) {

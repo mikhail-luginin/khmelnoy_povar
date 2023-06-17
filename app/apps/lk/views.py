@@ -34,6 +34,7 @@ from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee, 
 from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest, Setting
 from apps.repairer.models import Malfunction
 from apps.iiko.models import Product, Supplier
+from ..repairer.services import RepairerService
 
 
 class IndexView(BaseLkView):
@@ -1012,6 +1013,20 @@ class MalfunctionsView(BaseLkView):
 class MalfunctionDeleteView(ObjectDeleteMixin):
     model = Malfunction
     success_url = '/lk/malfunctions'
+
+
+class MalfunctionCompleteView(BaseLkView):
+
+    def get(self, request):
+        malfunction_id = request.GET.get('id')
+
+        try:
+            RepairerService().malfunction_repaired(malfunction_id=malfunction_id)
+            messages.success(request, 'Ваш ответ был успешно отправлен.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Malfunction.DoesNotExist) as error:
+            messages.error(request, error)
+
+        return redirect('/lk/malfunctions')
 
 
 def link_question_to_bar_setting(request):

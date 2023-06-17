@@ -90,6 +90,7 @@ urlpatterns = [
     path('malfunctions', MalfunctionsView.as_view(), name="malfunctions"),
     path('malfunctions/create', MalfunctionCreateView.as_view(), name="malfunction_create"),
     path('malfunctions/delete', MalfunctionDeleteView.as_view(), name="malfunction_delete"),
+    path('malfunctions/complete', MalfunctionCompleteView.as_view()),
 
     path('reviews', ReviewsView.as_view(), name="reviews"),
     path('reviews/create', review_create, name="review_create"),
