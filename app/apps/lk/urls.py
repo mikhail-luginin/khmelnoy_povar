@@ -38,6 +38,7 @@ urlpatterns = [
     path('money/update', update_money, name="update_money"),
     path('money/edit', MoneyEditView.as_view(), name="edit_money"),
     path('money/update_all', update_all_money_and_sessions, name="update_all_money"),
+    path('money/differences', MoneyDifferencesView.as_view(), name="money_differences"),
 
     path('timetable', TimetableView.as_view(), name="timetable"),
     path('timetable/create', CreateTimetableView.as_view(), name="create_timetable"),

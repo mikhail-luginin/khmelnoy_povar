@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-table table-responsive rounded">
+                <table class="table table-sm nowrap w-100">
+                    <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Заведение</th>
+                            <th>Касса утро</th>
+                            <th>Касса вечер</th>
+                            <th>Расчетный</th>
+                            <th>Разница</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                            <tr>
+                                <td>{{ row.date_at }}</td>
+                                <td>{{ row.storage.name }}</td>
+                                <td>{{ row.sum_cash_morning }}</td>
+                                <td>{{ row.sum_cash_end_day }}</td>
+                                <td>{{ row.calculated }}</td>
+                                <td>{{ row.difference }}</td>
+                                <td><a href="/lk/money/edit?id={{ row.id }}"><i class="fa fa-edit"></i></a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

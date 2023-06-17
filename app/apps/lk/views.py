@@ -1135,3 +1135,15 @@ def update_logs_view(request):
 
 class LogsWithFilterView(BaseLkView):
     template_name = 'lk/logs_with_filter.html'
+
+
+class MoneyDifferencesView(BaseLkView):
+    template_name = 'lk/money/differences.html'
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context.update({
+            "rows": MoneyService().rows_with_difference()
+        })
+
+        return context

@@ -147,3 +147,6 @@ class MoneyService:
                                                      storage_id=money_record.storage_id)
         else:
             raise self.model.DoesNotExist('Запись с указанным идентификатором не найдена.')
+
+    def rows_with_difference(self):
+        return self.model.objects.filter(difference__gt=0)
