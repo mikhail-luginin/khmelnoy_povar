@@ -26,29 +26,32 @@
                         </tr>
                         </thead>
                         {% for row in rows %}
-                            <tr class="table-{% if row.status == 0 %}danger{% elif row.status == 1 %}warning{% elif row.status == 2 %}success{% endif %}">
-                                <td><a class="image-popup" title="Фото" href="{{ row.photo.url }}">
-                                    <i class="fa fa-camera"></i>
-                                </a></td>
-                                <td>{{ row.date_at|date:'Y-m-d h:i' }}</td>
-                                <td>
-                                    <a href="{% url 'Repairer:index' %}?storage_id={{ row.storage.id }}">{{ row.storage.name }}</a>
-                                </td>
-                                <td>{{ row.fault_object }}</td>
-                                <td>{{ row.description }}</td>
-                                <td>{{ row.comment }}</td>
-                                <td>
-                                    {% if row.status == 0 %}
-                                        <a href="{% url 'Repairer:malfunction_complete' %}?id={{ row.id }}"
-                                           class="btn w-100">Завершить</a>
-                                    {% elif row.status == 1 %}
-                                        <button class="btn w-100" disabled>Отправлено</button>
-                                    {% elif row.status == 2 %}
-                                        <button
-                                           class="btn w-100" disabled>Завершено</button>
-                                    {% endif %}
-                                </td>
-                            </tr>
+                            {% if row.status != 2 %}
+                                <tr class="table-{% if row.status == 0 %}danger{% elif row.status == 1 %}warning{% elif row.status == 2 %}success{% endif %}">
+                                    <td><a class="image-popup" title="Фото" href="{{ row.photo.url }}">
+                                        <i class="fa fa-camera"></i>
+                                    </a></td>
+                                    <td>{{ row.date_at|date:'Y-m-d h:i' }}</td>
+                                    <td>
+                                        <a href="{% url 'Repairer:index' %}?storage_id={{ row.storage.id }}">{{ row.storage.name }}</a>
+                                    </td>
+                                    <td>{{ row.fault_object }}</td>
+                                    <td>{{ row.description }}</td>
+                                    <td>{{ row.comment }}</td>
+                                    <td>
+                                        {% if row.status == 0 %}
+                                            <a href="{% url 'Repairer:malfunction_complete' %}?id={{ row.id }}"
+                                               class="btn w-100">Завершить</a>
+                                        {% elif row.status == 1 %}
+                                            <button class="btn w-100" disabled>Отправлено</button>
+                                        {% elif row.status == 2 %}
+                                            <button
+                                                    class="btn w-100" disabled>Завершено
+                                            </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endif %}
                         {% endfor %}
                     </table>
                 </div>
