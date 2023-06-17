@@ -1,7 +1,11 @@
+import datetime
+
 from django.conf import settings
 
 from config.celery import app
+
 from core.telegram import send_message_to_telegram
+from core.time import get_current_time
 
 from apps.bar.models import Timetable, Setting, Money
 
@@ -44,3 +48,15 @@ def update_all_money():
         MoneyService().update(row_id=money.id)
 
     send_message_to_telegram(chat_id=settings.TELEGRAM_CHAT_ID_FOR_ERRORS, message=f'<b>[Admin]</b> Кассовые смены обновлены.')
+
+
+@app.task
+def update_money_every_day():
+    date = (get_current_time() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+    for money in Money.objects.filter(date_at=date):
+        if not money.sum_cash_end_day:
+            MoneyService().update(row_id=money.id)
+            money.sum_cash_end_day = 0
+            money.save()
+            send_message_to_telegram(chat_id=settings.TELEGRAM_CHAT_ID_FOR_ERRORS, message=f'<b>[Admin]</b> Заведение {money.storage.name} не заполнило кассу. Касса установлена 0.')
+
