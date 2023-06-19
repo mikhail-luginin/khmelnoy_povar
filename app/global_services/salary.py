@@ -99,7 +99,7 @@ class SalaryService:
             for salary in Salary.objects.filter(date_at__month=date['month'], date_at__year=date['year'], employee=employee, type=1):
                 row['received_salary'] += salary.oklad + salary.percent + salary.premium
 
-            for salary in Salary.objects.filter(date_at__month=date['month'], date_at__year=date['year'],employee=employee, type=2):
+            for salary in Salary.objects.filter(month=date['month'], date_at__year=date['year'], employee=employee, type=2):
                 row['received_salary'] += salary.oklad
 
             for timetable in Timetable.objects.filter(date_at__month=date['month'], date_at__year=date['year'],employee=employee).order_by('-date_at'):
