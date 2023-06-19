@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.db.models import Q
 from django.shortcuts import redirect
 
 from apps.bar.tasks import add_percent_and_premium_to_timetable
@@ -148,4 +149,4 @@ class MoneyService:
             raise self.model.DoesNotExist('Запись с указанным идентификатором не найдена.')
 
     def rows_with_difference(self):
-        return self.model.objects.filter(difference__gt=0)
+        return self.model.objects.filter(Q(difference__gt=100) | Q(difference__lt=-100))
