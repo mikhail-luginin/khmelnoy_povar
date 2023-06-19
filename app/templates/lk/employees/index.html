@@ -59,7 +59,7 @@
 
 {% block scripts %}
     <script>
-        table = run_datatable('employees-table', '/api/employees?is_deleted=0', '/lk/employees', [
+        let table = run_datatable('employees-table', '/api/employees?is_deleted=0', '/lk/employees', [
             {
                 data: 'photo',
                 render: function (data, typa, row) {
