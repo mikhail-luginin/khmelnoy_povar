@@ -78,7 +78,6 @@ class MoneyService:
             nal = int(total_day) - int(total_cashshifts)
             sum_nal = int(cash) + nal + int(cash_point)
             sum_bn = int(total_day) - sum_nal - int(yandex) - int(delivery)
-            sum_for_percent = total_day - yandex - delivery
 
             calculated = money_record.sum_cash_morning + sum_nal - expenses - salary_calculated - salary_avans - payout + payin
 
@@ -91,7 +90,7 @@ class MoneyService:
             money_record.total_payin = payin
             money_record.total_payout = payout
             money_record.calculated = calculated
-            money_record.difference = calculated - money_record.sum_cash_end_day
+            money_record.difference = money_record.sum_cash_end_day - calculated
 
             if money_record.session:
                 money_record.session.storage = storage
