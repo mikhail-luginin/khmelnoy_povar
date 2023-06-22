@@ -26,9 +26,9 @@
                             <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                             <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                             <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
-                            <th></th>
-                            <th></th>
                             <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th></th>
+                            <th></th>
                         </tr>
                         <tr>
                             <th>Дата</th>
@@ -80,8 +80,7 @@
             {
                 data: null,
                 render: function (data, type, row) {
-
-                    if (row.expense_status !== undefined) {
+                    if (row.expense_status.length > 0) {
                         const arr = row.expense_status[0].comments;
                         if (arr.length > 0) return arr.join(', '); else return ''
                     } else return ''
@@ -129,7 +128,7 @@
             }
         ], has_delete = true, has_update = false, has_dismiss = false, has_edit = true, has_actions = true, custom_dict = {
             createdRow: function (row, data, dataIndex) {
-                if (data.expense_status !== undefined) {
+                if (data.expense_status.length > 0) {
                     if (data.expense_status[0].success === true) {
                         $(row).addClass('table-success');
                     } else if (data.expense_status[0].success === false) {
