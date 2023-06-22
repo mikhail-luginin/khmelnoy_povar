@@ -6,8 +6,6 @@ ENV PYTHONUNBUFFERED=1
 COPY app/requirements.txt /temp/requirements.txt
 COPY app /app
 
-COPY nginx/conf.d /etc/nginx/conf.d
-
 WORKDIR /app
 EXPOSE 8080
 
