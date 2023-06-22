@@ -241,3 +241,16 @@ class ItemDeficit(models.Model):
     comment = models.CharField(max_length=255, null=True)
 
     objects = managers.ItemDeficitManager()
+
+
+class ExpenseStatus(models.Model):
+    SUCCESS_CHOICES = [
+        (False, 'Отказ'),
+        (True, 'Принят')
+    ]
+
+    expense = models.ForeignKey(to=Expense, on_delete=models.CASCADE)
+    success = models.BooleanField(choices=SUCCESS_CHOICES)
+    comments = models.JSONField(default=list)
+
+    objects = managers.ExpenseStatusManager()
