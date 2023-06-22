@@ -3,7 +3,7 @@ from django.shortcuts import redirect
 from django.contrib import messages
 
 from core.logs import create_log
-from core.time import today_date, get_current_time, monthdelta, get_months
+from core.utils.time import today_date, get_current_time, monthdelta, get_months
 
 from apps.bar.models import Timetable, Salary, Money
 from apps.iiko.models import Storage

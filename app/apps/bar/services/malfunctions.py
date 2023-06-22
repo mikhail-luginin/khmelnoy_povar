@@ -2,7 +2,7 @@ from core import validators
 
 from apps.repairer.models import Malfunction
 from core.logs import create_log
-from core.telegram import send_message_to_telegram
+from core.utils.telegram import send_message_to_telegram
 
 
 class MalfunctionService:

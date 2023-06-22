@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from apps.bar.models import Pays, Arrival, TovarRequest, Timetable, Salary, Money
 
-from core.time import get_months
+from core.utils.time import get_months
 
 
 class MoneySerializer(serializers.ModelSerializer):

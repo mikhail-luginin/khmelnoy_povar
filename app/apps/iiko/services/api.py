@@ -1,7 +1,7 @@
 from django.conf import settings
 from requests import Response
 
-from core import time
+from core.utils import time
 
 from apps.iiko.models import Product, Category
 
@@ -11,7 +11,7 @@ import requests
 
 import xml.etree.ElementTree as ET
 
-from core.time import today_date
+from core.utils.time import today_date
 
 
 class IikoService:

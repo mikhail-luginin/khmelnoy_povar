@@ -7,8 +7,8 @@ from apps.iiko.services.api import IikoService
 from apps.lk.models import Position, JobPlace, Employee
 from apps.iiko.models import Storage, PaymentType
 
-from core import total_values
-from core.time import today_date, get_current_time
+from core.utils import total_values
+from core.utils.time import today_date, get_current_time
 
 
 def get_bar(**kwargs) -> Storage | None:

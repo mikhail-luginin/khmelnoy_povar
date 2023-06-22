@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 
 from core import exceptions
-from core.utils import BaseLkView
+from core.mixins import BaseLkView
 
 from apps.iiko.services.storage import StorageService
 from apps.bar.services.malfunctions import MalfunctionService

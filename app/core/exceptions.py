@@ -11,7 +11,7 @@ class FieldCannotBeEmptyError(Exception):
 
 class WrongFieldTypeError(ValueError):
     """
-        Введенный тип данных не подходит под поле модели
+        Введенный тип данных не подходит под поле модели.
     """
 
 

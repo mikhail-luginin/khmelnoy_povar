@@ -2,7 +2,7 @@ import os
 import secrets
 
 from core import exceptions
-from core.time import today_date
+from core.utils.time import today_date
 from core import validators
 from apps.lk.models import Employee
 
