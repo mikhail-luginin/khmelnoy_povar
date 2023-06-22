@@ -81,7 +81,7 @@
                 data: null,
                 render: function(data, type, row) {
                     const arr = row.expense_status[0].comments;
-                    return arr.join(', ');
+                    if(arr.length > 0) return arr.join(', '); else return ''
                 }
             },
             {
