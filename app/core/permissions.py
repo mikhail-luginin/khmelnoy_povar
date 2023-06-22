@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 
-from apps.lk.models import Profile, Role, Navbar
+from apps.lk.models import Profile
 
 
 class AdministatorAccessMixin:

@@ -1,5 +1,5 @@
 from apps.iiko.models import Supplier
-from apps.iiko.services.api import IikoService
+from core.services.api import IikoService
 
 from core.validators import validate_field
 

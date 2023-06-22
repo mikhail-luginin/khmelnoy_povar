@@ -21,10 +21,10 @@ from apps.lk.models import Expense, Fine, ItemDeficit
 from apps.repairer.models import Malfunction
 from apps.iiko.models import Storage
 
-from apps.lk.services import catalog, positions, employees, bars
-from apps.lk.services.item_deficit import ItemDeficitService
+from core.services import catalog, bars, employees, positions
+from core.services.item_deficit import ItemDeficitService
 from apps.repairer.services import RepairerService
-from apps.iiko.services.storage import StorageService
+from core.services.storage import StorageService
 
 
 class IndexView(BaseView):

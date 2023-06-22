@@ -1,13 +1,13 @@
 from django.conf import settings
 
 from apps.bar.models import TovarRequest
-from apps.iiko.services.storage import StorageService
+from core.services.storage import StorageService
 from config.celery import app
 
 from core.utils.telegram import send_message_to_telegram
 
 from apps.iiko.models import Product, StopList
-from apps.iiko.services.api import IikoService
+from core.services.api import IikoService
 
 import datetime
 

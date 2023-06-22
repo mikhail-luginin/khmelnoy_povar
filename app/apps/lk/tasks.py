@@ -9,7 +9,7 @@ from core.utils.time import get_current_time
 
 from apps.bar.models import Timetable, Setting, Money
 
-from apps.lk.services.money import MoneyService
+from core.services.money import MoneyService
 
 from apps.bar.tasks import add_percent_and_premium_to_timetable
 

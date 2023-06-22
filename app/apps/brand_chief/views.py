@@ -4,10 +4,10 @@ from django.shortcuts import redirect
 from core import exceptions
 from core.mixins import BaseLkView
 
-from apps.iiko.services.storage import StorageService
+from core.services.storage import StorageService
 from apps.bar.services.malfunctions import MalfunctionService
-from apps.lk.services.index_page import IndexPageService
-from apps.lk.services.item_deficit import ItemDeficitService
+from core.services.index_page import IndexPageService
+from core.services.item_deficit import ItemDeficitService
 
 
 class IndexView(BaseLkView):

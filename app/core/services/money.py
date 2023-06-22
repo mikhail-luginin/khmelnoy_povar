@@ -9,7 +9,7 @@ from core.utils.total_values import get_total_expenses_by_date_and_storage, \
 from apps.bar.models import Money
 from apps.iiko.models import PaymentType, Session
 
-from apps.iiko.services.api import IikoService
+from core.services.api import IikoService
 
 import json
 

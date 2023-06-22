@@ -1,7 +1,7 @@
 from apps.bar.models import Money, TovarRequest, Setting, Timetable
 from apps.bar.services.bar_info import get_full_information_of_day
 from apps.iiko.models import Session
-from apps.iiko.services.storage import StorageService
+from core.services.storage import StorageService
 from core.logs import create_log
 from core.utils.telegram import send_message_to_telegram
 

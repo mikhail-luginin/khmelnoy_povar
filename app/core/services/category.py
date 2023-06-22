@@ -1,9 +1,8 @@
 from django.shortcuts import redirect
 
-from apps.iiko.services.api import IikoService
+from core.services.api import IikoService
 from apps.iiko.models import Category
 
-from core.exceptions import FieldNotFoundError
 from core.validators import validate_field
 
 from typing import List

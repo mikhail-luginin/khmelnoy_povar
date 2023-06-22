@@ -3,7 +3,7 @@ import json
 from typing import Type
 
 from apps.bar.models import Timetable, Setting, Money
-from apps.iiko.services.api import IikoService
+from core.services.api import IikoService
 from apps.lk.models import Position, JobPlace, Employee
 from apps.iiko.models import Storage, PaymentType
 

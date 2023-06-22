@@ -1,6 +1,6 @@
 from apps.bar.models import Setting
 from apps.iiko.models import Storage
-from apps.iiko.services.api import IikoService
+from core.services.api import IikoService
 
 from typing import List
 

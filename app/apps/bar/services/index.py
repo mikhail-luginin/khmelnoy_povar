@@ -2,9 +2,9 @@ from core.logs import create_log
 from core.utils.telegram import send_message_to_telegram
 from core.utils.time import today_date, get_current_time
 
-from apps.lk.services.employees import EmployeeService
-from apps.lk.services.timetable import TimetableService
-from apps.iiko.services.storage import StorageService
+from core.services.employees import EmployeeService
+from core.services.timetable import TimetableService
+from core.services.storage import StorageService
 
 from apps.iiko.models import Storage
 from apps.bar.models import Timetable, Position, Money, Setting

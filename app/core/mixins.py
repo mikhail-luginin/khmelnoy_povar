@@ -6,11 +6,10 @@ from django.shortcuts import render, redirect
 from django.views import View
 
 from apps.lk.models import Navbar
-
 from .exceptions import FieldNotFoundError
 from .permissions import CanViewMixin, AccessMixin
-from core.utils.profile import profile_by_request
-from core.utils.time import today_date
+from .utils.profile import profile_by_request
+from .utils.time import today_date
 
 
 class BaseLkView(LoginRequiredMixin, CanViewMixin, View):
@@ -69,8 +68,9 @@ class ObjectDeleteMixin(AccessMixin, BaseLkView):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request):
-        row = self.model.objects.filter(id=request.GET.get('id')).first()
-        if not row:
+        try:
+            row = self.model.objects.get(id=request.GET.get('id'))
+        except self.model.DoesNotExist:
             messages.error(request, 'Объекта с данным ID не существует :(')
             return redirect(self.success_url)
 

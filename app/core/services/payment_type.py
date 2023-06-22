@@ -1,7 +1,6 @@
 from apps.iiko.models import PaymentType
-from apps.iiko.services.api import IikoService
+from core.services.api import IikoService
 
-from core.exceptions import FieldNotFoundError
 from core.validators import validate_field
 
 import json

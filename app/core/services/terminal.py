@@ -1,4 +1,4 @@
-from .api import IikoService
+from core.services.api import IikoService
 from .storage import StorageService
 
 import xml.etree.ElementTree as ET

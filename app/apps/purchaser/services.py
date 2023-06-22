@@ -4,7 +4,9 @@ from core.utils.time import today_date
 from core import validators
 
 from apps.lk.models import Expense
-from apps.lk.services.catalog import CatalogService
+from core.services.catalog import CatalogService
+
+from apps.bar.models import Pays
 
 from .exceptions import DateIsNotEqualCurrentError, RowWasNotCreatedByPurchaser
 
@@ -95,3 +97,26 @@ class PurchaserService:
             row.delete()
         else:
             raise Expense.DoesNotExist('Запись с указанным идентификатором не найдена.')
+
+    def get_info_for_purchaser_difference(self):
+        rows = []
+
+        for pay in Pays.objects.filter(from_to_id=8):
+            row = {
+                'date_at': pay.date_at,
+                'get': 0,
+                'received': 0
+            }
+            rows.append(row)
+
+        for row in rows:
+            for pay in Pays.objects.filter(date_at=row['date_at']):
+                row['get'] += pay.sum
+
+            for expense in Expense.objects.filter(date_at=row['date_at'], expense_source_id=3):
+                row['received'] += expense.sum
+
+        return rows
+
+
+

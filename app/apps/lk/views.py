@@ -9,25 +9,25 @@ from core.utils.time import get_months
 from core.mixins import BaseLkView, ObjectEditMixin, ObjectCreateMixin, ObjectDeleteMixin
 from core import exceptions
 
-from .services import bars
-from .services.bar_actions import BarActionsService
-from .services.item_deficit import ItemDeficitService
-from .services.reviews import ReviewService
-from .services.salary import SalaryService
-from .services.catalog import CatalogService
-from .services.positions import JobsService
-from .services.bank import StatementUpdateService, CardService, PartnerService
-from .services.money import MoneyService
-from .services.employees import EmployeeService
-from .services.expenses import ExpenseService
-from .services.pays import PaysService
-from .services.fines import FineService
-from .services.index_page import IndexPageService
-from .services.timetable import TimetableService
+from core.services import bars
+from core.services.bar_actions import BarActionsService
+from core.services.item_deficit import ItemDeficitService
+from core.services.reviews import ReviewService
+from core.services.salary import SalaryService
+from core.services.catalog import CatalogService
+from core.services.positions import JobsService
+from core.services.bank import StatementUpdateService, CardService, PartnerService
+from core.services.money import MoneyService
+from core.services.employees import EmployeeService
+from core.services.expenses import ExpenseService
+from core.services.pays import PaysService
+from core.services.fines import FineService
+from core.services.index_page import IndexPageService
+from core.services.timetable import TimetableService
 
 from .tasks import calculate_percent_premium_for_all, update_all_money
 
-from apps.iiko.services.storage import StorageService
+from core.services.storage import StorageService
 from apps.bar.services.malfunctions import MalfunctionService
 from apps.repairer.services import RepairerService
 
@@ -1178,3 +1178,12 @@ class ExpenseStatusView(BaseLkView):
             messages.error(request, str(error))
 
         return redirect('/lk/expenses')
+
+
+class PurchaserView(BaseLkView):
+    template_name = 'lk/purchaser/index.html'
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+
+        return context

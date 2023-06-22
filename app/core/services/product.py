@@ -1,9 +1,7 @@
 from apps.iiko.models import Product, Category
-from apps.iiko.services.category import CategoryService
-from apps.iiko.services.api import IikoService
-from apps.iiko.services.supplier import SupplierService
+from core.services.category import CategoryService
+from core.services.api import IikoService
 
-from core.exceptions import FieldNotFoundError, WrongFieldTypeError
 from core.validators import validate_field
 
 import xml.etree.ElementTree as ET
