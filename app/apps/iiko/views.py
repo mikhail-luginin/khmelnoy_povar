@@ -5,7 +5,7 @@ from django.shortcuts import redirect
 
 from apps.iiko.services.product_request import ProductRequestService
 from core.exceptions import FieldNotFoundError, FieldCannotBeEmptyError
-from core.utils import ObjectEditMixin, BaseLkView
+from core.mixins import ObjectEditMixin, BaseLkView
 
 from apps.iiko.models import Product, Supplier, Category, PaymentType
 from apps.iiko.services.product import ProductService

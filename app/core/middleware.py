@@ -1,7 +1,7 @@
 from django.shortcuts import redirect
 from django.contrib import messages
 
-from .telegram import send_message_to_telegram
+from core.utils.telegram import send_message_to_telegram
 
 from django.conf import settings
 

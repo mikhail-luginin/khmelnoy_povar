@@ -52,7 +52,7 @@ class Salary(models.Model):
         return self.oklad + self.percent + self.premium
 
     def get_month_name(self):
-        from core.time import get_months
+        from core.utils.time import get_months
 
         return get_months(self.month)
 

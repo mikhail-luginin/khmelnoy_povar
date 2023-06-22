@@ -4,14 +4,14 @@ from apps.bar.models import TovarRequest
 from apps.iiko.services.storage import StorageService
 from config.celery import app
 
-from core.telegram import send_message_to_telegram
+from core.utils.telegram import send_message_to_telegram
 
 from apps.iiko.models import Product, StopList
 from apps.iiko.services.api import IikoService
 
 import datetime
 
-from core.time import today_datetime
+from core.utils.time import today_datetime
 
 
 @app.task

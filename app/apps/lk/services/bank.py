@@ -5,7 +5,7 @@ from django.contrib import messages
 from apps.lk.models import Statement, Partner, Card
 from core import validators
 
-from core.time import today_datetime
+from core.utils.time import today_datetime
 
 import time
 

@@ -1,7 +1,7 @@
 from apps.iiko.services.storage import StorageService
 from apps.lk.services.employees import EmployeeService
 from apps.lk.services.timetable import TimetableService
-from core.time import today_date
+from core.utils.time import today_date
 
 
 class IndexPageService:

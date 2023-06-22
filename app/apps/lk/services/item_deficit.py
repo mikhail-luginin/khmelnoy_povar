@@ -2,8 +2,8 @@ from core import validators
 
 from apps.lk.models import ItemDeficit, Profile
 from core.logs import create_log
-from core.telegram import send_message_to_telegram
-from core.time import today_datetime
+from core.utils.telegram import send_message_to_telegram
+from core.utils.time import today_datetime
 
 
 class ItemDeficitService:

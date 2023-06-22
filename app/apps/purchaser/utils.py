@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views import View
 
-from core.time import today_date
+from core.utils.time import today_date
 
 
 class BaseView(View):
