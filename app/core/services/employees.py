@@ -6,9 +6,9 @@ from core.time import today_date
 from core import validators
 from apps.lk.models import Employee
 
-from . import positions
+from core.services import positions
 
-from apps.iiko.services.storage import StorageService
+from core.services.storage import StorageService
 
 from django.shortcuts import redirect
 from django.contrib import messages

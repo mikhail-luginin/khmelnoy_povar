@@ -5,7 +5,7 @@ from core import exceptions
 from core.utils import BaseLkView
 
 from apps.lk.models import ItemDeficit
-from apps.lk.services.item_deficit import ItemDeficitService
+from core.services.item_deficit import ItemDeficitService
 
 from .models import Malfunction
 from .services import RepairerService

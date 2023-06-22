@@ -1,16 +1,11 @@
 from django.conf import settings
-from django.db.models import Sum
-
-from apps.lk.models import Fine
-from config.celery import app
-
-from core.telegram import send_message_to_telegram
-from core.time import today_datetime
-
-from global_services.salary import SalaryService
-
 
 from apps.bar.models import Timetable
+from apps.lk.models import Fine
+from config.celery import app
+from core.telegram import send_message_to_telegram
+from core.time import today_datetime
+from global_services.salary import SalaryService
 
 
 @app.task

@@ -1,6 +1,4 @@
-from django.contrib import messages
 from django.db.models import Q
-from django.shortcuts import redirect
 
 from apps.bar.tasks import add_percent_and_premium_to_timetable
 
@@ -8,10 +6,10 @@ from core import validators
 from core.total_values import get_total_expenses_by_date_and_storage, \
     get_total_payin_by_date_and_storage, get_total_payout_by_date_and_storage, get_total_salary_by_date_and_storage
 
-from apps.bar.models import Money, Timetable
+from apps.bar.models import Money
 from apps.iiko.models import PaymentType, Session
 
-from apps.iiko.services.api import IikoService
+from core.services.api import IikoService
 
 import json
 

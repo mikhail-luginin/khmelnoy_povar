@@ -1,7 +1,6 @@
-from core import validators
-
-from apps.lk.models import Review, Employee, Fine
 from apps.bar.models import Timetable
+from apps.lk.models import Review, Employee
+from core import validators
 
 
 class ReviewService:

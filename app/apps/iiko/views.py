@@ -3,18 +3,18 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import redirect
 
-from apps.iiko.services.product_request import ProductRequestService
+from core.services.product_request import ProductRequestService
 from core.exceptions import FieldNotFoundError, FieldCannotBeEmptyError
 from core.utils import ObjectEditMixin, BaseLkView
 
 from apps.iiko.models import Product, Supplier, Category, PaymentType
-from apps.iiko.services.product import ProductService
-from apps.iiko.services.storage import StorageService
-from apps.iiko.services.supplier import SupplierService
-from apps.iiko.services.category import CategoryService
-from apps.iiko.services.payment_type import PaymentTypeService
-from apps.iiko.services.stoplist import StoplistService
-from apps.iiko.services.terminal import TerminalService
+from core.services.product import ProductService
+from core.services.storage import StorageService
+from core.services.supplier import SupplierService
+from core.services.category import CategoryService
+from core.services.payment_type import PaymentTypeService
+from core.services.stoplist import StoplistService
+from core.services.terminal import TerminalService
 
 
 @login_required

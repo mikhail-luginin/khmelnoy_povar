@@ -8,7 +8,6 @@ from django.views import View
 from apps.lk.models import Navbar
 from .exceptions import FieldNotFoundError
 from .permissions import CanViewMixin, AccessMixin
-from .logs import create_log
 from .profile import get_profile
 from .time import today_date
 

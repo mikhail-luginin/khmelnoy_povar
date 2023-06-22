@@ -6,8 +6,8 @@ from core import exceptions
 
 from apps.lk.models import Expense
 
-from apps.iiko.services.storage import StorageService
-from apps.lk.services.catalog import CatalogService
+from core.services.storage import StorageService
+from core.services.catalog import CatalogService
 
 from .utils import BaseView
 from .services import PurchaserService

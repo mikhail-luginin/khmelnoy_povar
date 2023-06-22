@@ -7,9 +7,9 @@ from core import exceptions
 from .utils import BaseView, ObjectEditMixin, ObjectDeleteMixin
 from .exceptions import PasswordDontMatchError
 
-from .services.role import RoleService
-from .services.user import UserService
-from .services.page import PageService
+from core.services.role import RoleService
+from core.services.user import UserService
+from core.services.page import PageService
 
 from apps.lk.models import Role, Navbar, Profile
 

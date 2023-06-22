@@ -1,9 +1,5 @@
-from django.shortcuts import redirect
-from django.contrib import messages
-
-from core import validators
-
 from apps.repairer.models import Malfunction
+from core import validators
 from core.logs import create_log
 
 

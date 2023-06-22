@@ -1,5 +1,4 @@
 from django.contrib.auth import logout
-from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import redirect
 
 from apps.lk.models import Profile, Navbar

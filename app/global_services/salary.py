@@ -10,7 +10,7 @@ from apps.iiko.models import Storage
 from apps.lk.models import Employee, Fine
 
 from apps.bar.services.bar_info import get_full_information_of_day, get_bar_settings
-from apps.iiko.services.storage import StorageService
+from core.services.storage import StorageService
 
 from calendar import monthrange
 from typing import Literal

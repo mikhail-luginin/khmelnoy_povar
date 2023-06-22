@@ -99,5 +99,7 @@ urlpatterns = [
   
     path('logs', LogsView.as_view(), name="logs"),
     path('logs/update', update_logs_view, name="update_logs"),
-    path('logs/filter', LogsWithFilterView.as_view(), name="logs_with_filter")
+    path('logs/filter', LogsWithFilterView.as_view(), name="logs_with_filter"),
+
+    path('purchaser', PurchaserView.as_view(), name='purchaser')
 ]

@@ -3,13 +3,13 @@ from django.conf import settings
 from core.time import today_date
 from core.telegram import send_message_to_telegram
 
-from .api import IikoService
+from core.services.api import IikoService
 from .storage import StorageService
 from .product import ProductService
 
 import xml.etree.ElementTree as ET
 
-from ..models import Storage
+from apps.iiko.models import Storage
 
 
 class ProductRequestService:

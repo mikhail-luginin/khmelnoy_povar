@@ -4,10 +4,10 @@ from apps.bar.models import Pays
 from apps.bar.services.bar_info import get_main_barmen
 
 from apps.iiko.models import Storage
-from apps.iiko.services.storage import StorageService
+from core.services.storage import StorageService
 
 from apps.lk.models import Expense, Catalog
-from apps.lk.services.catalog import CatalogService
+from core.services.catalog import CatalogService
 
 from core.time import today_date
 from core.logs import create_log
