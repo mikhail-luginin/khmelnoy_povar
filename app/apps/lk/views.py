@@ -29,12 +29,12 @@ from .tasks import calculate_percent_premium_for_all, update_all_money
 
 from apps.iiko.services.storage import StorageService
 from apps.bar.services.malfunctions import MalfunctionService
+from apps.repairer.services import RepairerService
 
-from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee, ItemDeficit, Partner, Profile
+from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee, ItemDeficit, Partner
 from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest, Setting
 from apps.repairer.models import Malfunction
 from apps.iiko.models import Product, Supplier
-from ..repairer.services import RepairerService
 
 
 class IndexView(BaseLkView):
@@ -1162,3 +1162,19 @@ class MoneyDifferencesView(BaseLkView):
         })
 
         return context
+
+
+class ExpenseStatusView(BaseLkView):
+
+    def get(self, request):
+        expense_id = request.GET.get('id')
+        status = request.GET.get('status')
+        comment = request.GET.get('comment')
+
+        try:
+            ExpenseService().change_status(expense_id=expense_id, status=status, comment=comment)
+            messages.success(request, 'Статус записи успешно обновлен.')
+        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+            messages.error(request, str(error))
+
+        return redirect('/lk/expenses')

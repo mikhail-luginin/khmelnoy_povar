@@ -1,6 +1,6 @@
 from core import validators
 
-from apps.lk.models import Expense
+from apps.lk.models import Expense, ExpenseStatus
 
 from typing import List
 
@@ -58,3 +58,25 @@ class ExpenseService:
             expense.save()
         else:
             raise self.model.DoesNotExist('Запись с данным идентификатором не найдена.')
+
+    def change_status(self, expense_id: int, status: str, comment: str) -> ExpenseStatus:
+        expense_status = ExpenseStatus.objects.filter(expense_id=expense_id).first()
+
+        match status:
+            case 'accept':
+                success = True
+            case 'deny':
+                success = False
+            case _:
+                return expense_status
+
+        if expense_status:
+            expense_status.success = success
+            if comment:
+                expense_status.comments.append(comment)
+            expense_status.save()
+        else:
+            expense_status = ExpenseStatus.objects.create(expense_id=expense_id, success=success,
+                                                          comments=[comment])
+
+        return expense_status

@@ -50,6 +50,7 @@ urlpatterns = [
     path('expenses/create', CreateExpenseView.as_view(), name="create_expense"),
     path('expenses/edit', EditExpenseView.as_view(), name="edit_expense"),
     path('expenses/delete', DeleteExpenseView.as_view(), name="delete_expense"),
+    path('expenses/status', ExpenseStatusView.as_view(), name="status_expense"),
 
     path('salary', SalaryView.as_view(), name="salary"),
     path('salary/create', CreateSalaryView.as_view(), name="create_salary"),

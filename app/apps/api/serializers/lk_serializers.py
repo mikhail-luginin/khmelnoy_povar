@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from apps.lk.models import Navbar, Role, Profile, JobPlace, Position, Employee, Catalog, CatalogType, Log, Expense, \
-    Fine, Statement, Card, Partner, TelegramChat, TestResult, Test, TestQuestion, ItemDeficit, Review
+    Fine, Statement, Card, Partner, TelegramChat, TestResult, Test, TestQuestion, ItemDeficit, Review, ExpenseStatus
 from apps.repairer.models import Malfunction
 
 
@@ -145,10 +145,22 @@ class FineSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ExpenseStatusSerializer(serializers.ModelSerializer):
+    success = serializers.CharField(source='get_success_display')
+
+    class Meta:
+        model = ExpenseStatus
+        fields = '__all__'
+
+
 class ExpenseSerializer(serializers.ModelSerializer):
     storage_name = serializers.CharField(source='storage.name')
     expense_type_name = serializers.CharField(source='expense_type.name', allow_null=True, default='Не указана')
     expense_source_name = serializers.CharField(source='expense_source.name', allow_null=True, default='Не указан')
+    expense_status = serializers.SerializerMethodField()
+
+    def get_expense_status(self, obj):
+        return ExpenseStatus.objects.filter(expense_id=obj.id).values()
 
     class Meta:
         model = Expense

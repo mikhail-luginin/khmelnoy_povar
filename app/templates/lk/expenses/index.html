@@ -27,6 +27,8 @@
                             <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                             <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                             <th></th>
+                            <th></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                         </tr>
                         <tr>
                             <th>Дата</th>
@@ -38,10 +40,14 @@
                             <th>Сумма</th>
                             <th>Комментарий</th>
                             <th></th>
+                            <th></th>
+                            <th></th>
                         </tr>
                         </thead>
                         <tfoot>
                             <tr>
+                                <th></th>
+                                <th></th>
                                 <th></th>
                                 <th></th>
                                 <th></th>
@@ -70,7 +76,62 @@
             {data: 'expense_source_name'},
             {data: 'payment_receiver'},
             {data: 'sum'},
-            {data: 'comment'}
-        ])
+            {data: 'comment'},
+            {
+                data: null,
+                render: function(data, type, row) {
+                    const arr = row.expense_status[0].comments;
+                    return arr.join(', ');
+                }
+            },
+            {
+                data: null,
+                render: function(data, type, row) {
+                    return '<a href="/lk/expenses/status?id='+ row.id + '&status=accept"><i class="fa fa-check"></i></a>' +
+                        '<a href="#" data-bs-toggle="modal" data-bs-target="#need-items-send-modal2-' + row.id + '"><i class="fa fa-xmark"></i></a>' +
+                            '<div class="modal modal-blur fade" id="need-items-send-modal2-' + row.id + '" tabindex="-1" role="dialog" aria-hidden="true">' +
+                                '<div class="modal-dialog modal-dialog-centered" role="document">' +
+                                    '<div class="modal-content">' +
+                                        '<form action="/lk/expenses/status">' +
+                                        '<input type="hidden" name="id" value="' + row.id + '"> <input type="hidden" name="status" value="deny">' +
+                                        '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'+
+                                        '<div class="modal-body text-center py-4">' +
+                                            '<h3>Заполните информацию для отмены</h3>' +
+                                            '<div class="text-muted" id="confirm-text">' +
+                                                    '<div class="mb-2">' +
+                                                        '<input class="form-control" name="comment" placeholder="Введите комментарий">' +
+                                                    '</div>' +
+                                            '</div>' +
+                                        '</div>' +
+                                        '<div class="modal-footer">' +
+                                            '<div class="w-100">' +
+                                                '<div class="row">' +
+                                                    '<div class="col"><a href="#" class="btn w-100" data-bs-dismiss="modal">' +
+                                                        'Отмена' +
+                                                    '</a></div>' +
+                                                    '<div class="col">' +
+                                                        '<button id="confirm-delete1" class="btn btn-tabler w-100"' +
+                                                                'data-bs-dismiss="modal">' +
+                                                            'Обновить статус' +
+                                                        '</button>' +
+                                                    '</div>' +
+                                                '</div>' +
+                                            '</div>' +
+                                        '</div>' +
+                                        '</form>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>'
+                }
+            }
+        ], has_delete=true, has_update=false, has_dismiss=false, has_edit=true, has_actions=true, custom_dict = {
+            createdRow: function (row, data, dataIndex) {
+                if (data.expense_status[0].success === true) {
+                    $(row).addClass('table-success');
+                } else if (data.expense_status[0].success === false) {
+                    $(row).addClass('table-danger');
+                }
+            },
+        }, order_id=1)
     </script>
 {% endblock %}
