@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.http import Http404
 from django.conf import settings
 
-from core.telegram import send_message_to_telegram
+from core.utils.telegram import send_message_to_telegram
 
 from apps.bar.models import TovarRequest, Arrival
 
@@ -16,9 +16,9 @@ from apps.iiko.models import Product, Category, Storage
 from core.services.api import IikoService
 from core.services.storage import StorageService
 
-from core.time import today_date, monthdelta, get_current_time, get_months
+from core.utils.time import today_date, monthdelta, get_current_time, get_months
 from core.logs import create_log
-from core.payment_types import get_bn_category, get_nal_category
+from core.utils.payment_types import get_bn_category, get_nal_category
 import xml.etree.ElementTree as ET
 
 from apps.lk.models import Expense, Catalog

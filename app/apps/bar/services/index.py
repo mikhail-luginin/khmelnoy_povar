@@ -1,6 +1,6 @@
 from core.logs import create_log
-from core.telegram import send_message_to_telegram
-from core.time import today_date, get_current_time
+from core.utils.telegram import send_message_to_telegram
+from core.utils.time import today_date, get_current_time
 
 from core.services.employees import EmployeeService
 from core.services.timetable import TimetableService

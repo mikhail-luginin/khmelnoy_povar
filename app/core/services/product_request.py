@@ -1,7 +1,7 @@
 from django.conf import settings
 
-from core.time import today_date
-from core.telegram import send_message_to_telegram
+from core.utils.time import today_date
+from core.utils.telegram import send_message_to_telegram
 
 from core.services.api import IikoService
 from .storage import StorageService

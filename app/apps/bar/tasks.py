@@ -3,8 +3,8 @@ from django.conf import settings
 from apps.bar.models import Timetable
 from apps.lk.models import Fine
 from config.celery import app
-from core.telegram import send_message_to_telegram
-from core.time import today_datetime
+from core.utils.telegram import send_message_to_telegram
+from core.utils.time import today_datetime
 from global_services.salary import SalaryService
 
 

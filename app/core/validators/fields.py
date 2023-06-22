@@ -1,4 +1,4 @@
-from . import exceptions
+from core import exceptions
 
 
 def validate_field(field, field_name: str) -> None:

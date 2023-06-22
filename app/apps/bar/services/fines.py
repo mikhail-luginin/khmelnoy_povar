@@ -2,7 +2,7 @@ from typing import List
 
 from apps.iiko.models import Storage
 from apps.lk.models import Fine
-from core.time import get_current_time, monthdelta
+from core.utils.time import get_current_time, monthdelta
 
 
 def get_fines_on_storage_by_month(storage: Storage, month: str | None) -> List[Fine]:

@@ -4,8 +4,8 @@ from django.conf import settings
 
 from config.celery import app
 
-from core.telegram import send_message_to_telegram
-from core.time import get_current_time
+from core.utils.telegram import send_message_to_telegram
+from core.utils.time import get_current_time
 
 from apps.bar.models import Timetable, Setting, Money
 

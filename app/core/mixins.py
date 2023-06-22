@@ -8,8 +8,8 @@ from django.views import View
 from apps.lk.models import Navbar
 from .exceptions import FieldNotFoundError
 from .permissions import CanViewMixin, AccessMixin
-from .profile import get_profile
-from .time import today_date
+from .utils.profile import profile_by_request
+from .utils.time import today_date
 
 
 class BaseLkView(LoginRequiredMixin, CanViewMixin, View):
@@ -26,7 +26,7 @@ class BaseLkView(LoginRequiredMixin, CanViewMixin, View):
     def get_context_data(self, request, **kwargs) -> dict:
         context = dict()
 
-        context['profile'] = get_profile(request)
+        context['profile'] = profile_by_request(request)
         context['navbar'] = Navbar.objects.all()
         context['date'] = today_date()
 

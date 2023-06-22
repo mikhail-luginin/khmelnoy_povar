@@ -4,7 +4,7 @@ from django.conf import settings
 from django.db.models import Sum
 
 from core import exceptions
-from core.time import today_date, get_months, get_current_time
+from core.utils.time import today_date, get_months, get_current_time
 from global_services.salary import SalaryService
 
 from .utils import BaseView, ObjectDeleteMixin, TovarRequestMixin, ArrivalMixin, InventoryMixin, DataLogsMixin

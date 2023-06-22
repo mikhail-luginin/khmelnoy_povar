@@ -3,10 +3,10 @@ from apps.bar.services.bar_info import get_full_information_of_day
 from apps.iiko.models import Session
 from core.services.storage import StorageService
 from core.logs import create_log
-from core.telegram import send_message_to_telegram
+from core.utils.telegram import send_message_to_telegram
 
-from core.time import today_date
-from core import total_values
+from core.utils.time import today_date
+from core.utils import total_values
 
 from apps.bar.tasks import add_percent_and_premium_to_timetable
 

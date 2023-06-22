@@ -1,7 +1,7 @@
 from core.services.storage import StorageService
 from core.services.employees import EmployeeService
 from core.services.timetable import TimetableService
-from core.time import today_date
+from core.utils.time import today_date
 
 
 class IndexPageService:
