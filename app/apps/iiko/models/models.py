@@ -12,7 +12,6 @@ class Storage(models.Model):
     district = models.CharField(max_length=8)
     is_hide = models.PositiveSmallIntegerField()
     is_office = models.PositiveSmallIntegerField()
-    terminal_ids = models.JSONField(null=True, default=list)
 
 
 class Category(models.Model):
@@ -109,3 +108,10 @@ class Session(models.Model):
     delivery = models.IntegerField(null=True)
 
     objects = managers.SessionManager()
+
+
+class Terminal(models.Model):
+    terminal_uuid = models.CharField(max_length=255)
+    storage = models.ForeignKey(to=Storage, on_delete=models.CASCADE)
+
+    objects = managers.TerminalManager()

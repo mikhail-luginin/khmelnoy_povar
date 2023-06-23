@@ -1,8 +1,7 @@
 from django.conf import settings
 
-from apps.iiko.models import Storage
 from core.services.api import IikoService
-from core.services.storage import StorageService
+from core.services.terminal import TerminalService
 
 
 class OnlineTableService:
@@ -10,10 +9,11 @@ class OnlineTableService:
     def current_tables(self):
         tables = {}
         for event in IikoService().get_events_by_types(types=settings.IIKO_ORDER_TYPES):
-            storage_name = None
-            for storage in StorageService().storages_all():
-                if event.get('terminal') in storage.terminal_ids:
-                    storage_name = storage.name
+            terminal = TerminalService().terminal_by_uuid(uuid=event.get('terminal'))
+            if terminal:
+                storage = terminal.storage
+            else:
+                continue
 
             match event.get('type'):
                 case 'orderOpened':
@@ -28,7 +28,7 @@ class OnlineTableService:
                 tables[event.get('orderId')] = {}
                 table = tables[event.get('orderId')]
 
-            table["storage_name"] = storage_name
+            table["storage_name"] = storage.name
             table["is_open"] = is_open
             table["type"] = event.get('type')
 
