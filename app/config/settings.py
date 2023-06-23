@@ -169,6 +169,10 @@ PAYMENT_TYPE_BN = 'Бизнес-карта'
 PURCHASER_CATEGORY = 'Расходы.Закупщик'
 SALARY_CATEGORY = 'Зарплата'
 
+IIKO_ORDER_TYPES = ['orderPaid', 'orderOpened', 'orderPrechequed', 'addItemToOrder', 'orderDeleted', 'orderDiscounted',
+                    'deletedPrintedItems', 'orderPaidNoSum', 'orderMoved', 'orderCancelPrechequed', 'orderPrepaid',
+                    'orderReturned']
+
 REDIS_HOST = os.environ.get('REDIS_HOST')
 REDIS_PORT = os.environ.get('REDIS_PORT')
 
