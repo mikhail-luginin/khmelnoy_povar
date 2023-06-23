@@ -99,5 +99,21 @@ class IikoService:
                 rows.append(dictionary)
         return rows
 
+    def get_events_by_types(self, types: list):
+        rows = []
+        xml = ET.fromstring(self._get_iiko_events())
+        for event in xml.findall('event'):
+            if event.find('type').text in types:
+                dictionary = {
+                    "date": event.find('date').text.split('T')[0] + ' ' + event.find('date').text.split('T')[1],
+                    "type": event.find('type').text
+                }
+                for attribute in event.findall('attribute'):
+                    name = attribute.find('name').text
+                    value = attribute.find('value').text
+                    dictionary[name] = value
+                rows.append(dictionary)
+        return rows
+
     def get_terminals(self) -> str:
         return self._iiko_request('/resto/api/corporation/terminals').text

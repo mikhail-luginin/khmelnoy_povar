@@ -14,6 +14,7 @@ from core.services.supplier import SupplierService
 from core.services.category import CategoryService
 from core.services.payment_type import PaymentTypeService
 from core.services.stoplist import StoplistService
+from core.services.tables import OnlineTableService
 from core.services.terminal import TerminalService
 
 
@@ -237,3 +238,15 @@ class ProductRequestGenerateMessageView(BaseLkView):
 
         message = ProductRequestService().generate_message(date_at=date_at)
         return JsonResponse({"message": message}, status=200)
+
+
+class OnlineTablesView(BaseLkView):
+    template_name = 'iiko/online_tables.html'
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context.update({
+            "tables": OnlineTableService().current_tables()
+        })
+
+        return context
