@@ -101,5 +101,6 @@ urlpatterns = [
     path('logs/update', update_logs_view, name="update_logs"),
     path('logs/filter', LogsWithFilterView.as_view(), name="logs_with_filter"),
 
-    path('purchaser', PurchaserView.as_view(), name='purchaser')
+    path('purchaser', PurchaserView.as_view(), name='purchaser'),
+    path('purchaser_get_table', get_table_for_purchaser, name='purchaser_get_table')
 ]
