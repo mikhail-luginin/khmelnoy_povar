@@ -99,24 +99,24 @@ class PurchaserService:
             raise Expense.DoesNotExist('Запись с указанным идентификатором не найдена.')
 
     def get_info_for_purchaser_difference(self):
-        rows = []
+        data = []
 
         for pay in Pays.objects.filter(from_to_id=8):
             row = {
-                'date_at': pay.date_at,
+                'date_at': pay.comment,
                 'get': 0,
                 'received': 0
             }
-            rows.append(row)
+            if row not in data:
+                data.append(row)
 
-        for row in rows:
+        for row in data:
             for pay in Pays.objects.filter(date_at=row['date_at']):
                 row['get'] += pay.sum
 
             for expense in Expense.objects.filter(date_at=row['date_at'], expense_source_id=3):
                 row['received'] += expense.sum
 
-        return rows
+            row['difference'] = row['get'] - row['received']
 
-
-
+        return data

@@ -35,6 +35,7 @@ from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee, 
 from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest, Setting
 from apps.repairer.models import Malfunction
 from apps.iiko.models import Product, Supplier
+from ..purchaser.services import PurchaserService
 
 
 class IndexView(BaseLkView):
@@ -1183,7 +1184,6 @@ class ExpenseStatusView(BaseLkView):
 class PurchaserView(BaseLkView):
     template_name = 'lk/purchaser/index.html'
 
-    def get_context_data(self, request, **kwargs) -> dict:
-        context = super().get_context_data(request, **kwargs)
 
-        return context
+def get_table_for_purchaser(request):
+    return JsonResponse({'data': PurchaserService().get_info_for_purchaser_difference()})
