@@ -1,5 +1,5 @@
 from django.conf import settings
-
+from django.db.models import Sum
 from core.utils.time import today_date
 from core import validators
 
@@ -101,22 +101,22 @@ class PurchaserService:
     def get_info_for_purchaser_difference(self):
         data = []
 
-        for pay in Pays.objects.filter(from_to_id=8):
+        for expense in Expense.objects.filter(writer__icontains='закупщик'):
             row = {
-                'date_at': pay.comment,
-                'get': 0,
-                'received': 0
+                'date_at': expense.date_at,
+                'received': 0,
+                'spent': 0,
+                'difference': 0
             }
             if row not in data:
                 data.append(row)
 
         for row in data:
-            for pay in Pays.objects.filter(date_at=row['date_at']):
-                row['get'] += pay.sum
+            row['received'] = Pays.objects.filter(date_at=row.get('date_at')).aggregate(Sum('sum'))['sum__sum']
 
-            for expense in Expense.objects.filter(date_at=row['date_at'], expense_source_id=3):
-                row['received'] += expense.sum
+            row['spent'] = Expense.objects.filter(date_at=row.get('date_at'),
+                                                  expense_source__name__icontains='наличные').aggregate(Sum('sum'))['sum__sum']
 
-            row['difference'] = row['get'] - row['received']
+            row['difference'] = row['received'] - row['spent']
 
         return data
