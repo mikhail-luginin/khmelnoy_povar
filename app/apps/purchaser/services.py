@@ -112,11 +112,12 @@ class PurchaserService:
                 data.append(row)
 
         for row in data:
-            row['received'] = Pays.objects.filter(date_at=row.get('date_at')).aggregate(Sum('sum'))['sum__sum']
+            received = Pays.objects.filter(date_at=row.get('date_at')).aggregate(Sum('sum'))['sum__sum']
+            spent = Expense.objects.filter(date_at=row.get('date_at'),
+                                           expense_source__name__icontains='наличные').aggregate(Sum('sum'))['sum__sum']
 
-            row['spent'] = Expense.objects.filter(date_at=row.get('date_at'),
-                                                  expense_source__name__icontains='наличные').aggregate(Sum('sum'))['sum__sum']
-
+            row['received'] = received if received else 0
+            row['spent'] = round(spent)
             row['difference'] = row['received'] - row['spent']
 
         return data
