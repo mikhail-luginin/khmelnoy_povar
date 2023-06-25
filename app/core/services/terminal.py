@@ -1,10 +1,16 @@
 from core.services.api import IikoService
+
+from apps.iiko.models import Terminal
+
 from .storage import StorageService
 
 import xml.etree.ElementTree as ET
 
 
 class TerminalService:
+
+    def terminal_by_uuid(self, uuid: str) -> Terminal | None:
+        return Terminal.objects.filter(terminal_uuid=uuid).first()
 
     def update(self) -> None:
         text = IikoService().get_terminals()
@@ -21,14 +27,12 @@ class TerminalService:
             for storage in storage_service.storages_all():
                 if storage.name in names:
                     terminal_id = terminal_dto.findtext('id')
-                    if terminal_id not in storage.terminal_ids:
-                        storage.terminal_ids.append(terminal_id)
-                        storage.save()
+                    if not self.terminal_by_uuid(terminal_id):
+                        Terminal.objects.create(terminal_uuid=terminal_id, storage_id=storage.id)
             else:
                 if group_info:
                     storage = storage_service.storage_get(name__contains=group_info.findtext('name'))
                     if storage:
                         terminal_id = group_info.findtext('id')
-                        if terminal_id not in storage.terminal_ids:
-                            storage.terminal_ids.append(terminal_id)
-                            storage.save()
+                        if not self.terminal_by_uuid(terminal_id):
+                            Terminal.objects.create(terminal_uuid=terminal_id, storage_id=storage.id)

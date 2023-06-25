@@ -1,13 +1,57 @@
 {% extends 'base.html' %}
 
 {% block body %}
-    <div class="container-xl">
-        {% for order_id, info in tables.items %}
-            <div class="card rounded-3">
-                <div class="card-body">
-                    <p class="text-{% if info.is_open %}success{% else %}danger{% endif %}">Заведение: {{ info.storage_name }} ({{ info.sum }})</p>
+    <div class="container-xl row">
+        {% for storage in storages %}
+            <div class="col-3">
+                <div class="card rounded-3 mb-4">
+                    <div class="card-header card-header-light"><b>{{ storage.name }}</b></div>
+                    <div class="list-group list-group-flush" id="card[{{ storage.id }}]"></div>
                 </div>
             </div>
         {% endfor %}
+        {{ table }}
     </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '/iiko/temp/online_tables',
+                type: 'get',
+                success: function (response) {
+                    let tables = response.tables
+                    let status = ''
+                    let status_color = ''
+                    for (let table_id in tables) {
+                        let table = tables[table_id]
+                        let card = $('#card\\[' + table.storage_id + '\\]')
+                        if (table.is_open === true) {
+                            status = 'Открыт'
+                            status_color = 'success'
+                        } else {
+                            status = 'Закрыт'
+                            status_color = 'danger'
+                        }
+                        if (table.is_precheque === true) {
+                            status = 'Пречек'
+                            status_color = 'warning'
+                        }
+                        let data = '<a class="list-group-item list-group-item-action" ' +
+                            'href="/iiko/online_tables_by_order_num?order_num=' + table.order_num + '">' +
+                            '<div class="text-truncate">' +
+                            'Чек ' + table.order_num +
+                            '</div>' +
+                            '<div class="text-' + status_color + '">' +
+                            status +
+                            '</div>' +
+                            '</a>'
+                        if(table.is_open === true) card.prepend(data)
+                        else card.append(data)
+                    }
+                }
+            })
+        })
+    </script>
 {% endblock %}

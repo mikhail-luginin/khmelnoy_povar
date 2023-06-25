@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import redirect
 
+from core.services.discount import DiscountTypeService
 from core.services.product_request import ProductRequestService
 from core.exceptions import FieldNotFoundError, FieldCannotBeEmptyError
 from core.mixins import ObjectEditMixin, BaseLkView
@@ -246,7 +247,37 @@ class OnlineTablesView(BaseLkView):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context.update({
-            "tables": OnlineTableService().current_tables()
+            "storages": StorageService().storages_all(),
+            "table": False
+        })
+
+        order_num = request.GET.get('order_num')
+        if order_num:
+            context['table'] = OnlineTableService().table_by_order_num(order_num=order_num)
+
+        return context
+
+
+class OnlineTableByOrderNumView(BaseLkView):
+    template_name = 'iiko/online_tables_by_id.html'
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context.update({
+            "table": OnlineTableService().table_by_order_num(order_num=request.GET.get('order_num'))
         })
 
         return context
+
+
+class OnlineTablesTempView(BaseLkView):
+
+    def get(self, request):
+        return JsonResponse({"tables": OnlineTableService().current_tables()}, status=200)
+
+
+class DiscountTypeUpdateView(BaseLkView):
+
+    def get(self, request):
+        DiscountTypeService().update()
+        return redirect('/iiko/discounts/types')

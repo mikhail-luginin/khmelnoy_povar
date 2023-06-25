@@ -8,7 +8,7 @@ from typing import Union, Dict
 
 
 def get_current_time() -> datetime.date:
-    return timezone.now() - datetime.timedelta(hours=2)
+    return timezone.now() - datetime.timedelta(hours=4)
 
 
 def today_date() -> str:

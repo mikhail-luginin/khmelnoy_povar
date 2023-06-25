@@ -1,12 +1,12 @@
 from django.conf import settings
 
 from apps.bar.models import TovarRequest
-from core.services.storage import StorageService
 from config.celery import app
+from core.services.terminal import TerminalService
 
 from core.utils.telegram import send_message_to_telegram
 
-from apps.iiko.models import Product, StopList
+from apps.iiko.models import Product, StopList, Terminal
 from core.services.api import IikoService
 
 import datetime
@@ -17,14 +17,10 @@ from core.utils.time import today_datetime
 @app.task
 def iiko_stoplist_items():
     for row in IikoService().get_stop_list_events():
-        terminal = row.get('terminal')
-        storage = None
+        terminal = TerminalService().terminal_by_uuid(uuid=row.get('terminal'))
 
-        for st in StorageService().storages_all():
-            if terminal in st.terminal_ids and not storage:
-                storage = st
-
-        if storage:
+        if terminal:
+            storage = terminal.storage
             date_string = row['date'].split('.')[0]
             date = datetime.datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S')
 

@@ -29,3 +29,9 @@ class SessionManager(models.Manager):
 
     def get_queryset(self):
         return super().get_queryset().select_related('storage')
+
+
+class TerminalManager(models.Manager):
+
+    def get_queryset(self):
+        return super().get_queryset().select_related('storage')

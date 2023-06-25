@@ -32,5 +32,9 @@ urlpatterns = [
     path('requests/product/generate_message', ProductRequestGenerateMessageView.as_view(),
          name="product_request_generate_message"),
 
-    path('online_tables', OnlineTablesView.as_view())
+    path('online_tables', OnlineTablesView.as_view()),
+    path('online_tables_by_order_num', OnlineTableByOrderNumView.as_view()),
+    path('temp/online_tables', OnlineTablesTempView.as_view()),
+
+    path('discounts/types/update', DiscountTypeUpdateView.as_view())
 ]
