@@ -84,6 +84,23 @@ class IikoService:
                                   f'&from_time={time.get_current_time().strftime("%Y-%m-%d")}T09:00:00.000'
                                   f'&to_time={time.get_current_time() + datetime.timedelta(days=1)}T02:00:00.000').text
 
+    def _get_iiko_events_by_types(self, types: list) -> str:
+        token = self._iiko_connect()
+
+        send_text = f'{settings.IIKO_API_URL}/resto/api/events' \
+                    f'?from_time={time.get_current_time().strftime("%Y-%m-%d")}T09:00:00.000' \
+                    f'&to_time={time.get_current_time() + datetime.timedelta(days=1)}T02:00:00.000&key={token}'
+
+        events = '<eventsRequestData><events>'
+        for event_type in types:
+            events += f'<event>{event_type}</event>'
+        events += '</events></eventsRequestData>'
+        r = requests.post(send_text, data=events, headers={'Content-Type': 'application/xml;charset=UTF-8'})
+
+        self._iiko_disconnect(token)
+
+        return r.text
+
     def get_stop_list_events(self):
         rows = []
         xml = ET.fromstring(self._get_iiko_events())
@@ -99,21 +116,23 @@ class IikoService:
                 rows.append(dictionary)
         return rows
 
-    def get_events_by_types(self, types: list):
+    def get_order_events(self):
         rows = []
-        xml = ET.fromstring(self._get_iiko_events())
+        xml = ET.fromstring(self._get_iiko_events_by_types(types=settings.IIKO_ORDER_TYPES))
         for event in xml.findall('event'):
-            if event.find('type').text in types:
-                dictionary = {
-                    "date": event.find('date').text.split('T')[0] + ' ' + event.find('date').text.split('T')[1],
-                    "type": event.find('type').text
-                }
-                for attribute in event.findall('attribute'):
-                    name = attribute.find('name').text
-                    value = attribute.find('value').text
-                    dictionary[name] = value
-                rows.append(dictionary)
+            dictionary = {
+                "date": event.find('date').text.split('T')[0] + ' ' + event.find('date').text.split('T')[1],
+                "type": event.find('type').text
+            }
+            for attribute in event.findall('attribute'):
+                name = attribute.find('name').text
+                value = attribute.find('value').text
+                dictionary[name] = value
+            rows.append(dictionary)
         return rows
 
     def get_terminals(self) -> str:
         return self._iiko_request('/resto/api/corporation/terminals').text
+
+    def get_discount_types(self) -> str:
+        return self._iiko_request('/resto/api/v2/entities/list', '&rootType=DiscountType').text

@@ -74,6 +74,11 @@ class PaymentType(models.Model):
     is_active = models.PositiveSmallIntegerField(choices=PAYMENT_TYPE_CHOICES)
 
 
+class DiscountType(models.Model):
+    uuid = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
+
+
 class Discount(models.Model):
     date_at = models.DateField()
     storage = models.ForeignKey(to=Storage, on_delete=models.SET_NULL, null=True)
@@ -81,9 +86,9 @@ class Discount(models.Model):
     discount_percent = models.IntegerField()
     order_sum = models.IntegerField()
     order_sum_after_discount = models.IntegerField()
-    discount_type = models.CharField(max_length=32)
+    discount_type = models.ForeignKey(to=DiscountType, on_delete=models.CASCADE)
     discount_owner = models.CharField(max_length=32)
-    is_deleted = models.PositiveSmallIntegerField()
+    is_deleted = models.BooleanField(default=False)
 
     objects = managers.DiscountManager()
 
