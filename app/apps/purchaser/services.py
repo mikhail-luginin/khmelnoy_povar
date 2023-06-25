@@ -1,5 +1,5 @@
 from django.conf import settings
-
+from django.db.models import Sum
 from core.utils.time import today_date
 from core import validators
 
@@ -99,24 +99,26 @@ class PurchaserService:
             raise Expense.DoesNotExist('Запись с указанным идентификатором не найдена.')
 
     def get_info_for_purchaser_difference(self):
-        rows = []
+        data = []
 
-        for pay in Pays.objects.filter(from_to_id=8):
+        for expense in Expense.objects.filter(writer__icontains='закупщик'):
             row = {
-                'date_at': pay.date_at,
-                'get': 0,
-                'received': 0
+                'date_at': expense.date_at,
+                'received': 0,
+                'spent': 0,
+                'difference': 0
             }
-            rows.append(row)
+            if row not in data:
+                data.append(row)
 
-        for row in rows:
-            for pay in Pays.objects.filter(date_at=row['date_at']):
-                row['get'] += pay.sum
+        for row in data:
+            received = Pays.objects.filter(comment=row.get('date_at'),
+                                           from_to__name__icontains='закупщик').aggregate(Sum('sum'))['sum__sum']
+            spent = Expense.objects.filter(date_at=row.get('date_at'),
+                                           expense_source__name__icontains='наличные').aggregate(Sum('sum'))['sum__sum']
 
-            for expense in Expense.objects.filter(date_at=row['date_at'], expense_source_id=3):
-                row['received'] += expense.sum
+            row['received'] = received if received else 0
+            row['spent'] = round(spent)
+            row['difference'] = row['received'] - row['spent']
 
-        return rows
-
-
-
+        return data

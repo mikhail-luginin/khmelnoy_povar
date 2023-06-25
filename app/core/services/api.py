@@ -129,6 +129,7 @@ class IikoService:
                 value = attribute.find('value').text
                 dictionary[name] = value
             rows.append(dictionary)
+        
         return rows
 
     def get_terminals(self) -> str:
