@@ -2,22 +2,51 @@
 
 {% block body %}
     <div class="container-xl">
-        <div class="card rounded-3">
-            <div class="card-header card-header-light rounded-3">
-                <b>Заказ №{{ table.order_num }}</b>
-            </div>
+        <div class="card card-lg">
             <div class="card-body">
-                <center><big>{% if table.is_open and not table.is_prechequed %}Открытый{% elif table.is_prechequed %}Пречек{% else %}Закрытый{% endif %}</big></center><br>
-                <center>{{ table.storage_name }}</center><br>
-                <center>Стол: {{ table.table_num }}</center><br>
-                <center>открыт: {{ table.time.open }}</center><br>
-                {% if table.is_precheque %}<center>пречек: {{ table.time.precheque }}</center><br>{% endif %}
-                {% if not table.is_open %}<center>закрыт: {{ table.time.close }}</center><br>{% endif %}
-                {% for dish in table.dishes %}
-                    {{ dish.dish }} - {{ dish.count }}<br>
-                {% endfor %}
-                <center>Подытог: {{ table.sum.subtotal }}</center><br>
-                <center>Итог: {{ table.sum.total }}</center><br>
+                <div class="justify-content-center">
+                    <div class="col-6">
+                        <p class="h3">
+                            {% if table.is_open and table.is_prechequed %}
+                                Пречек
+                            {% elif table.is_open %}
+                                Открыт
+                            {% else %}
+                                Закрыт
+                            {% endif %}
+                        </p>
+                        <p>
+                            Открыт: {{ table.time.open|date:'Y-m-d H:m:s' }}<br>
+                            {% if table.time.precheque %}
+                                Пречек: {{ table.time.precheque|date:'Y-m-d H:m:s' }}<br>
+                            {% endif %}
+                            {% if table.is_open is False %}
+                                Закрыт: {{ table.time.close|date:'Y-m-d H:m:s' }}<br>
+                            {% endif %}
+                            Заведение: {{ table.storage_name }}<br>
+                            Стол: {{ table.table_num }}
+                        </p>
+                    </div>
+                    <div class="col-12 my-5">
+                        <h1>Заказ №{{ table.order_num }}</h1>
+                    </div>
+                </div>
+                <table class="table table-transparent table-responsive">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% for dish in table.dishes %}
+                            <tr>
+                                <td>{{ dish.dish }}</td>
+                                <td>{{ dish.count }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

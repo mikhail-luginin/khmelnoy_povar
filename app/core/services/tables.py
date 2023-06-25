@@ -31,15 +31,19 @@ class OnlineTableService:
         # }
         #
         for order_id, table in self.current_tables().items():
-            if table['order_num'] == order_num:
+            if table.get('order_num') == order_num:
                 return table
 
     def current_tables(self):
-        tables = {}
+        tables = {"count": {}}
         for event in IikoService().get_order_events():
             terminal = TerminalService().terminal_by_uuid(uuid=event.get('terminal'))
             if terminal:
                 storage = terminal.storage
+                order = tables['count'].get(storage.id)
+                if order is None:
+                    tables['count'][storage.id] = {"open": 0, "close": 0}
+                    order = tables['count'][storage.id]
             else:
                 continue
 
@@ -50,12 +54,14 @@ class OnlineTableService:
             is_moved = False
 
             date = event.get('date')
+            date = date.split('.')[0] if '.' in date else date.split('+')[0]
             subtotal = event.get('sum')
             total = event.get('orderSumAfterDiscount')
             order_num = event.get('orderNum')
             table_num = event.get('tableNum')
             num_guests = event.get('numGuests')
             discount_type = DiscountTypeService().discount_type_by_uuid(uuid=event.get('discountTypeId'))
+            discount_type_name = discount_type.name if discount_type else 'Нет названия'
             discount_percent = event.get('percent')
 
             open_time = datetime.datetime.strptime(event.get('openTime'), '%Y-%m-%dT%H:%M:%S.%f')
@@ -67,10 +73,14 @@ class OnlineTableService:
             dishes = []
 
             match event.get('type'):
+                case 'orderOpened':
+                    order['open'] += 1
                 case 'orderPaid' | 'orderPaidNoCash':
                     is_open = False
-                    close_time = date
+                    close_time = datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
                     precheque_time = datetime.datetime.strptime(precheque_time, '%Y-%m-%dT%H:%M:%S.%f')
+                    order['close'] += 1
+                    order['open'] -= 1
                 case 'orderPrechequed':
                     is_precheque = True
                     precheque_time = datetime.datetime.strptime(precheque_time, '%Y-%m-%dT%H:%M:%S.%f')
@@ -79,15 +89,19 @@ class OnlineTableService:
                 case 'orderPrepaid':
                     pass
                 case 'orderReturned':
-                    pass
+                    is_open = False
+                    order['open'] -= 1
                 case 'orderDeleted':
+                    is_open = False
                     is_deleted = True
+                    order['open'] -= 1
+                    # todo: сохранять
                 case 'orderMoved':
                     is_moved = True
                 case 'orderDiscounted':
                     is_discounted = True
                 case 'addItemToOrder':
-                    dishes.append({"dish": event.get('dishes'), "count": event.get('rowCount')})
+                    dishes.append({"dish": event.get('dishes'), "count": event.get('rowCount').split('.')[0]})
                 case 'deletedPrintedItems':
                     for dish in dishes:
                         if dish.get('dish') == event.get('dishes'):
@@ -98,9 +112,11 @@ class OnlineTableService:
                     continue
 
             table = tables.get(event.get("orderId"))
-            if not table:
+            if table is None:
                 tables[event.get('orderId')] = {}
                 table = tables[event.get('orderId')]
+
+            dishes = dishes if not table.get("dishes") else dishes + table.get("dishes")
 
             table["storage_name"] = storage.name
             table["storage_id"] = storage.id
@@ -116,7 +132,7 @@ class OnlineTableService:
             table["order_num"] = order_num.split('.')[0] if order_num else None
             table["table_num"] = table_num.split('.')[0] if table_num else None
             table["num_guests"] = num_guests.split('.')[0] if num_guests else None
-            table["discount"] = {"type": discount_type, "percent": discount_percent}
+            table["discount"] = {"type": discount_type_name, "percent": discount_percent}
             table["dishes"] = dishes
             table["type"] = event.get('type')
 

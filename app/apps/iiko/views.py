@@ -247,13 +247,8 @@ class OnlineTablesView(BaseLkView):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context.update({
-            "storages": StorageService().storages_all(),
-            "table": False
+            "storages": StorageService().storages_all()
         })
-
-        order_num = request.GET.get('order_num')
-        if order_num:
-            context['table'] = OnlineTableService().table_by_order_num(order_num=order_num)
 
         return context
 

@@ -5,12 +5,11 @@
         {% for storage in storages %}
             <div class="col-3">
                 <div class="card rounded-3 mb-4">
-                    <div class="card-header card-header-light"><b>{{ storage.name }}</b></div>
+                    <div class="card-header card-header-light"><b>{{ storage.name }}</b> (<span id="text_{{ storage.id }}">0/0</span>)</div>
                     <div class="list-group list-group-flush" id="card[{{ storage.id }}]"></div>
                 </div>
             </div>
         {% endfor %}
-        {{ table }}
     </div>
 {% endblock %}
 
@@ -27,16 +26,20 @@
                     for (let table_id in tables) {
                         let table = tables[table_id]
                         let card = $('#card\\[' + table.storage_id + '\\]')
-                        if (table.is_open === true) {
+                        if (table.is_precheque === true && table.is_open === true) {
+                            status = 'Пречек'
+                            status_color = 'warning'
+                        } else if (table.is_open === true) {
                             status = 'Открыт'
                             status_color = 'success'
                         } else {
-                            status = 'Закрыт'
-                            status_color = 'danger'
-                        }
-                        if (table.is_precheque === true) {
-                            status = 'Пречек'
-                            status_color = 'warning'
+                            if(table.is_deleted === true) {
+                                status = 'Удален'
+                                status_color = 'danger'
+                            } else {
+                                status = 'Закрыт'
+                                status_color = 'danger'
+                            }
                         }
                         let data = '<a class="list-group-item list-group-item-action" ' +
                             'href="/iiko/online_tables_by_order_num?order_num=' + table.order_num + '">' +
@@ -50,6 +53,9 @@
                         if(table.is_open === true) card.prepend(data)
                         else card.append(data)
                     }
+                    {% for storage in storages %}
+                        $('#text_{{ storage.id }}').html(tables.count[{{ storage.id }}]['open'] + '/' + tables.count[{{ storage.id }}]['close'])
+                    {% endfor %}
                 }
             })
         })
