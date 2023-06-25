@@ -114,7 +114,7 @@ class PurchaserService:
         for row in data:
             received = Pays.objects.filter(comment=row.get('date_at'),
                                            from_to__name__icontains='закупщик').aggregate(Sum('sum'))['sum__sum']
-            spent = Expense.objects.filter(date_at=row.get('date_at'),
+            spent = Expense.objects.filter(date_at=row.get('date_at'), writer__icontains='закупщик',
                                            expense_source__name__icontains='наличные').aggregate(Sum('sum'))['sum__sum']
 
             row['received'] = received if received else 0
