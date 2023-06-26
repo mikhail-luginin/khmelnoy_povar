@@ -92,7 +92,7 @@
         $(document).ready(function () {
             $('#only-deleted').click(function () {
                 table.destroy()
-                run_datatable('employees-table', '/api/employees', '/lk/employees?is_deleted=1', [
+                table = run_datatable('employees-table', '/api/employees?is_deleted=1', '/lk/employees', [
                     {
                         data: 'photo',
                         render: function (data, typa, row) {
@@ -124,7 +124,7 @@
             })
             $('#without-deleted').click(function () {
                 table.destroy()
-                table = run_datatable('employees-table', '/api/employees', '/lk/employees?is_deleted=0', [
+                table = run_datatable('employees-table', '/api/employees?is_deleted=0', '/lk/employees', [
                     {
                         data: 'photo',
                         render: function (data, typa, row) {
