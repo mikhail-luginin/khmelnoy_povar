@@ -87,6 +87,9 @@ class Employee(models.Model):
     dismiss_date = models.DateField(null=True)
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=3)
     reviews = models.ManyToManyField(to=Review)
+    description = models.CharField(max_length=255, null=True)
+    dismiss_comment = models.CharField(max_length=255, default='')
+    status_change_comment = models.CharField(max_length=255, default='')
 
     objects = managers.EmployeeManager()
 

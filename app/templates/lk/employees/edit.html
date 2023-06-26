@@ -7,72 +7,120 @@
 
 {% block body %}
     <div class="container-xl">
-        <div class="card rounded-3">
-            <div class="card-body">
-                <form action="{% url 'LK:edit_employee' %}?id={{ row.id }}" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="mb-4">
-                        {% if row.photo.url is not None %}
+        <div class="row">
+            <div class="col-6">
+                <div class="card rounded-3">
+                    <div class="card-body">
+                        <form action="{% url 'LK:edit_employee' %}?id={{ row.id }}" method="post"
+                              enctype="multipart/form-data">
+                            {% csrf_token %}
                             <div class="mb-4">
-                                <label for="old_employee_photo" class="form-label">Фото сотрудника</label>
-                                <img style="width: 100px; height: 100px;" src="{{ row.photo.url }}" id="old_employee_photo">
+                                {% if row.photo.url is not None %}
+                                    <div class="mb-4">
+                                        <label for="old_employee_photo" class="form-label">Фото сотрудника</label>
+                                        <img style="width: 100px; height: 100px;" src="{{ row.photo.url }}"
+                                             id="old_employee_photo">
+                                    </div>
+                                    <label for="employee_photo" class="form-label">Изменить</label>
+                                {% else %} <label for="employee_photo" class="form-label">Фото</label> {% endif %}
+                                <input class="form-control" type="file" name="employee_photo" id="employee_photo">
                             </div>
-                        <label for="employee_photo" class="form-label">Изменить</label>
-                        {% else %} <label for="employee_photo" class="form-label">Фото</label> {% endif %}
-                        <input class="form-control" type="file" name="employee_photo" id="employee_photo">
+                            <div class="mb-4">
+                                <label class="form-label">Фамилия</label>
+                                <input class="form-control" name="last-name" placeholder="Введите фамилию"
+                                       value="{{ row.fio|last_name }}">
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Имя</label>
+                                <input class="form-control" name="first-name" placeholder="Введите имя"
+                                       value="{{ row.fio|first_name }}">
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Дата рождения</label>
+                                <input class="form-control date-at" name="birth_date"
+                                       placeholder="Выберите дату рождения" value="{{ row.birth_date|date:'Y-m-d' }}">
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Адрес проживания</label>
+                                <input class="form-control" name="address" placeholder="Введите адрес проживания"
+                                       value="{{ row.address }}">
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Должность</label>
+                                <select class="form-select" name="job_place_id" placeholder="Выберите должность">
+                                    <option></option>
+                                    {% for job in jobs %}
+                                        <option value="{{ job.id }}"
+                                                {% if row.job_place.id == job.id %}selected{% endif %}>{{ job.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Заведение</label>
+                                <select class="form-select" name="storage_id" placeholder="Выберите заведение">
+                                    <option></option>
+                                    {% for storage in storages %}
+                                        <option value="{{ storage.id }}"
+                                                {% if storage.id == row.storage.id %}selected{% endif %}>{{ storage.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Номер телефона</label>
+                                <input type="tel" inputmode="numeric" name="phone" class="form-control"
+                                       placeholder="Введите номер телефона" autocomplete="off" value="{{ row.phone }}"/>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Описание сотрудника</label>
+                                <input name="description" class="form-control" placeholder="Введите описание"
+                                       value="{% if row.description %}{{ row.description }}{% endif %}"/>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Статус</label>
+                                <select class="form-select mb-1" placeholder="Выберите статус" name="status"
+                                        onchange="document.getElementById('status_change_comment').removeAttribute('style')">
+                                    <option></option>
+                                    <option value="1" {% if row.status == 1 %}selected{% endif %}>Кандидат</option>
+                                    <option value="2" {% if row.status == 2 %}selected{% endif %}>Стажер</option>
+                                    <option value="3" {% if row.status == 3 %}selected{% endif %}>Сотрудник</option>
+                                    <option value="4" {% if row.status == 4 %}selected{% endif %}>Резерв</option>
+                                </select>
+                                <input class="form-control" id="status_change_comment" name="status_change_comment"
+                                       style="display: none;" placeholder="Введите комментарий к смене статуса">
+                            </div>
+                            <div class="mb-1">
+                                <button type="submit" class="btn btn-success w-100">Сохранить</button>
+                            </div>
+                        </form>
                     </div>
-                    <div class="mb-4">
-                        <label class="form-label">Фамилия</label>
-                        <input class="form-control" name="last-name" placeholder="Введите фамилию" value="{{ row.fio|last_name }}">
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card rounded-3">
+                    <div class="card-body">
+                        <p>Дата последней смены: {{ last_work_date }}</p>
+                        <p>Описание сотрудника: {{ row.description }}</p>
+                        <p>Комментарии к смене статуса: {{ row.status_change_comment }}</p>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Начислено</th>
+                                    <th>Получено</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for salary in salaries %}
+                                    <tr>
+                                        <td>{{ salary.month }} ({{ salary.year }})</td>
+                                        <td>{{ salary.accrued_salary }}</td>
+                                        <td>{{ salary.received_salary }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="mb-4">
-                        <label class="form-label">Имя</label>
-                        <input class="form-control" name="first-name" placeholder="Введите имя" value="{{ row.fio|first_name }}">
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label">Дата рождения</label>
-                        <input class="form-control date-at" name="birth_date" placeholder="Выберите дату рождения" value="{{ row.birth_date|date:'Y-m-d' }}">
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label">Адрес проживания</label>
-                        <input class="form-control" name="address" placeholder="Введите адрес проживания" value="{{ row.address }}">
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label">Должность</label>
-                        <select class="form-select" name="job_place_id" placeholder="Выберите должность">
-                            <option></option>
-                            {% for job in jobs %}
-                                <option value="{{ job.id }}" {% if row.job_place.id == job.id %}selected{% endif %}>{{ job.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label">Заведение</label>
-                        <select class="form-select" name="storage_id" placeholder="Выберите заведение">
-                            <option></option>
-                            {% for storage in storages %}
-                                <option value="{{ storage.id }}" {% if storage.id == row.storage.id %}selected{% endif %}>{{ storage.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label">Номер телефона</label>
-                        <input type="tel" inputmode="numeric" name="phone" class="form-control" placeholder="Введите номер телефона" autocomplete="off" value="{{ row.phone }}"/>
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label">Статус</label>
-                        <select class="form-select" placeholder="Выберите статус" name="status">
-                            <option></option>
-                            <option value="1" {% if row.status == 1 %}selected{% endif %}>Кандидат</option>
-                            <option value="2" {% if row.status == 2 %}selected{% endif %}>Стажер</option>
-                            <option value="3" {% if row.status == 3 %}selected{% endif %}>Сотрудник</option>
-                            <option value="4" {% if row.status == 4 %}selected{% endif %}>Резерв</option>
-                        </select>
-                    </div>
-                    <div class="mb-1">
-                        <button type="submit" class="btn btn-success w-100">Добавить</button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>

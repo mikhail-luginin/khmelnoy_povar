@@ -66,9 +66,16 @@ class SalaryService:
         data['amount_gain_shifts'] = 0
 
         employee_code = request.GET.get('employee_code')
+        employee_id = request.GET.get('id')
         previous = request.GET.get('previous')
 
-        employee = Employee.objects.get(code=employee_code)
+        filter_data = {}
+        if employee_code:
+            filter_data['code'] = employee_code
+        else:
+            filter_data['id'] = employee_id
+
+        employee = Employee.objects.get(**filter_data)
         data['previous'] = False
         current_date = get_current_time()
 
