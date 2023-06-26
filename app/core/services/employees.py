@@ -1,6 +1,7 @@
 import os
 import secrets
 
+from apps.bar.models import Timetable
 from core import exceptions
 from core.utils.time import today_date
 from core import validators
@@ -67,7 +68,7 @@ class EmployeeService:
     def employee_edit(self, employee_id: int | None, first_name: str | None, last_name: str | None,
                       birth_date: str | None, address: str | None, job_place_id: int | None,
                       storage_id: int | None, phone: str | None, status: int | None, photo,
-                      description: str | None) -> Employee:
+                      description: str | None, status_change_comment: str | None) -> Employee:
         validators.validate_field(first_name, 'фамилия')
         validators.validate_field(last_name, 'имя')
         validators.validate_field(birth_date, 'дата рождения')
@@ -79,10 +80,13 @@ class EmployeeService:
         if len(phone) != 10:
             raise exceptions.IncorrectFieldError('Некорректный ввод номера телефона. Попробуйте еще раз')
 
-        employee = self.model.objects.filter(id=employee_id)
+        employee = self.model.objects.filter(id=employee_id).first()
 
-        if employee.exists():
-            employee = employee.first()
+        if employee:
+            if int(status) != employee.status:
+                validators.validate_field(status_change_comment, 'Комментарий к изменению статуса')
+                employee.status_change_comment += ' / ' + status_change_comment
+
             employee.fio = f'{last_name} {first_name}'
             employee.birth_date = birth_date
             employee.address = address
@@ -140,3 +144,6 @@ class EmployeeService:
 
         messages.success(request, 'Сотрудник успешно возвращен.')
         return redirect('/lk/employees')
+
+    def last_work_date(self, employee_id: int):
+        return Timetable.objects.filter(id=employee_id).order_by('-date_at').first()
