@@ -843,7 +843,7 @@ class EditEmployeeView(ObjectEditMixin):
         context['storages'] = StorageService().storages_all()
         context['jobs'] = JobsService().jobs_all()
         context['salaries'] = salary.SalaryService().get_money_data_employee(request).get('entire_salary_data')
-        context['last_work_date'] = EmployeeService().last_work_date(employee_id=request.GET.get('id'))
+        context['last_work_day'] = EmployeeService().last_work_day(employee_id=request.GET.get('id'))
 
         return context
 
