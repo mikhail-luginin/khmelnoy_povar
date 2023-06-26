@@ -27,7 +27,8 @@ class EmployeeService:
         return self.model.objects.filter(id=employee_id).first()
 
     def employee_create(self, request, first_name: str | None, last_name: str | None, birth_date: str | None, address: str | None,
-                        job_id: int | None, storage_id: int | None, phone: str | None, status: int | None, photo) -> redirect:
+                        job_id: int | None, storage_id: int | None, phone: str | None, status: int | None, photo,
+                        description: str | None) -> Employee:
         validators.validate_field(first_name, 'фамилия')
         validators.validate_field(last_name, 'имя')
         validators.validate_field(birth_date, 'дата рождения')
@@ -55,15 +56,18 @@ class EmployeeService:
             job_place=positions.JobsService().job_get(id=job_id),
             phone=phone,
             status=status,
+            description=description
         )
         row.storage = StorageService().storage_get(id=storage_id) if storage_id is not None else StorageService().storage_get(
             code=request.GET.get('code'))
-
         row.save()
+
+        return row
 
     def employee_edit(self, employee_id: int | None, first_name: str | None, last_name: str | None,
                       birth_date: str | None, address: str | None, job_place_id: int | None,
-                      storage_id: int | None, phone: str | None, status: int | None, photo) -> None:
+                      storage_id: int | None, phone: str | None, status: int | None, photo,
+                      description: str | None) -> Employee:
         validators.validate_field(first_name, 'фамилия')
         validators.validate_field(last_name, 'имя')
         validators.validate_field(birth_date, 'дата рождения')
@@ -85,6 +89,7 @@ class EmployeeService:
             employee.job_place_id = job_place_id
             employee.storage_id = storage_id
             employee.status = status
+            employee.description = description
 
             old_photo = employee.photo
 
@@ -105,6 +110,8 @@ class EmployeeService:
         else:
             raise self.model.DoesNotExist('Запись с указанным идентификатором не найдена.')
 
+        return employee
+
     def dismiss(self, request) -> redirect:
         try:
             employee = self.model.objects.get(id=request.GET.get('id'))
@@ -114,6 +121,7 @@ class EmployeeService:
 
         employee.is_deleted = 1
         employee.dismiss_date = today_date()
+        employee.dismiss_comment += ', ' + request.GET.get('comment')
         employee.save()
 
         messages.success(request, 'Сотрудник успешно уволен.')
