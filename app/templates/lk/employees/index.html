@@ -12,8 +12,8 @@
             <div class="card-header card-header-light rounded-top-3">
                 Сотрудники
                 <div class="card-actions">
-                    <button class="btn btn-danger w-100" id="only-deleted">Только уволенные</button>
-                    <button class="btn btn-success w-100" id="without-deleted">Без уволенных</button>
+                    <button class="btn btn-danger" id="only-deleted">Только уволенные</button>
+                    <button class="btn btn-success" id="without-deleted">Без уволенных</button>
                     <a href="{% url 'LK:create_employee' %}" class="btn btn-tabler">Добавить сотрудника</a>
                 </div>
             </div>
@@ -92,7 +92,7 @@
         $(document).ready(function () {
             $('#only-deleted').click(function () {
                 table.destroy()
-                table =run_datatable('employees-table', '/api/employees?is_deleted=1', '/lk/employees', [
+                table = run_datatable('employees-table', '/api/employees?is_deleted=1', '/lk/employees', [
                     {
                         data: 'photo',
                         render: function (data, typa, row) {
