@@ -92,7 +92,7 @@
         $(document).ready(function () {
             $('#only-deleted').click(function () {
                 table.destroy()
-                table = run_datatable('employees-table', '/api/employees?is_deleted=1', '/lk/employees', [
+                table =run_datatable('employees-table', '/api/employees?is_deleted=1', '/lk/employees', [
                     {
                         data: 'photo',
                         render: function (data, typa, row) {
