@@ -145,5 +145,5 @@ class EmployeeService:
         messages.success(request, 'Сотрудник успешно возвращен.')
         return redirect('/lk/employees')
 
-    def last_work_date(self, employee_id: int):
+    def last_work_day(self, employee_id: int):
         return Timetable.objects.filter(id=employee_id).order_by('-date_at').first()
