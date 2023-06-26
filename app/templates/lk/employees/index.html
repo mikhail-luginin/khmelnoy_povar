@@ -92,7 +92,7 @@
         $(document).ready(function () {
             $('#only-deleted').click(function () {
                 table.destroy()
-                table = run_datatable('employees-table', '/api/employees?is_deleted=1', '/lk/employees', [
+                run_datatable('employees-table', '/api/employees', '/lk/employees?is_deleted=1', [
                     {
                         data: 'photo',
                         render: function (data, typa, row) {
@@ -107,7 +107,6 @@
                             }
                         }
                     },
-                    {data: 'photo'},
                     {data: 'employee_fio'},
                     {data: 'birth_date'},
                     {data: 'address'},
@@ -116,7 +115,7 @@
                     {data: 'phone'},
                     {data: 'active_status'},
                     {data: 'reviews_count'},
-                    {data: 'status'}
+                    {data: 'status'},
                 ], has_delete = false, has_update = false, has_dismiss = true, has_edit = true, has_actions = true, custom_dict = {
                     createdRow: function (row, data, dataIndex) {
                         if (data.reviews_count >= 3) $(row).addClass('table-danger');
@@ -125,7 +124,7 @@
             })
             $('#without-deleted').click(function () {
                 table.destroy()
-                table = run_datatable('employees-table', '/api/employees?is_deleted=0', '/lk/employees', [
+                table = run_datatable('employees-table', '/api/employees', '/lk/employees?is_deleted=0', [
                     {
                         data: 'photo',
                         render: function (data, typa, row) {
@@ -140,7 +139,6 @@
                             }
                         }
                     },
-                    {data: 'photo'},
                     {data: 'employee_fio'},
                     {data: 'birth_date'},
                     {data: 'address'},
@@ -148,8 +146,13 @@
                     {data: 'storage_name'},
                     {data: 'phone'},
                     {data: 'active_status'},
-                    {data: 'status'}
-                ], has_delete = false, has_update = false, has_dismiss = true)
+                    {data: 'reviews_count'},
+                    {data: 'status'},
+                ], has_delete = false, has_update = false, has_dismiss = true, has_edit = true, has_actions = true, custom_dict = {
+                    createdRow: function (row, data, dataIndex) {
+                        if (data.reviews_count >= 3) $(row).addClass('table-danger');
+                    },
+                })
             })
         })
     </script>
