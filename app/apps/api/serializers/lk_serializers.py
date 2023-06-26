@@ -158,9 +158,16 @@ class ExpenseSerializer(serializers.ModelSerializer):
     expense_type_name = serializers.CharField(source='expense_type.name', allow_null=True, default='Не указана')
     expense_source_name = serializers.CharField(source='expense_source.name', allow_null=True, default='Не указан')
     expense_status = serializers.SerializerMethodField()
+    expense_status_comments = serializers.SerializerMethodField()
 
     def get_expense_status(self, obj):
         return ExpenseStatus.objects.filter(expense_id=obj.id).values()
+
+    def get_expense_status_comments(self, obj):
+        expense_status = ExpenseStatus.objects.filter(expense_id=obj.id).first()
+        if expense_status:
+            return expense_status.comments
+        return ''
 
     class Meta:
         model = Expense
