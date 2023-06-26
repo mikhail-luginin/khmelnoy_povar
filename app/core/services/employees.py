@@ -146,4 +146,4 @@ class EmployeeService:
         return redirect('/lk/employees')
 
     def last_work_day(self, employee_id: int):
-        return Timetable.objects.filter(id=employee_id).order_by('-date_at').first()
+        return Timetable.objects.filter(id=employee_id).order_by('date_at').first()
