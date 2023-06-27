@@ -21,7 +21,7 @@
                     </div>
                     <div class="mb-4">
                         <label class="form-label">Тип расхода</label>
-                        <select class="form-select" name="expense_type_id" placeholder="Выберите тип расхода" required>
+                        <select class="form-select" name="type_id" placeholder="Выберите тип расхода" required>
                             <option></option>
                             {% for type in types %}
                                 <option value="{{ type.id }}" {% if type.id == row.expense_type_id %}selected{% endif %}>{{ type.name }}</option>
@@ -30,7 +30,7 @@
                     </div>
                     <div class="mb-4">
                         <label class="form-label">Источник расхода</label>
-                        <select class="form-select" name="expense_source_id" placeholder="Выберите источник расхода" required>
+                        <select class="form-select" name="source_id" placeholder="Выберите источник расхода" required>
                             <option></option>
                             {% for source in sources %}
                                 <option value="{{ source.id }}" {% if source.id == row.expense_source_id %}selected{% endif %}>{{ source.name }}</option>

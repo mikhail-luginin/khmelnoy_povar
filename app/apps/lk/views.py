@@ -24,6 +24,7 @@ from core.services.pays import PaysService
 from core.services.fines import FineService
 from core.services.index_page import IndexPageService
 from core.services.timetable import TimetableService
+from global_services import salary
 
 from .tasks import calculate_percent_premium_for_all, update_all_money
 
@@ -815,12 +816,13 @@ class CreateEmployeeView(ObjectCreateMixin):
         phone = request.POST.get('phone')
         status = request.POST.get('status')
         photo = request.FILES.get('employee_photo')
+        description = request.POST.get('description')
 
         try:
             EmployeeService().employee_create(request, first_name=first_name, last_name=last_name,
                                               birth_date=birth_date,
                                               address=address, job_id=job_id, storage_id=storage_id, phone=phone,
-                                              status=status, photo=photo)
+                                              status=status, photo=photo, description=description)
             messages.success(request, 'Сотрудник успешно создан.')
             url = '/lk/employees'
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, exceptions.UniqueFieldError,
@@ -840,6 +842,8 @@ class EditEmployeeView(ObjectEditMixin):
         context = super().get_context_data(request, **kwargs)
         context['storages'] = StorageService().storages_all()
         context['jobs'] = JobsService().jobs_all()
+        context['salaries'] = salary.SalaryService().get_money_data_employee(request).get('entire_salary_data')
+        context['last_work_day'] = EmployeeService().last_work_day(employee_id=request.GET.get('id'))
 
         return context
 
@@ -854,11 +858,14 @@ class EditEmployeeView(ObjectEditMixin):
         phone = request.POST.get('phone')
         status = request.POST.get('status')
         photo = request.FILES.get('employee_photo')
+        description = request.POST.get('description')
+        status_change_comment = request.POST.get('status_change_comment')
 
         try:
             EmployeeService().employee_edit(employee_id=employee_id, first_name=first_name, last_name=last_name,
                                             birth_date=birth_date, address=address, job_place_id=job_place_id,
-                                            storage_id=storage_id, phone=phone, status=status, photo=photo)
+                                            storage_id=storage_id, phone=phone, status=status, photo=photo,
+                                            description=description, status_change_comment=status_change_comment)
             messages.success(request, 'Сотрудник успешно отредактирован.')
             url = '/lk/employees'
         except (exceptions.FieldCannotBeEmptyError, exceptions.FieldNotFoundError, exceptions.UniqueFieldError,
