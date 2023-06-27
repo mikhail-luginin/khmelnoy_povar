@@ -34,7 +34,6 @@ urlpatterns = [
     path('arrivals/delete', views.ArrivalDeleteView.as_view(), name="arrival_delete"),
 
     path('employee', views.EmployeeView.as_view(), name="employee"),
-    path('employee/add', views.AddEmployeeView.as_view(), name="add_employee"),
 
     path('inventory/bar', views.InventoryBarView.as_view(), name="inventory_bar"),
     path('inventory/ware', views.InventoryWareView.as_view(), name="inventory_ware"),

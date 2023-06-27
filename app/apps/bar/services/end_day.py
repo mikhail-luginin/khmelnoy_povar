@@ -1,7 +1,7 @@
 from apps.bar.models import Money, TovarRequest, Setting, Timetable
 from apps.bar.services.bar_info import get_full_information_of_day
 from apps.iiko.models import Session
-from core.services.storage import StorageService
+from core.services import storage_service
 from core.logs import create_log
 from core.utils.telegram import send_message_to_telegram
 
@@ -13,14 +13,14 @@ from apps.bar.tasks import add_percent_and_premium_to_timetable
 from django.contrib import messages
 from django.shortcuts import redirect
 
-from global_services.salary import SalaryService
+from core.services.salary_service import SalaryService
 
 
 def complete_day(request):
     sum_cash_end_day = request.POST.get('sum_cash_end_day')
     code = request.GET.get('code')
 
-    storage = StorageService().storage_get(code=code)
+    storage = storage_service.storage_get(code=code)
     information_of_day = get_full_information_of_day(today_date(), storage)
 
     try:

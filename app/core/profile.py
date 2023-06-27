@@ -1,23 +1,8 @@
-from django.contrib.auth import logout
-from django.shortcuts import redirect
-
-from apps.lk.models import Profile, Navbar
+from apps.lk.models import Navbar
 
 
-def get_profile(request) -> Profile:
-    try:
-        profile = Profile.objects.get(user=request.user)
-    except Profile.DoesNotExist:
-        logout(request)
-        return redirect('/login')
-
-    return profile
-
-
-def get_navbar(user_id: int) -> list:
+def get_navbar() -> list:
     rows = []
-
-    profile = Profile.objects.get(user_id=user_id)
 
     # ToDo: Show pages by role
 

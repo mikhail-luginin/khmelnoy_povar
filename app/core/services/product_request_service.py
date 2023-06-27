@@ -3,9 +3,9 @@ from django.conf import settings
 from core.utils.time import today_date
 from core.utils.telegram import send_message_to_telegram
 
-from core.services.api import IikoService
-from .storage import StorageService
-from .product import ProductService
+from .api.iiko import IikoService
+from . import storage_service
+from . import product_service as product_service
 
 import xml.etree.ElementTree as ET
 
@@ -29,7 +29,7 @@ class ProductRequestService:
                 product_id = product.find('id').text
             expected_amount = round(float(item.find('expectedAmount').text))
 
-            product = ProductService().product_get(product_id=product_id)
+            product = product_service.product_get(product_id=product_id)
             if product:
                 if product.supplier:
                     supplier_name = f'{product.supplier.name} ({product.supplier.friendly_name})'
@@ -44,7 +44,7 @@ class ProductRequestService:
             date_at = today_date()
 
         message = None
-        for storage in StorageService().storages_all():
+        for storage in storage_service.storages_all():
             xml = IikoService().check_inventory(storage.storage_id, 'Бар', date_at=date_at)
             items = ET.fromstring(xml)
 
@@ -61,7 +61,7 @@ class ProductRequestService:
                     product_id = product.find('id').text
                 expected_amount = item.find('expectedAmount').text
 
-                product = ProductService().product_get(product_id=product_id)
+                product = product_service.product_get(product_id=product_id)
                 if product:
                     if product.minimal:
                         if int(round(float(expected_amount))) <= product.minimal:
@@ -76,7 +76,7 @@ class ProductRequestService:
 
     def remain_products(self, category: str, date_at: str = today_date()) -> list[dict]:
         arr = []
-        for storage in StorageService().storages_all():
+        for storage in storage_service.storages_all():
             arr += self._get_remains(
                 storage=storage, category_name=category,
                 date_at=date_at

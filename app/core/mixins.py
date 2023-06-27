@@ -6,6 +6,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 
 from apps.lk.models import Navbar
+
 from .exceptions import FieldNotFoundError
 from .permissions import CanViewMixin, AccessMixin
 from .utils.profile import profile_by_request
@@ -24,12 +25,11 @@ class BaseLkView(LoginRequiredMixin, CanViewMixin, View):
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, request, **kwargs) -> dict:
-        context = dict()
-
-        context['profile'] = profile_by_request(request)
-        context['navbar'] = Navbar.objects.all()
-        context['date'] = today_date()
-
+        context = {
+            "profile": profile_by_request(request),
+            "navbar": Navbar.objects.all(),
+            "date": today_date()
+        }
         context.update(**kwargs)
 
         return context
@@ -68,9 +68,8 @@ class ObjectDeleteMixin(AccessMixin, BaseLkView):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request):
-        try:
-            row = self.model.objects.get(id=request.GET.get('id'))
-        except self.model.DoesNotExist:
+        row = self.model.objects.filter(id=request.GET.get('id')).first()
+        if not row:
             messages.error(request, 'Объекта с данным ID не существует :(')
             return redirect(self.success_url)
 
@@ -87,15 +86,15 @@ class ObjectEditMixin(AccessMixin, BaseLkView):
     can_edit = 1
 
     def _get_row(self, row_id):
-        row = self.model.objects.filter(id=row_id)
-        if row.exists():
-            return row.first()
+        row = self.model.objects.filter(id=row_id).first()
+        if row:
+            return row
         raise FieldNotFoundError(f'Запись с указанным идентификатором не найдена.')
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-
         context['row'] = self._get_row(request.GET.get('id'))
+
         return context
 
     def get(self, request):

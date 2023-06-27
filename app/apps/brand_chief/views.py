@@ -3,11 +3,10 @@ from django.shortcuts import redirect
 
 from core import exceptions
 from core.mixins import BaseLkView
+from core.services import storage_service, item_deficit_service
 
-from core.services.storage import StorageService
 from apps.bar.services.malfunctions import MalfunctionService
-from core.services.index_page import IndexPageService
-from core.services.item_deficit import ItemDeficitService
+from apps.lk.services import index_page
 
 
 class IndexView(BaseLkView):
@@ -16,7 +15,7 @@ class IndexView(BaseLkView):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context.update({
-            "employees_data": IndexPageService().employees_by_storages()
+            "employees_data": index_page.employees_by_storages()
         })
 
         return context
@@ -28,7 +27,7 @@ class MalfunctionsView(BaseLkView):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context['rows'] = MalfunctionService().all()
-        context['storages'] = StorageService().storages_all()
+        context['storages'] = storage_service.storages_all()
 
         return context
 
@@ -56,14 +55,14 @@ class ItemDeficitView(BaseLkView):
 
         storage_id = request.GET.get('storage_id')
         if storage_id:
-            need_items = ItemDeficitService().deficit_by_storage(storage_id=storage_id)
+            need_items = item_deficit_service.deficit_by_storage(storage_id=storage_id)
         else:
-            need_items = ItemDeficitService().all()
+            need_items = item_deficit_service.item_deficit_all()
 
         context.update({
             "is_filter": storage_id,
             "need_items": need_items,
-            "storages": StorageService().storages_all()
+            "storages": storage_service.storages_all()
         })
 
         return context
@@ -74,7 +73,7 @@ class ItemDeficitView(BaseLkView):
         storage_id = request.POST.get('storage_id')
 
         try:
-            ItemDeficitService().create(storage_id=storage_id, item=item, amount=amount)
+            item_deficit_service.create(storage_id=storage_id, item=item, amount=amount)
             messages.success(request, 'Заявка на нехватку успешно создана.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
             messages.error(request, str(error))
@@ -88,7 +87,7 @@ class SendMessageView(BaseLkView):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context.update({
-            "storages": StorageService().storages_all()
+            "storages": storage_service.storages_all()
         })
         
         return context

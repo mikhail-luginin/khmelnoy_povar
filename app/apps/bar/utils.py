@@ -13,8 +13,8 @@ from apps.bar.models import TovarRequest, Arrival
 from .services.bar_info import get_bar, get_main_barmen
 
 from apps.iiko.models import Product, Category, Storage
-from core.services.api import IikoService
-from core.services.storage import StorageService
+from core.services.api.iiko import IikoService
+from core.services import storage_service
 
 from core.utils.time import today_date, monthdelta, get_current_time, get_months
 from core.logs import create_log
@@ -22,7 +22,7 @@ from core.utils.payment_types import get_bn_category, get_nal_category
 import xml.etree.ElementTree as ET
 
 from apps.lk.models import Expense, Catalog
-from core.services.catalog import CatalogService
+from core.services import catalog_service
 
 
 class BaseView(View):
@@ -95,7 +95,7 @@ class ProductsMovementMixin(BaseView):
                 products=self.get_category_products(),
                 category=self.category,
                 rows=self.model.objects.filter(date_at=today_date(),
-                                               storage=StorageService().storage_get(code=request.GET.get('code')),
+                                               storage=storage_service.storage_get(code=request.GET.get('code')),
                                                product__category_id=category),
             )
         )
@@ -112,7 +112,7 @@ class TovarRequestMixin(ProductsMovementMixin):
             if request.POST.get(f'{product.id}') is not None:
                 row = self.model.objects.create(
                     date_at=today_date(),
-                    storage=StorageService().storage_get(code=request.GET.get('code')),
+                    storage=storage_service.storage_get(code=request.GET.get('code')),
                     product=product,
                     product_amount=product.minimal if product.minimal is not None else 1,
                     product_main_unit=product.main_unit,
@@ -137,7 +137,7 @@ class ArrivalMixin(ProductsMovementMixin):
         invoice_sum = request.POST.get('sum')
         payment_type = request.POST.get('payment-type')
 
-        storage = StorageService().storage_get(code=request.GET.get('code'))
+        storage = storage_service.storage_get(code=request.GET.get('code'))
 
         try:
             product = Product.objects.get(id=product_id)
@@ -162,7 +162,7 @@ class ArrivalMixin(ProductsMovementMixin):
                 else get_main_barmen(today_date(), storage).fio
 
             try:
-                expense_type = CatalogService().get_catalog_by_name(settings.TOVAR_ARRIVAL_CATEGORY)
+                expense_type = catalog_service.get_catalog_by_name(settings.TOVAR_ARRIVAL_CATEGORY)
             except Catalog.DoesNotExist:
                 messages.error(request, 'Категория для типа расхода не найдена.')
                 return redirect(request.META.get('HTTP_REFERER'))
@@ -222,7 +222,7 @@ class InventoryMixin(BaseView):
         return context
 
     def post(self, request):
-        storage = StorageService().storage_get(code=request.GET.get('code'))
+        storage = storage_service.storage_get(code=request.GET.get('code'))
 
         xml = IikoService().check_inventory(storage.storage_id, self.category_name)
         items = ET.fromstring(xml)

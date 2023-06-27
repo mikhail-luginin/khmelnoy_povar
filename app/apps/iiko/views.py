@@ -3,32 +3,25 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import redirect
 
-from core.services.discount import DiscountTypeService
-from core.services.product_request import ProductRequestService
+from core.services import discount_service, product_service, storage_service, supplier_service, category_service, payment_type_service, stoplist_service, terminal_service
+from core.services.product_request_service import ProductRequestService
 from core.exceptions import FieldNotFoundError, FieldCannotBeEmptyError
 from core.mixins import ObjectEditMixin, BaseLkView
 
 from apps.iiko.models import Product, Supplier, Category, PaymentType
-from core.services.product import ProductService
-from core.services.storage import StorageService
-from core.services.supplier import SupplierService
-from core.services.category import CategoryService
-from core.services.payment_type import PaymentTypeService
-from core.services.stoplist import StoplistService
-from core.services.tables import OnlineTableService
-from core.services.terminal import TerminalService
+from core.services.tables_service import OnlineTableService
 
 
 @login_required
 def update_nomenclature_view(request):
-    ProductService().update()
+    product_service.update()
     messages.success(request, 'Номенклатура успешно обновлена.')
     return redirect('/iiko/nomenclature')
 
 
 @login_required
 def update_categories_view(request):
-    if CategoryService().update():
+    if category_service.update():
         messages.success(request, 'Категории успешно обновлены.')
     else:
         messages.error(request, 'Произошла ошибка при обновлении категорий.')
@@ -37,7 +30,7 @@ def update_categories_view(request):
 
 @login_required
 def update_suppliers_view(request):
-    if SupplierService().update():
+    if supplier_service.update():
         messages.success(request, 'Поставщики успешно обновлены.')
     else:
         messages.error(request, 'Произошла ошибка при обновлении поставщиков.')
@@ -46,7 +39,7 @@ def update_suppliers_view(request):
 
 @login_required
 def update_storages_view(request):
-    if StorageService().update():
+    if storage_service.update():
         messages.success(request, 'Заведения успешно обновлены.')
     else:
         messages.error(request, 'Произошла ошибка при обновлении заведений')
@@ -55,7 +48,7 @@ def update_storages_view(request):
 
 @login_required
 def update_payment_types_view(request):
-    if PaymentTypeService().update():
+    if payment_type_service.update():
         messages.success(request, 'Типы платежей успешно обновлены.')
     else:
         messages.error(request, 'Произошла ошибка при обновлении типов платежей')
@@ -73,8 +66,8 @@ class NomenclatureEditView(ObjectEditMixin):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request)
-        context['suppliers'] = SupplierService().suppliers_all()
-        context['categories'] = CategoryService().categories_all()
+        context['suppliers'] = supplier_service.suppliers_all()
+        context['categories'] = category_service.categories_all()
         context['row'] = Product.objects.filter(id=request.GET.get('id')).first()
         return context
 
@@ -86,7 +79,7 @@ class NomenclatureEditView(ObjectEditMixin):
         supplier_id = request.POST.get('supplier_id')
 
         try:
-            ProductService().nomenclature_edit(row_id=row_id, minimal=minimal, for_order=for_order,
+            product_service.nomenclature_edit(row_id=row_id, minimal=minimal, for_order=for_order,
                                              category_id=category_id, supplier_id=supplier_id)
             messages.success(request, 'Продукт успешно отредактирован :)')
             url = '/iiko/nomenclature'
@@ -111,7 +104,7 @@ class SupplierEditView(ObjectEditMixin):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request)
-        context['categories'] = CategoryService().categories_all()
+        context['categories'] = category_service.categories_all()
 
         return context
 
@@ -122,7 +115,7 @@ class SupplierEditView(ObjectEditMixin):
         is_revise = request.POST.get('is_revise')
 
         try:
-            SupplierService().supplier_edit(row_id=row_id, friendly_name=friendly_name,
+            supplier_service.supplier_edit(row_id=row_id, friendly_name=friendly_name,
                                             category=category, is_revise=is_revise)
             messages.success(request, 'Поставщик успешно отредактирован :)')
             url = '/iiko/suppliers'
@@ -149,7 +142,7 @@ class CategoryEditView(ObjectEditMixin):
         is_remains = request.POST.get('is_remains')
 
         try:
-            CategoryService().category_edit(row_id=row_id, is_income=is_income,
+            category_service.category_edit(row_id=row_id, is_income=is_income,
                                             is_sales=is_sales, is_remains=is_remains)
             messages.success(request, 'Категория успешно отредактирована :)')
             url = '/iiko/categories'
@@ -173,7 +166,7 @@ class PaymentTypeEdit(ObjectEditMixin):
         is_active = request.POST.get('is_active')
 
         try:
-            PaymentTypeService().paymenttype_edit(row_id=row_id, is_active=is_active)
+            payment_type_service.paymenttype_edit(row_id=row_id, is_active=is_active)
             messages.success(request, f'Тип оплаты успешно отредактирован :)')
             url = '/iiko/paymenttypes'
         except FieldNotFoundError as error:
@@ -188,7 +181,7 @@ class StopListView(BaseLkView):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['rows'] = StoplistService().get_stoplist_items()
+        context['rows'] = stoplist_service.get_stoplist_items()
 
         return context
 
@@ -196,8 +189,8 @@ class StopListView(BaseLkView):
 class StopListUpdateView(BaseLkView):
 
     def get(self, request):
-        if StoplistService().update():
-            response = {"status": True, "rows": StoplistService().get_stoplist_items()}
+        if stoplist_service.update():
+            response = {"status": True, "rows": stoplist_service.get_stoplist_items()}
         else:
             response = {"status": False}
 
@@ -205,7 +198,7 @@ class StopListUpdateView(BaseLkView):
 
 
 def terminals_update_view(request):
-    TerminalService().update()
+    terminal_service.update()
     messages.success(request, 'Терминалы успешно обновлены.')
     return redirect('/iiko/terminals')
 
@@ -216,7 +209,7 @@ class ProductRequestView(BaseLkView):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context.update({
-            "categories": CategoryService().remain_categories()
+            "categories": category_service.remain_categories()
         })
 
         return context
@@ -247,7 +240,7 @@ class OnlineTablesView(BaseLkView):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context.update({
-            "storages": StorageService().storages_all()
+            "storages": storage_service.storages_all()
         })
 
         return context
@@ -274,5 +267,5 @@ class OnlineTablesTempView(BaseLkView):
 class DiscountTypeUpdateView(BaseLkView):
 
     def get(self, request):
-        DiscountTypeService().update()
+        discount_service.update_discount_types()
         return redirect('/iiko/discounts/types')

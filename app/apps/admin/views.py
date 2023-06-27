@@ -7,9 +7,7 @@ from core import exceptions
 from .utils import BaseView, ObjectEditMixin, ObjectDeleteMixin
 from .exceptions import PasswordDontMatchError
 
-from core.services.role import RoleService
-from core.services.user import UserService
-from core.services.page import PageService
+from core.services import role_service, user_service, page_service
 
 from apps.lk.models import Role, Navbar, Profile
 
@@ -20,9 +18,9 @@ class IndexView(BaseView):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context.update({
-            "roles": RoleService().roles_all(),
-            "pages": PageService().pages_all(),
-            "users": UserService().users_all()
+            "roles": role_service.roles_all(),
+            "pages": page_service.pages_all(),
+            "users": user_service.users_all()
         })
 
         return context
@@ -39,7 +37,7 @@ class RoleCreateView(BaseView):
         can_view = request.POST.getlist('can-view')
 
         try:
-            RoleService().create(role_name=role_name, can_create=can_create, can_all=can_all, can_view=can_view,
+            role_service.create(role_name=role_name, can_create=can_create, can_all=can_all, can_view=can_view,
                                  can_edit=can_edit, can_delete=can_delete)
             messages.success(request, 'Роль успешно создана.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
@@ -55,7 +53,7 @@ class RoleEditView(ObjectEditMixin):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context.update({
-            "pages": PageService().pages_all()
+            "pages": page_service.pages_all()
         })
 
         return context
@@ -70,7 +68,7 @@ class RoleEditView(ObjectEditMixin):
         can_view = request.POST.getlist('can-view')
 
         try:
-            RoleService().edit(role_id=role_id, role_name=role_name, can_create=can_create, can_all=can_all,
+            role_service.edit(role_id=role_id, role_name=role_name, can_create=can_create, can_all=can_all,
                                can_view=can_view, can_edit=can_edit, can_delete=can_delete)
             messages.success(request, 'Роль успешно отредактирована.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, self.model.DoesNotExist) as error:
@@ -91,7 +89,7 @@ class PageCreateView(BaseView):
         page_app_name = request.POST.get('page-app-name')
 
         try:
-            PageService().create(page_link=page_link, page_name=page_name, page_app_name=page_app_name)
+            page_service.create(page_link=page_link, page_name=page_name, page_app_name=page_app_name)
             messages.success(request, 'Страница успешно создана.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
             messages.error(request, error)
@@ -110,7 +108,7 @@ class PageEditView(ObjectEditMixin):
         page_app_name = request.POST.get('page-app-name')
 
         try:
-            PageService().edit(page_id=page_id, page_link=page_link, page_name=page_name, page_app_name=page_app_name)
+            page_service.edit(page_id=page_id, page_link=page_link, page_name=page_name, page_app_name=page_app_name)
             messages.success(request, 'Страница успешно отредактирована.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, self.model.DoesNotExist) as error:
             messages.error(request, error)
@@ -134,7 +132,7 @@ class UserCreateView(BaseView):
         role = request.POST.get('role')
 
         try:
-            UserService().create(username=username, first_name=first_name, last_name=last_name,
+            user_service.create(username=username, first_name=first_name, last_name=last_name,
                                  email=email, password=password, confirm_password=confirm_password, role=role)
             messages.success(request, 'Пользователь успешно создан.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, PasswordDontMatchError) as error:
@@ -150,7 +148,7 @@ class UserEditView(ObjectEditMixin):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context.update({
-            "roles": RoleService().roles_all()
+            "roles": role_service.roles_all()
         })
 
         return context
@@ -160,7 +158,7 @@ class UserEditView(ObjectEditMixin):
         role = request.POST.get('role')
 
         try:
-            UserService().edit(user_id=user_id, role=role)
+            user_service.edit(user_id=user_id, role=role)
             messages.success(request, 'Пользователь успешно отредактирован.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
             messages.error(request, error)

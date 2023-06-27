@@ -2,9 +2,9 @@ from core.logs import create_log
 from core.utils.telegram import send_message_to_telegram
 from core.utils.time import today_date, get_current_time
 
-from core.services.employees import EmployeeService
-from core.services.timetable import TimetableService
-from core.services.storage import StorageService
+from core.services import employees_service
+from core.services import timetable_service
+from core.services import storage_service
 
 from apps.iiko.models import Storage
 from apps.bar.models import Timetable, Position, Money, Setting
@@ -53,17 +53,17 @@ class HomePageService:
         return rows
 
     def timetable_add(self, request):
-        storage = StorageService().storage_get(code=request.GET.get('code'))
+        storage = storage_service.storage_get(code=request.GET.get('code'))
         bar_setting = Setting.objects.get(storage=storage)
 
         for position in Position.objects.all():
             employee_id = request.POST.get(f'position[{position.id}]')
             if employee_id and employee_id != '':
-                employee = EmployeeService().employee_get(employee_id)
+                employee = employees_service.employee_get(employee_id)
                 if not employee:
                     raise Employee.DoesNotExist(f'Указанный сотрудник с идентификатором {employee_id} не найден.')
 
-                check_employee_on_work = TimetableService().is_employee_work_on_date(date_at=today_date(),
+                check_employee_on_work = timetable_service.is_employee_work_on_date(date_at=today_date(),
                                                                                      employee_id=employee_id)
                 if check_employee_on_work:
                     raise EmployeeAlreadyWorkingToday(f'{employee.fio} уже работает сегодня')
