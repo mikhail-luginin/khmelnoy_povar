@@ -125,7 +125,7 @@ class EmployeeService:
 
         employee.is_deleted = 1
         employee.dismiss_date = today_date()
-        employee.dismiss_comment += ', ' + request.GET.get('comment')
+        # employee.dismiss_comment += ', ' + request.GET.get('comment')
         employee.save()
 
         messages.success(request, 'Сотрудник успешно уволен.')
