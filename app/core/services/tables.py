@@ -44,6 +44,12 @@ class OnlineTableService:
                 if order is None:
                     tables['count'][storage.id] = {"open": 0, "close": 0}
                     order = tables['count'][storage.id]
+                table = tables.get(event.get("orderId"))
+                if table is None:
+                    tables[event.get('orderId')] = {}
+                    table = tables[event.get('orderId')]
+                    table["storage_name"] = storage.name
+                    table["storage_id"] = storage.id
             else:
                 continue
 
@@ -71,55 +77,6 @@ class OnlineTableService:
             move_time = None
 
             dishes = []
-
-            match event.get('type'):
-                case 'orderOpened':
-                    order['open'] += 1
-                case 'orderPaid' | 'orderPaidNoCash':
-                    is_open = False
-                    close_time = datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
-                    precheque_time = datetime.datetime.strptime(precheque_time, '%Y-%m-%dT%H:%M:%S.%f')
-                    order['close'] += 1
-                    order['open'] -= 1
-                case 'orderPrechequed':
-                    is_precheque = True
-                    precheque_time = datetime.datetime.strptime(precheque_time, '%Y-%m-%dT%H:%M:%S.%f')
-                case 'orderCancelPrechequed':
-                    is_precheque = False
-                case 'orderPrepaid':
-                    pass
-                case 'orderReturned':
-                    is_open = False
-                    order['open'] -= 1
-                case 'orderDeleted':
-                    is_open = False
-                    is_deleted = True
-                    order['open'] -= 1
-                    # todo: сохранять
-                case 'orderMoved':
-                    is_moved = True
-                case 'orderDiscounted':
-                    is_discounted = True
-                case 'addItemToOrder':
-                    dishes.append({"dish": event.get('dishes'), "count": event.get('rowCount').split('.')[0]})
-                case 'deletedPrintedItems':
-                    for dish in dishes:
-                        if dish.get('dish') == event.get('dishes'):
-                            dish['is_deleted'] = True
-                            dish['comment'] = event.get('comment')
-                            dish['reason'] = event.get('reason')
-                case _:
-                    continue
-
-            table = tables.get(event.get("orderId"))
-            if table is None:
-                tables[event.get('orderId')] = {}
-                table = tables[event.get('orderId')]
-
-            dishes = dishes if not table.get("dishes") else dishes + table.get("dishes")
-
-            table["storage_name"] = storage.name
-            table["storage_id"] = storage.id
             table["is_open"] = is_open
             table["is_precheque"] = is_precheque
             table["is_deleted"] = is_deleted
@@ -135,5 +92,45 @@ class OnlineTableService:
             table["discount"] = {"type": discount_type_name, "percent": discount_percent}
             table["dishes"] = dishes
             table["type"] = event.get('type')
+
+            match event.get('type'):
+                case 'orderOpened':
+                    order['open'] += 1
+                    table["is_open"] = True
+                case 'orderPaid' | 'orderPaidNoCash':
+                    table["is_open"] = False
+                    table["time"]["close"] = datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
+                    table["time"]["precheque"] = datetime.datetime.strptime(precheque_time, '%Y-%m-%dT%H:%M:%S.%f')
+                    order['close'] += 1
+                    order['open'] -= 1
+                case 'orderPrechequed':
+                    table["is_precheque"] = True
+                    table["time"]["precheque"] = datetime.datetime.strptime(precheque_time, '%Y-%m-%dT%H:%M:%S.%f')
+                case 'orderCancelPrechequed':
+                    table["is_precheque"] = False
+                case 'orderPrepaid':
+                    pass
+                case 'orderReturned':
+                    table["is_open"] = False
+                    order['open'] -= 1
+                case 'orderDeleted':
+                    table["is_open"] = False
+                    table["is_deleted"] = True
+                    order['open'] -= 1
+                    # todo: сохранять
+                case 'orderMoved':
+                    table["is_moved"] = True
+                case 'orderDiscounted':
+                    table["is_discounted"] = True
+                case 'addItemToOrder':
+                    dishes.append({"dish": event.get('dishes'), "count": event.get('rowCount').split('.')[0]})
+                case 'deletedPrintedItems':
+                    for dish in dishes:
+                        if dish.get('dish') == event.get('dishes'):
+                            dish['is_deleted'] = True
+                            dish['comment'] = event.get('comment')
+                            dish['reason'] = event.get('reason')
+                case _:
+                    continue
 
         return tables
