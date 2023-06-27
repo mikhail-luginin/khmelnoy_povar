@@ -4,7 +4,7 @@ from core.utils.time import today_date
 from core import validators
 
 from apps.lk.models import Expense
-from core.services.catalog import CatalogService
+from core.services import catalog_service
 
 from apps.bar.models import Pays
 
@@ -30,7 +30,7 @@ class PurchaserService:
         validators.validate_field(expense_sum, 'сумма')
         validators.validate_field(expense_source_id, 'источник расхода')
 
-        catalog = CatalogService()
+        catalog = catalog_service
         payment_receiver = catalog.get_catalog_by_id(row_id=payment_receiver_id)
         expense_type = catalog.get_catalog_by_name('Продукты')
 

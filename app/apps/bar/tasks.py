@@ -5,7 +5,7 @@ from apps.lk.models import Fine
 from config.celery import app
 from core.utils.telegram import send_message_to_telegram
 from core.utils.time import today_datetime
-from global_services.salary import SalaryService
+from core.services.salary_service import SalaryService
 
 
 @app.task

@@ -3,9 +3,9 @@ from django.shortcuts import redirect
 
 from core import exceptions
 from core.mixins import BaseLkView
+from core.services import item_deficit_service
 
 from apps.lk.models import ItemDeficit
-from core.services.item_deficit import ItemDeficitService
 
 from .models import Malfunction
 from .services import RepairerService
@@ -43,7 +43,7 @@ class ItemDeficitView(BaseLkView):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context.update({
-            "rows": ItemDeficitService().all()
+            "rows": item_deficit_service.item_deficit_all()
         })
 
         return context
@@ -57,7 +57,7 @@ class ItemDeficitSendView(BaseLkView):
         request_id = request.GET.get('id')
 
         try:
-            receive_status = ItemDeficitService().send(request_id=request_id, user=context.get('profile'),
+            receive_status = item_deficit_service.send(request_id=request_id, user=context.get('profile'),
                                                        sended_amount=request.POST.get('sended_amount'),
                                                        comment=request.POST.get('comment'))
             if receive_status:

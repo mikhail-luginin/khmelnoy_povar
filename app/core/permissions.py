@@ -45,7 +45,6 @@ class CanViewMixin:
         profile = Profile.objects.filter(user_id=request.user.id)
         if profile.exists():
             profile = profile.first()
-            user = profile.user
             role = profile.role
 
             page_url = request.path

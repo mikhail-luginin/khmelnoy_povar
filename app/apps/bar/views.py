@@ -4,8 +4,9 @@ from django.conf import settings
 from django.db.models import Sum
 
 from core import exceptions
+from core.services import bar_service
 from core.utils.time import today_date, get_months, get_current_time
-from global_services.salary import SalaryService
+from core.services.salary_service import SalaryService
 
 from .utils import BaseView, ObjectDeleteMixin, TovarRequestMixin, ArrivalMixin, InventoryMixin, DataLogsMixin
 from .services.index import HomePageService
@@ -21,10 +22,8 @@ from apps.lk.models import Expense, Fine, ItemDeficit
 from apps.repairer.models import Malfunction
 from apps.iiko.models import Storage
 
-from core.services import catalog, bars, employees, positions
-from core.services.item_deficit import ItemDeficitService
+from core.services import catalog_service, item_deficit_service, storage_service
 from apps.repairer.services import RepairerService
-from core.services.storage import StorageService
 
 
 class IndexView(BaseView):
@@ -58,12 +57,12 @@ class ExpensesView(BaseView):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context['rows'] = ExpensesPageService().get_expenses_today(context['bar'])
-        context['expenses_types'] = catalog.CatalogService().get_catalog_by_type(settings.EXPENSE_TYPE_CATEGORY)
-        context['expenses_sources'] = catalog.CatalogService().get_catalog_by_type(settings.EXPENSE_SOURCE_CATEGORY)
+        context['expenses_types'] = catalog_service.get_catalog_by_type(settings.EXPENSE_TYPE_CATEGORY)
+        context['expenses_sources'] = catalog_service.get_catalog_by_type(settings.EXPENSE_SOURCE_CATEGORY)
         context['timetable'] = HomePageService().get_timetable_today(context['bar'])
         context['expenses'] = ExpensesPageService().get_sum_expenses_today(context['bar'])
-        context['payin_types'] = catalog.CatalogService().get_catalog_by_type(settings.PAYIN_CATEGORY)
-        context['payout_types'] = catalog.CatalogService().get_catalog_by_type(settings.PAYOUT_CATEGORY)
+        context['payin_types'] = catalog_service.get_catalog_by_type(settings.PAYIN_CATEGORY)
+        context['payout_types'] = catalog_service.get_catalog_by_type(settings.PAYOUT_CATEGORY)
         context['pays_rows'] = Pays.objects.filter(date_at=today_date(), storage=context['bar'])
         context['bar_setting'] = get_bar_settings(storage_id=context.get('bar').id)
 
@@ -117,25 +116,12 @@ class EndDayView(BaseView):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context['information'] = get_full_information_of_day(today_date(), context['bar'])
-        context['data'] = bars.BarSettingService().get_question_on_end_day_by_storage_id(storage_id=context['bar'].id)
+        context['data'] = bar_service.get_question_on_end_day_by_storage_id(storage_id=context['bar'].id)
 
         return context
 
     def post(self, request):
         return complete_day(request)
-
-
-class AddEmployeeView(BaseView):
-    template_name = 'bar/add_employee.html'
-
-    def get_context_data(self, request, **kwargs) -> dict:
-        context = super().get_context_data(request, **kwargs)
-        context['jobs'] = positions.JobsService().jobs_all()
-
-        return context
-
-    def post(self, request):
-        return employees.EmployeeService().employee_create(request)
 
 
 class TovarRequestBeerView(TovarRequestMixin):
@@ -217,7 +203,7 @@ class MalfunctionsView(BaseView):
         return context
 
     def post(self, request):
-        storage_id = StorageService().storage_get(code=request.GET.get('code')).id
+        storage_id = storage_service.storage_get(code=request.GET.get('code')).id
 
         photo = request.FILES.get('malfunction-photo')
         fault_object = request.POST.get('fault-object')
@@ -315,7 +301,7 @@ class NeedItemsView(BaseView):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context.update({
-            "need_items": ItemDeficitService().deficit_by_storage(storage_id=context['bar'].id)
+            "need_items": item_deficit_service.deficit_by_storage(storage_id=context['bar'].id)
         })
 
         return context
@@ -335,7 +321,7 @@ class NeedItemsView(BaseView):
             return redirect(url)
 
         try:
-            ItemDeficitService().create(storage_id=storage_id, item=item, amount=amount)
+            item_deficit_service.create(storage_id=storage_id, item=item, amount=amount)
             messages.success(request, 'Заявка на нехватку успешно создана.')
         except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
             messages.error(request, error)
@@ -349,7 +335,7 @@ class NeedItemsReceiveView(BaseView):
         request_id = request.GET.get('id')
 
         try:
-            receive_status = ItemDeficitService().receive(request_id=request_id,
+            receive_status = item_deficit_service.receive(request_id=request_id,
                                                           arrived_amount=request.POST.get('arrived_amount'),
                                                           comment=request.POST.get('comment'))
             if receive_status:

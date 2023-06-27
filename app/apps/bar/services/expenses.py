@@ -1,20 +1,16 @@
 from django.db.models import Sum
-
-from apps.bar.models import Pays
-from apps.bar.services.bar_info import get_main_barmen
-
-from apps.iiko.models import Storage
-from core.services.storage import StorageService
-
-from apps.lk.models import Expense, Catalog
-from core.services.catalog import CatalogService
-
-from core.utils.time import today_date
-from core.logs import create_log
-
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.conf import settings
+
+from apps.bar.models import Pays
+from apps.iiko.models import Storage
+from apps.lk.models import Expense, Catalog
+
+from core.services import storage_service
+from core.services import catalog_service
+from core.utils.time import today_date
+from core.logs import create_log
 
 
 class ExpensesPageService:
@@ -47,8 +43,7 @@ class ExpensesPageService:
 
     def create_expense(self, request) -> redirect:
         code = request.GET.get('code')
-        storage = StorageService().storage_get(code=code)
-        barmen = get_main_barmen(today_date(), storage)
+        storage = storage_service.storage_get(code=code)
 
         expense_source = request.POST.get('expense-source')
         if not expense_source:
@@ -56,12 +51,12 @@ class ExpensesPageService:
             return redirect(request.META.get('HTTP_REFERER'))
 
         try:
-            expense_source_object = CatalogService().get_catalog_by_id(expense_source)
+            expense_source_object = catalog_service.get_catalog_by_id(expense_source)
         except Catalog.DoesNotExist:
             messages.error(request, 'Выбранный тип оплаты не указан.')
             return redirect(request.META.get('HTTP_REFERER'))
 
-        for row in CatalogService().get_catalog_by_type(settings.EXPENSE_TYPE_CATEGORY):
+        for row in catalog_service.get_catalog_by_type(settings.EXPENSE_TYPE_CATEGORY):
             expense_sum = request.POST.get(f'sum[{row.id}]')
             if len(expense_sum) > 0:
                 expense = Expense.objects.create(
@@ -84,7 +79,7 @@ class ExpensesPageService:
         code = request.GET.get('code')
         redirect_url = '/bar/expenses?code=' + code
 
-        storage = StorageService().storage_get(code=code)
+        storage = storage_service.storage_get(code=code)
 
         oil_sum = request.POST.get('oil_sum')
         oil_comment = request.POST.get('oil_comment')
@@ -100,7 +95,7 @@ class ExpensesPageService:
                 messages.error(request, 'Комментарий к внесению не указан.')
                 return redirect(redirect_url)
 
-            from_to_id = CatalogService().get_catalog_by_name(catalog_name='Масло -')
+            from_to_id = catalog_service.get_catalog_by_name(catalog_name='Масло -')
             if from_to_id:
                 from_to_id = from_to_id.id
 
@@ -118,7 +113,7 @@ class ExpensesPageService:
                 messages.error(request, 'Комментарий к изъятию закупщика не указан.')
                 return redirect(redirect_url)
 
-            from_to_id = CatalogService().get_catalog_by_name(catalog_name='Закупщик')
+            from_to_id = catalog_service.get_catalog_by_name(catalog_name='Закупщик')
             if from_to_id:
                 from_to_id = from_to_id.id
 
@@ -136,7 +131,7 @@ class ExpensesPageService:
                 messages.error(request, 'Комментарий к изъятию Данила не указан.')
                 return redirect(redirect_url)
 
-            from_to_id = CatalogService().get_catalog_by_name(catalog_name='Данил')
+            from_to_id = catalog_service.get_catalog_by_name(catalog_name='Данил')
             if from_to_id:
                 from_to_id = from_to_id.id
 

@@ -4,13 +4,13 @@ from django.contrib import messages
 
 from core.logs import create_log
 from core.utils.time import today_date, get_current_time, monthdelta, get_months
+from core.services import storage_service
 
 from apps.bar.models import Timetable, Salary, Money
 from apps.iiko.models import Storage
 from apps.lk.models import Employee, Fine
 
 from apps.bar.services.bar_info import get_full_information_of_day, get_bar_settings
-from core.services.storage import StorageService
 
 from calendar import monthrange
 from typing import Literal
@@ -170,7 +170,7 @@ class SalaryService:
             "left_sum": 0
         }
 
-        bar = StorageService().storage_get(code=code)
+        bar = storage_service.storage_get(code=code)
 
         for timetable in Timetable.objects.filter(storage=bar, date_at=today_date()):
             row = {
@@ -251,7 +251,7 @@ class SalaryService:
                    action='create', additional_data=additional_data)
 
     def accrue_salary_prepayment(self, request) -> redirect:
-        bar = StorageService().storage_get(code=request.GET.get('code'))
+        bar = storage_service.storage_get(code=request.GET.get('code'))
         employee = None
 
         for timetable in Timetable.objects.filter(storage=bar, date_at=today_date()):
@@ -274,7 +274,7 @@ class SalaryService:
         return redirect('/bar/salary?code=' + request.GET.get('code'))
 
     def accrue_month_salary(self, request):
-        bar = StorageService().storage_get(code=request.GET.get('code'))
+        bar = storage_service.storage_get(code=request.GET.get('code'))
 
         data = self.data_for_calculate_month_salary()
 
@@ -370,7 +370,7 @@ class SalaryService:
         employee_code = request.GET.get('employee_code')
         code = request.GET.get('code')
 
-        storage = StorageService().storage_get(code=code)
+        storage = storage_service.storage_get(code=code)
 
         try:
             employee = Employee.objects.get(code=employee_code)

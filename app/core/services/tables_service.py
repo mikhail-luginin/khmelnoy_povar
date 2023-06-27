@@ -1,8 +1,8 @@
 import datetime
 
-from core.services.api import IikoService
-from core.services.discount import DiscountTypeService
-from core.services.terminal import TerminalService
+from core.services.api.iiko import IikoService
+from core.services import discount_service
+from core.services import terminal_service
 
 
 class OnlineTableService:
@@ -37,7 +37,7 @@ class OnlineTableService:
     def current_tables(self):
         tables = {"count": {}}
         for event in IikoService().get_order_events():
-            terminal = TerminalService().terminal_by_uuid(uuid=event.get('terminal'))
+            terminal = terminal_service.terminal_by_uuid(uuid=event.get('terminal'))
             if terminal:
                 storage = terminal.storage
                 order = tables['count'].get(storage.id)
@@ -66,7 +66,7 @@ class OnlineTableService:
             order_num = event.get('orderNum')
             table_num = event.get('tableNum')
             num_guests = event.get('numGuests')
-            discount_type = DiscountTypeService().discount_type_by_uuid(uuid=event.get('discountTypeId'))
+            discount_type = discount_service.discount_type_by_uuid(uuid=event.get('discountTypeId'))
             discount_type_name = discount_type.name if discount_type else 'Нет названия'
             discount_percent = event.get('percent')
 

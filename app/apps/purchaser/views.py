@@ -6,8 +6,7 @@ from core import exceptions
 
 from apps.lk.models import Expense
 
-from core.services.storage import StorageService
-from core.services.catalog import CatalogService
+from core.services import storage_service, catalog_service
 
 from .utils import BaseView
 from .services import PurchaserService
@@ -22,7 +21,7 @@ class IndexView(BaseView):
         context.update({
             "rows": PurchaserService().get_rows_by_date(date_at=request.GET.get('date_at'),
                                                         storage_id=request.GET.get('storage_id')),
-            "storages": StorageService().storages_all(),
+            "storages": storage_service.storages_all(),
             "data": PurchaserService().get_money_data(date_at=request.GET.get('date_at'),
                                                       storage_id=request.GET.get('storage_id'))
         })
@@ -36,9 +35,9 @@ class ExpenseCreateView(BaseView):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context.update({
-            "storages": StorageService().storages_all(),
-            "receivers": CatalogService().get_catalog_by_catalog_type_name_contains(settings.PURCHASER_CATEGORY),
-            "types": CatalogService().get_catalog_by_catalog_type_name_contains(settings.EXPENSE_SOURCE_CATEGORY)
+            "storages": storage_service.storages_all(),
+            "receivers": catalog_service.get_catalog_by_catalog_type_name_contains(settings.PURCHASER_CATEGORY),
+            "types": catalog_service.get_catalog_by_catalog_type_name_contains(settings.EXPENSE_SOURCE_CATEGORY)
         })
 
         return context
