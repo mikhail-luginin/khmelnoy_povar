@@ -169,6 +169,8 @@ PAYMENT_TYPE_BN = 'Бизнес-карта'
 PURCHASER_CATEGORY = 'Расходы.Закупщик'
 SALARY_CATEGORY = 'Зарплата'
 
+LEADERSHIP_CHAT_ID = ''
+
 IIKO_ORDER_TYPES = ['orderPaid', 'orderOpened', 'orderPrechequed', 'addItemToOrder', 'orderDeleted', 'orderDiscounted',
                     'deletedPrintedItems', 'orderPaidNoSum', 'orderMoved', 'orderCancelPrechequed', 'orderPrepaid',
                     'orderReturned', 'orderDiscountDeleted']

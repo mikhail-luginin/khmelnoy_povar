@@ -2,21 +2,47 @@
 
 {% block body %}
     <div class="container-xl">
-        {% if is_morning_cashbox_filled %}
-            <div class="card rounded-3 mb-2">
-                <div class="card-body">
-                    <label class="form-label">Касса вечер предыдущего дня</label>
-                    <input class="form-control" value="{{ evening_cashbox_previous_day }}" disabled>
+{#        <div class="card rounded-3 mb-2">#}
+{#            <div class="card-body">#}
+{#                <label class="form-label">Касса вечер предыдущего дня</label>#}
+{#                <input class="form-control" value="{% if evening_cashbox_previous_day %}{{ evening_cashbox_previous_day }}{% else %}Касса вечер предыдущего дня не была заполнена{% endif %}" disabled>#}
+{#            </div>#}
+{#        </div>#}
+        <div class="card rounded-3 mb-2">
+            <div class="card-body">
+                <label class="form-label">Касса утро</label>
+                <input class="form-control" type="tel" inputmode="numeric"
+                       name="sum_cash_morning" value="{% if morning_cashbox is not None %}{{ morning_cashbox }}{% else %}Касса вечер предыдущего дня не была заполнена{% endif %}" disabled><br>
+                <a data-bs-toggle="modal" data-bs-target="#revise" class="btn w-100">Сверка</a>
+            </div>
+        </div>
+        <div class="modal modal-blur fade" id="revise" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <form id="revise-form" method="post">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <h5 class="modal-title">Заявка на сверку</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row mb-3 align-items-end">
+                                <div class="col">
+                                    <label class="form-label">Укажите причину сверки</label>
+                                    <input class="form-control" name="revise-reason"
+                                           placeholder="Введите причину"/>
+                                    <div class="text-muted">* Данная причина будет отправлена руководству</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn me-auto" data-bs-dismiss="modal">Закрыть</button>
+                            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Отправить</button>
+                        </div>
+                    </form>
                 </div>
             </div>
-            <div class="card rounded-3 mb-2">
-                <div class="card-body">
-                    <label class="form-label">Касса утро</label>
-                    <input class="form-control" type="tel" inputmode="numeric"
-                           name="sum_cash_morning" value="{{ is_morning_cashbox_filled }}" disabled>
-                </div>
-            </div>
-        {% endif %}
+        </div>
         <div class="card rounded-3 overflow-hidden mb-2">
             <table id="table" class="table card-table table-mobile-sm table-hover">
                 <tbody>
@@ -34,18 +60,6 @@
         </div>
         <form action="{% url 'Bar:index' %}?code={{ code }}" method="post">
             {% csrf_token %}
-            {% if is_morning_cashbox_filled is False %}
-                <div class="card rounded-3 mb-2">
-                    <div class="card-body">
-                        <div class="mb-4">
-                            <label class="form-label">Касса утро</label>
-                            <input class="form-control" type="tel" inputmode="numeric"
-                                   placeholder="Введите остаток в кассе на утро"
-                                   name="sum_cash_morning">
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
             <div class="card rounded-3 mb-2">
                 <div class="card-header card-header-light rounded-3">
                     Бармены
@@ -152,4 +166,23 @@
             </div>
         </form>
     </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(document).ready(function() {
+            $('#revise-form').submit(function() {
+                $.ajax({
+                    data: $(this).serialize(),
+                    type: 'post',
+                    url: '/bar/revise?code={{ code }}',
+                    success: function (response) {
+                        document.getElementById('revise-form').reset()
+                        notification(true, 'Ваша заявка была успешно отправлена.')
+                    }
+                })
+                return false
+            })
+        })
+    </script>
 {% endblock %}

@@ -50,5 +50,7 @@ urlpatterns = [
     path('need_items', views.NeedItemsView.as_view(), name="need_items"),
     path('need_items/receive', views.NeedItemsReceiveView.as_view(), name="receive_need_item"),
 
+    path('revise', views.send_revise_message, name="revise"),
+
     path('end_day', views.EndDayView.as_view(), name="end_day")
 ]
