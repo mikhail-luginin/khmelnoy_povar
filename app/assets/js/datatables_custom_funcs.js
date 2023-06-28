@@ -50,9 +50,75 @@ function run_datatable(table_id, ajax_url, url, ajax_columns,
                     }
                     if (has_dismiss === true) {
                         if (row.active_status === 'Активный') {
-                            actions += '<a href="#" onclick="delete_confirm(' + '\'' + row.id + '\'' + ', ' + '\'Вы действительно хотите уволить ' + row.fio + '?\'' + ', ' + '\'' + url + '/dismiss' + '\'' + ', ' + '\'' + 'Уволить' + '\'' + ')"><i class="fa fa-user-minus"></i></a>'
+                            actions += '<a href="#" data-bs-toggle="modal" data-bs-target="#dismiss-employee-' + row.id + '"><i class="fa fa-user-minus"></i></a>' +
+                                '<div class="modal modal-blur fade" id="dismiss-employee-' + row.id + '" tabindex="-1" role="dialog" aria-hidden="true">' +
+                                '<div class="modal-dialog modal-dialog-centered" role="document">' +
+                                '<div class="modal-content">' +
+                                '<form action="/lk/employees/dismiss">' +
+                                '<input type="hidden" name="id" value="' + row.id + '">' +
+                                '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>' +
+                                '<div class="modal-body text-center py-4">' +
+                                '<h3>Вы действительно хотите уволить сотрудника?</h3>' +
+                                '<div class="text-muted" id="confirm-text">' +
+                                '<div class="mb-2">' +
+                                '<input class="form-control" name="comment" placeholder="Введите комментарий">' +
+                                '</div>' +
+                                '</div>' +
+                                '</div>' +
+                                '<div class="modal-footer">' +
+                                '<div class="w-100">' +
+                                '<div class="row">' +
+                                '<div class="col"><a href="#" class="btn w-100" data-bs-dismiss="modal">' +
+                                'Отмена' +
+                                '</a></div>' +
+                                '<div class="col">' +
+                                '<button class="btn btn-tabler w-100"' +
+                                'data-bs-dismiss="modal">' +
+                                'Уволить' +
+                                '</button>' +
+                                '</div>' +
+                                '</div>' +
+                                '</div>' +
+                                '</div>' +
+                                '</form>' +
+                                '</div>' +
+                                '</div>' +
+                                '</div>'
                         } else {
-                            actions += '<a href="' + url + '/return?id=' + row.id + '"<i class="fa fa-user"></i</a>'
+                            actions += '<a href="#" data-bs-toggle="modal" data-bs-target="#return-employee-' + row.id + '"><i class="fa fa-user"></i></a>' +
+                                '<div class="modal modal-blur fade" id="return-employee-' + row.id + '" tabindex="-1" role="dialog" aria-hidden="true">' +
+                                '<div class="modal-dialog modal-dialog-centered" role="document">' +
+                                '<div class="modal-content">' +
+                                '<form action="/lk/employees/return">' +
+                                '<input type="hidden" name="id" value="' + row.id + '">' +
+                                '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>' +
+                                '<div class="modal-body text-center py-4">' +
+                                '<h3>Вы действительно хотите вернуть сотрудника?</h3>' +
+                                '<div class="text-muted" id="confirm-text">' +
+                                '<div class="mb-2">' +
+                                '<input class="form-control" name="comment" placeholder="Введите комментарий">' +
+                                '</div>' +
+                                '</div>' +
+                                '</div>' +
+                                '<div class="modal-footer">' +
+                                '<div class="w-100">' +
+                                '<div class="row">' +
+                                '<div class="col"><a href="#" class="btn w-100" data-bs-dismiss="modal">' +
+                                'Отмена' +
+                                '</a></div>' +
+                                '<div class="col">' +
+                                '<button class="btn btn-tabler w-100"' +
+                                'data-bs-dismiss="modal">' +
+                                'Вернуть' +
+                                '</button>' +
+                                '</div>' +
+                                '</div>' +
+                                '</div>' +
+                                '</div>' +
+                                '</form>' +
+                                '</div>' +
+                                '</div>' +
+                                '</div>'
                         }
                     }
                     return actions

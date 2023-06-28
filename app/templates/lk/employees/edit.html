@@ -99,15 +99,16 @@
                 <div class="card rounded-3">
                     <div class="card-body">
                         <p>Дата последней смены: {{ last_work_day.date_at }}</p>
-                        <table class="table">
-                            <thead>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
                                 <tr>
                                     <th>Дата</th>
                                     <th>Тип</th>
                                     <th>Комментарий</th>
                                 </tr>
-                            </thead>
-                            <tbody>
+                                </thead>
+                                <tbody>
                                 {% for log in employee_logs %}
                                     <tr>
                                         <td>{{ log.date_at }}</td>
@@ -115,24 +116,25 @@
                                         <td>{{ log.comment }}</td>
                                     </tr>
                                 {% endfor %}
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
                         <table class="table">
                             <thead>
-                                <tr>
-                                    <th>Дата</th>
-                                    <th>Начислено</th>
-                                    <th>Получено</th>
-                                </tr>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Начислено</th>
+                                <th>Получено</th>
+                            </tr>
                             </thead>
                             <tbody>
-                                {% for salary in salaries %}
-                                    <tr>
-                                        <td>{{ salary.month }} ({{ salary.year }})</td>
-                                        <td>{{ salary.accrued_salary }}</td>
-                                        <td>{{ salary.received_salary }}</td>
-                                    </tr>
-                                {% endfor %}
+                            {% for salary in salaries %}
+                                <tr>
+                                    <td>{{ salary.month }} ({{ salary.year }})</td>
+                                    <td>{{ salary.accrued_salary }}</td>
+                                    <td>{{ salary.received_salary }}</td>
+                                </tr>
+                            {% endfor %}
                             </tbody>
                         </table>
                     </div>

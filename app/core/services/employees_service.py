@@ -126,32 +126,35 @@ def employee_edit(employee_id: int | None, first_name: str | None, last_name: st
     return employee
 
 
+@transaction.atomic()
 def dismiss(request) -> redirect:
-    try:
-        employee = Employee.objects.get(id=request.GET.get('id'))
-    except Employee.DoesNotExist:
+    employee = Employee.objects.filter(id=request.GET.get('id')).first()
+    if not employee:
         messages.error(request, 'Сотрудник с данным ID не найден.')
         return redirect('/lk/employees')
 
     employee.is_deleted = 1
     employee.dismiss_date = today_date()
-    # employee.dismiss_comment += ', ' + request.GET.get('comment')
     employee.save()
+
+    EmployeeLog.objects.create(date_at=today_date(), employee=employee, type=1, comment=request.GET.get('comment'))
 
     messages.success(request, 'Сотрудник успешно уволен.')
     return redirect('/lk/employees')
 
 
+@transaction.atomic()
 def return_to_work(request) -> redirect:
-    try:
-        employee = Employee.objects.get(id=request.GET.get('id'))
-    except Employee.DoesNotExist:
+    employee = Employee.objects.filter(id=request.GET.get('id')).first()
+    if not employee:
         messages.error(request, 'Сотрудник с данным ID не найден.')
         return redirect('/lk/employees')
 
     employee.is_deleted = 0
     employee.dismiss_date = None
     employee.save()
+
+    EmployeeLog.objects.create(date_at=today_date(), employee=employee, type=2, comment=request.GET.get('comment'))
 
     messages.success(request, 'Сотрудник успешно возвращен.')
     return redirect('/lk/employees')
