@@ -87,11 +87,27 @@ class Employee(models.Model):
     dismiss_date = models.DateField(null=True)
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=3)
     reviews = models.ManyToManyField(to=Review)
-    description = models.CharField(max_length=255, null=True)
-    dismiss_comment = models.CharField(max_length=255, default='')
-    status_change_comment = models.CharField(max_length=255, default='')
 
     objects = managers.EmployeeManager()
+
+    def get_status_by_id(self, status_id: int) -> str:
+        return next(item[1] for item in self.STATUS_CHOICES if item[0] == status_id)
+
+
+class EmployeeLog(models.Model):
+    TYPE_CHOICES = [
+        (1, 'Увольнение'),
+        (2, 'Восстановление'),
+        (3, 'Смена статуса'),
+        (4, 'Описание')
+    ]
+
+    date_at = models.DateField()
+    employee = models.ForeignKey(to=Employee, on_delete=models.CASCADE)
+    type = models.PositiveSmallIntegerField(choices=TYPE_CHOICES)
+    comment = models.CharField(max_length=255)
+
+    objects = managers.EmployeeLogManager()
 
 
 class CatalogType(models.Model):

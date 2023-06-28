@@ -89,3 +89,5 @@ def catalog_create(name: str, linked: list):
             raise CatalogType.DoesNotExist(f'Тип справочника с идентификатором {link} не найден.')
         row.catalog_types.add(catalog_type)
     row.save()
+
+    return row

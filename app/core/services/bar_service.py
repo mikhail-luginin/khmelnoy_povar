@@ -77,3 +77,7 @@ def storage_by_setting_id(setting_id: int) -> Storage | None:
     if setting:
         return setting.storage
     return None
+
+
+def bar_settings() -> list[Setting]:
+    return Setting.objects.all()

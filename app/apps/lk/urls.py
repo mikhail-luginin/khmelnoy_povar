@@ -8,16 +8,16 @@ urlpatterns = [
     path('', IndexView.as_view(), name="index"),
 
     path('catalog', CatalogView.as_view(), name="catalog"),
-    path('catalog/add', CatalogAddView.as_view(), name="catalog_add"),
+    path('catalog/add', CatalogCreateView.as_view(), name="catalog_add"),
     path('catalog/edit', CatalogEditView.as_view(), name="catalog_edit"),
     path('catalog/delete', CatalogDeleteView.as_view(), name="catalog_delete"),
 
-    path('catalog/type/add', CatalogTypeAddView.as_view(), name="catalog_type_add"),
+    path('catalog/type/add', CatalogTypeCreateView.as_view(), name="catalog_type_add"),
     path('catalog/types/edit', CatalogTypeEditView.as_view(), name="catalog_type_edit"),
     path('catalog/types/delete', CatalogTypeDeleteView.as_view(), name="catalog_type_delete"),
 
     path('bars', BarsView.as_view(), name="bars"),
-    path('bars/settings', BarsSettingsView.as_view(), name="bars_settings"),
+    path('bars/settings', BarSettingsView.as_view(), name="bars_settings"),
     path('product_remains_add', product_remains_add, name="product_remains_add"),
     path('link_question_to_bar_setting', link_question_to_bar_setting, name="link_question_to_bar_setting"),
 

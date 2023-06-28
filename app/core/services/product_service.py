@@ -95,3 +95,7 @@ def product_get(product_id: str = None, row_id: int = None) -> Product | None:
 
 def nomenclature_by_category(category_name: str) -> Product | None:
     return Product.objects.filter(category__name=category_name)
+
+
+def nomenclature_by_categories(categories: list):
+    return Product.objects.filter(category__name__in=categories)
