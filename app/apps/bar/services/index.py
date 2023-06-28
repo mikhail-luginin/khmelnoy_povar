@@ -2,12 +2,10 @@ from core.logs import create_log
 from core.utils.telegram import send_message_to_telegram
 from core.utils.time import today_date, get_current_time
 
-from core.services import employees_service
-from core.services import timetable_service
-from core.services import storage_service
+from core.services import employees_service, timetable_service, storage_service, bar_service
 
 from apps.iiko.models import Storage
-from apps.bar.models import Timetable, Position, Money, Setting
+from apps.bar.models import Timetable, Position, Money
 from apps.lk.models import Employee
 
 from apps.bar.exceptions import EmployeeAlreadyWorkingToday
@@ -54,7 +52,7 @@ class HomePageService:
 
     def timetable_add(self, request):
         storage = storage_service.storage_get(code=request.GET.get('code'))
-        bar_setting = Setting.objects.get(storage=storage)
+        bar_setting = bar_service.get_setting_by_storage_id(storage_id=storage.id)
 
         for position in Position.objects.all():
             employee_id = request.POST.get(f'position[{position.id}]')
@@ -86,31 +84,24 @@ class HomePageService:
                 create_log(owner=f'CRM {storage.name}', entity=employee.fio, row=row,
                            action='create', additional_data='Вышел на смену')
 
-        if self.morning_cashbox_today(storage) is False:
-            sum_cash_morning = request.POST.get('sum_cash_morning')
-            if sum_cash_morning:
-                row = Money.objects.create(date_at=today_date(), storage=storage,
-                                           sum_cash_morning=sum_cash_morning, barmen_percent=bar_setting.percent)
-                create_log(owner=f'CRM {storage.name}', entity=storage.name, row=row,
-                           action='create', additional_data='Смена открыта')
+        if self.morning_cashbox_today(storage_id=storage.id) is None:
+            evening_cashbox_previous_day = self.evening_cashbox_previous_day(storage=storage)
+            sum_cash_morning = evening_cashbox_previous_day if evening_cashbox_previous_day else 0
+            row = Money.objects.create(date_at=today_date(), storage=storage,
+                                       sum_cash_morning=sum_cash_morning, barmen_percent=bar_setting.percent)
+            create_log(owner=f'CRM {storage.name}', entity=storage.name, row=row,
+                       action='create', additional_data='Смена открыта')
 
-    def morning_cashbox_today(self, storage_id: Storage) -> int | bool:
-        row = Money.objects.filter(storage=storage_id, date_at=today_date())
-        if row.exists():
-            row = row.first()
+    def morning_cashbox_today(self, storage_id: int) -> int | None:
+        row = Money.objects.filter(storage_id=storage_id, date_at=today_date()).first()
+        if row:
             return row.sum_cash_morning
-        else:
-            return False
+        return None
 
-    def evening_cashbox_previous_day(self, storage: Storage) -> int | str:
+    def evening_cashbox_previous_day(self, storage: Storage) -> int | None:
         previous_day = (get_current_time() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
 
-        row = Money.objects.filter(storage=storage, date_at=previous_day)
-        if row.exists():
-            row = row.first()
-            if row.sum_cash_end_day:
-                return row.sum_cash_end_day
-            else:
-                return 'Касса вечер предыдущего дня не была заполнена.'
-        else:
-            return 'Касса вечер предыдущего дня не найдена.'
+        row = Money.objects.filter(storage=storage, date_at=previous_day).first()
+        if row:
+            return row.sum_cash_end_day
+        return None

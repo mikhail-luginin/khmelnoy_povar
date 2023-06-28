@@ -1,10 +1,12 @@
 from django.contrib import messages
+from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.conf import settings
 from django.db.models import Sum
 
 from core import exceptions
 from core.services import bar_service
+from core.utils.telegram import send_message_to_telegram
 from core.utils.time import today_date, get_months, get_current_time
 from core.services.salary_service import SalaryService
 
@@ -33,8 +35,7 @@ class IndexView(BaseView):
         context = super().get_context_data(request, **kwargs)
         context['rows'] = HomePageService().get_timetable_today(context['bar'])
         context['positions'] = HomePageService().positions_on_storage()
-        context['is_morning_cashbox_filled'] = HomePageService().morning_cashbox_today(context['bar'])
-        context['evening_cashbox_previous_day'] = HomePageService().evening_cashbox_previous_day(context['bar'])
+        context['morning_cashbox'] = HomePageService().morning_cashbox_today(context['bar'])
 
         return context
 
@@ -346,3 +347,10 @@ class NeedItemsReceiveView(BaseView):
             messages.error(request, error)
 
         return redirect('/bar/need_items?code=' + request.GET.get('code'))
+
+
+def send_revise_message(request):
+    if request.method == "POST":
+        send_message_to_telegram(chat_id=settings.LEADERSHIP_CHAT_ID, message=request.POST.get('revise-reason'))
+
+        return JsonResponse(data={"success": True}, status=200)
