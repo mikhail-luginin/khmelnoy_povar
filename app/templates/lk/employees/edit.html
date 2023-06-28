@@ -99,8 +99,24 @@
                 <div class="card rounded-3">
                     <div class="card-body">
                         <p>Дата последней смены: {{ last_work_day.date_at }}</p>
-                        <p>Описание сотрудника: {{ row.description }}</p>
-                        <p>Комментарии к смене статуса: {{ row.status_change_comment }}</p>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Тип</th>
+                                    <th>Комментарий</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in employee_logs %}
+                                    <tr>
+                                        <td>{{ log.date_at }}</td>
+                                        <td>{{ log.get_type_display }}</td>
+                                        <td>{{ log.comment }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                         <table class="table">
                             <thead>
                                 <tr>

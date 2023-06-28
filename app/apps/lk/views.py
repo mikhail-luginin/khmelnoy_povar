@@ -9,20 +9,20 @@ from core.utils.time import get_months
 from core.mixins import BaseLkView, ObjectEditMixin, ObjectCreateMixin, ObjectDeleteMixin
 from core import exceptions
 from core.services import salary_service, bar_service, item_deficit_service, reviews_service, catalog_service, \
-    positions_service, money_service, employees_service, expenses_service, pays_service, fines_service, \
-    timetable_service, storage_service, statement_service, salary_crud, product_remains_service, product_service
+                          positions_service, money_service, employees_service, expenses_service, pays_service, \
+                          timetable_service, storage_service, statement_service, salary_crud, product_remains_service, \
+                          supplier_service, fines_service, product_service
 
 from .tasks import calculate_percent_premium_for_all, update_all_money
+from .services import index_page
 
 from apps.bar.services.malfunctions import MalfunctionService
 from apps.repairer.services import RepairerService
+from apps.purchaser.services import PurchaserService
 
 from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee, ItemDeficit, Partner
 from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest, Setting
 from apps.repairer.models import Malfunction
-from apps.iiko.models import Product, Supplier
-from ..purchaser.services import PurchaserService
-from .services import index_page
 
 
 class IndexView(BaseLkView):
@@ -42,37 +42,32 @@ class CatalogView(BaseLkView):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['catalog_types'] = catalog_service.get_catalog_types()
+        context.update({
+            "catalog_types": catalog_service.get_catalog_types()
+        })
 
         return context
 
 
-class CatalogAddView(ObjectCreateMixin):
+class CatalogCreateView(BaseLkView):
 
     def post(self, request):
-        name = request.POST.get('catalog-name')
-        linked = request.POST.getlist('linked')
-
         try:
-            if catalog_service.catalog_create(name, linked):
-                messages.success(request, 'Запись успешно добавлена в справочник.')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, CatalogType.DoesNotExist) as error:
+            catalog_service.catalog_create(name=request.POST.get('catalog-name'), linked=request.POST.getlist('linked'))
+            messages.success(request, 'Запись успешно добавлена в справочник.')
+        except (exceptions.FieldNotFoundError, CatalogType.DoesNotExist) as error:
             messages.error(request, str(error))
 
         return redirect('/lk/catalog')
 
 
-class CatalogTypeAddView(ObjectCreateMixin):
-    model = CatalogType
-    success_url = '/lk/catalog'
+class CatalogTypeCreateView(BaseLkView):
 
     def post(self, request):
-        name = request.POST.get('name')
-
         try:
-            if catalog_service.catalog_type_create(name):
-                messages.success(request, 'Тип каталога успешно создан.')
-        except (exceptions.FieldCannotBeEmptyError, exceptions.FieldNotFoundError) as error:
+            catalog_service.catalog_type_create(name=request.POST.get('name'))
+            messages.success(request, 'Тип каталога успешно создан.')
+        except exceptions.FieldNotFoundError as error:
             messages.error(request, str(error))
 
         return redirect('/lk/catalog')
@@ -94,20 +89,19 @@ class CatalogEditView(ObjectEditMixin):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['types'] = catalog_service.get_catalog_types()
-        context['linked_types'] = catalog_service.get_catalog_linked_types(request.GET.get('id'))
+        context.update({
+            "types": catalog_service.get_catalog_types(),
+            "linked_types": catalog_service.get_catalog_linked_types(catalog_id=request.GET.get('id'))
+        })
 
         return context
 
     def post(self, request):
-        row_id = request.GET.get('id')
-        name = request.POST.get('name')
-        linked = request.POST.getlist('linked')
-
         try:
-            if catalog_service.catalog_edit(row_id=row_id, name=name, linked=linked):
-                messages.success(request, 'Запись успешно отредактирована.')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, CatalogType.DoesNotExist) as error:
+            catalog_service.catalog_edit(row_id=request.GET.get('id'), name=request.POST.get('name'),
+                                         linked=request.POST.getlist('linked'))
+            messages.success(request, 'Запись успешно отредактирована.')
+        except (exceptions.FieldNotFoundError, CatalogType.DoesNotExist) as error:
             messages.error(request, str(error))
 
         return redirect('/lk/catalog')
@@ -118,13 +112,10 @@ class CatalogTypeEditView(ObjectEditMixin):
     template_name = 'lk/catalog/type_edit.html'
 
     def post(self, request):
-        row_id = request.GET.get('id')
-        name = request.POST.get('name')
-
         try:
-            if catalog_service.catalog_type_edit(row_id=row_id, name=name):
-                messages.success(request, 'Тип справочника успешно отредактирован.')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, CatalogType.DoesNotExist) as error:
+            catalog_service.catalog_type_edit(row_id=request.GET.get('id'), name=request.POST.get('name'))
+            messages.success(request, 'Тип справочника успешно отредактирован.')
+        except (exceptions.FieldNotFoundError, CatalogType.DoesNotExist) as error:
             messages.error(request, str(error))
 
         return redirect('/lk/catalog')
@@ -135,12 +126,14 @@ class BarsView(BaseLkView):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['bars'] = Setting.objects.all()
+        context.update({
+            "bars": bar_service.bar_settings()
+        })
 
         return context
 
 
-class BarsSettingsView(BaseLkView):
+class BarSettingsView(BaseLkView):
     template_name = 'lk/bars_settings.html'
 
     def get_context_data(self, request, **kwargs) -> dict:
@@ -157,14 +150,11 @@ class BarsSettingsView(BaseLkView):
         return context
 
     def post(self, request):
-        storage_id = request.GET.get('id')
-        percent = request.POST.get('percent')
-        tg_chat_id = request.POST.get('chat-id')
-
         try:
-            bar_service.settings_edit(storage_id=storage_id, percent=percent, tg_chat_id=tg_chat_id)
+            bar_service.settings_edit(storage_id=request.GET.get('id'), percent=request.POST.get('percent'),
+                                      tg_chat_id=request.POST.get('chat-id'))
             messages.success(request, 'Настройки бара успешно обновлены')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Setting.DoesNotExist) as error:
+        except (exceptions.FieldNotFoundError, Setting.DoesNotExist) as error:
             messages.error(request, str(error))
 
         return redirect('/lk/bars')
@@ -175,7 +165,9 @@ class PositionsView(BaseLkView):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['jobs'] = positions_service.jobs_all()
+        context.update({
+            "jobs": positions_service.jobs_all()
+        })
 
         return context
 
@@ -193,14 +185,14 @@ class PositionsView(BaseLkView):
 
         try:
             positions_service.position_create(position_oklad=position_oklad, position_is_usil=position_is_usil,
-                                          position_name=position_name, position_is_trainee=position_is_trainee,
-                                          position_is_called=position_is_called,
-                                          position_all_storages=position_all_storages,
-                                          position_has_percent=position_has_percent,
-                                          position_has_premium=position_has_premium,
-                                          position_job_ids=position_job_ids, priority_id=priority_id)
+                                              position_name=position_name, position_is_trainee=position_is_trainee,
+                                              position_is_called=position_is_called,
+                                              position_all_storages=position_all_storages,
+                                              position_has_percent=position_has_percent,
+                                              position_has_premium=position_has_premium,
+                                              position_job_ids=position_job_ids, priority_id=priority_id)
             messages.success(request, 'Позиция успешно создана.')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+        except exceptions.FieldNotFoundError as error:
             messages.error(request, str(error))
 
         return redirect('/lk/positions')
@@ -212,7 +204,9 @@ class PositionsEditView(ObjectEditMixin):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['jobs'] = positions_service.jobs_all()
+        context.update({
+            "jobs": positions_service.jobs_all()
+        })
 
         return context
 
@@ -231,14 +225,14 @@ class PositionsEditView(ObjectEditMixin):
 
         try:
             positions_service.position_edit(position_id=position_id, position_name=position_name,
-                                        position_is_trainee=position_is_trainee, position_is_called=position_is_called,
-                                        position_job_ids=position_job_ids, position_is_usil=position_is_usil,
-                                        position_has_premium=position_has_premium,
-                                        position_has_percent=position_has_percent,
-                                        position_all_storages=position_all_storages, position_oklad=position_oklad,
-                                        priority_id=priority_id)
+                                            position_is_trainee=position_is_trainee, position_is_called=position_is_called,
+                                            position_job_ids=position_job_ids, position_is_usil=position_is_usil,
+                                            position_has_premium=position_has_premium,
+                                            position_has_percent=position_has_percent,
+                                            position_all_storages=position_all_storages, position_oklad=position_oklad,
+                                            priority_id=priority_id)
             messages.success(request, 'Позиция успешно отредактирована')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Position.DoesNotExist) as error:
+        except (exceptions.FieldNotFoundError, Position.DoesNotExist) as error:
             messages.error(request, str(error))
 
         return redirect('/lk/positions')
@@ -260,12 +254,12 @@ class JobAddView(BaseLkView):
 
         try:
             positions_service.job_create(job_name=job_name,
-                                     job_gain_oklad_accrual=job_gain_oklad_accrual,
-                                     job_main_oklad_accrual=job_main_oklad_accrual,
-                                     job_main_oklad_receiving=job_main_oklad_receiving,
-                                     job_gain_oklad_receiving=job_gain_oklad_receiving)
+                                         job_gain_oklad_accrual=job_gain_oklad_accrual,
+                                         job_main_oklad_accrual=job_main_oklad_accrual,
+                                         job_main_oklad_receiving=job_main_oklad_receiving,
+                                         job_gain_oklad_receiving=job_gain_oklad_receiving)
             messages.success(request, 'Должность успешно создана.')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+        except exceptions.FieldNotFoundError as error:
             messages.error(request, str(error))
 
         return redirect('/lk/positions')
@@ -305,9 +299,9 @@ class BankPartnerEditView(ObjectEditMixin):
 
         try:
             statement_service.PartnerService().edit(partner_id=partner_id, friendly_name=friendly_name,
-                                  expense_types=expense_types, storages=storages)
+                                                    expense_types=expense_types, storages=storages)
             messages.success(request, 'Контрагент успешно отредактирован.')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Partner.DoesNotExist) as error:
+        except (exceptions.FieldNotFoundError, Partner.DoesNotExist) as error:
             messages.error(request, str(error))
 
         return redirect('/lk/bank/partners')
@@ -318,9 +312,10 @@ class BankCardsView(BaseLkView):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-
-        context['undefined_cards'] = statement_service.CardService().get_undefined_cards()
-        context['cards'] = statement_service.CardService().cards_all()
+        context.update({
+            "undefined_cards": statement_service.CardService().get_undefined_cards(),
+            "cards": statement_service.CardService().cards_all()
+        })
 
         return context
 
@@ -330,8 +325,10 @@ class BankCardCreateView(ObjectCreateMixin):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['current_card'] = request.GET.get('card')
-        context['storages'] = storage_service.storages_all()
+        context.update({
+            "current_card": request.GET.get('card'),
+            "storages": storage_service.storages_all()
+        })
 
         return context
 
@@ -346,7 +343,9 @@ class BankCardEditView(ObjectEditMixin):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['storages'] = storage_service.storages_all()
+        context.update({
+            "storages": storage_service.storages_all()
+        })
 
         return context
 
@@ -358,7 +357,7 @@ class BankCardEditView(ObjectEditMixin):
         try:
             statement_service.CardService().edit(card_id=card_id, name=name, storage_id=storage_id)
             messages.success(request, 'Карта успешно отредактирована.')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Card.DoesNotExist) as error:
+        except (exceptions.FieldNotFoundError, Card.DoesNotExist) as error:
             messages.error(request, str(error))
 
         return redirect('/lk/bank/cards')
@@ -382,7 +381,7 @@ def update_money(request):
     try:
         money_service.update(row_id=row_id)
         messages.success(request, 'Запись успешно обновлена.')
-    except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Money.DoesNotExist) as error:
+    except (exceptions.FieldNotFoundError, Money.DoesNotExist) as error:
         messages.error(request, str(error))
 
     return redirect('/lk/money')
@@ -400,9 +399,9 @@ class MoneyEditView(ObjectEditMixin):
 
         try:
             money_service.money_edit(row_id=row_id, sum_cash_morning=sum_cash_morning,
-                                      sum_cash_end_day=sum_cash_end_day, barmen_percent=barmen_percent)
+                                     sum_cash_end_day=sum_cash_end_day, barmen_percent=barmen_percent)
             messages.success(request, 'Запись успешно отредактирована.')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Money.DoesNotExist) as error:
+        except (exceptions.FieldNotFoundError, Money.DoesNotExist) as error:
             messages.error(request, str(error))
 
         return redirect('/lk/money')
@@ -419,9 +418,11 @@ class CreateTimetableView(ObjectCreateMixin):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['storages'] = storage_service.storages_all()
-        context['employees'] = employees_service.employees_all()
-        context['positions'] = positions_service.positions_all()
+        context.update({
+            "storages": storage_service.storages_all(),
+            "employees": employees_service.employees_all(),
+            "positions": positions_service.positions_all()
+        })
 
         return context
 
@@ -434,9 +435,9 @@ class CreateTimetableView(ObjectCreateMixin):
 
         try:
             timetable_service.create(date_at=date_at, employee_id=employee_id,
-                                      oklad=oklad, position_id=position_id, storage_id=storage_id)
+                                     oklad=oklad, position_id=position_id, storage_id=storage_id)
             messages.success(request, 'Запись успешно создана.')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+        except exceptions.FieldNotFoundError as error:
             messages.error(request, str(error))
 
         return redirect('/lk/timetable')
@@ -449,9 +450,11 @@ class EditTimetableView(ObjectEditMixin):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['storages'] = storage_service.storages_all()
-        context['employees'] = employees_service.employees_all()
-        context['positions'] = positions_service.positions_all()
+        context.update({
+            "storages": storage_service.storages_all(),
+            "employees": employees_service.employees_all(),
+            "positions": positions_service.positions_all()
+        })
 
         return context
 
@@ -465,9 +468,9 @@ class EditTimetableView(ObjectEditMixin):
 
         try:
             timetable_service.edit(timetable_id=timetable_id, date_at=date_at, employee_id=employee_id,
-                                    oklad=oklad, position_id=position_id, storage_id=storage_id)
+                                   oklad=oklad, position_id=position_id, storage_id=storage_id)
             messages.success(request, 'Запись успешно отредактирована.')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Timetable.DoesNotExist) as error:
+        except (exceptions.FieldNotFoundError, Timetable.DoesNotExist) as error:
             messages.error(request, str(error))
 
         return redirect('/lk/timetable')
@@ -489,9 +492,11 @@ class CreateExpenseView(ObjectCreateMixin):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['storages'] = storage_service.storages_all()
-        context['types'] = catalog_service.get_catalog_by_catalog_type_name_contains('расходы')
-        context['sources'] = catalog_service.get_catalog_by_type(settings.EXPENSE_SOURCE_CATEGORY)
+        context.update({
+            "storages": storage_service.storages_all(),
+            "types": catalog_service.get_catalog_by_catalog_type_name_contains(name='расходы'),
+            "sources": catalog_service.get_catalog_by_type(type_name=settings.EXPENSE_SOURCE_CATEGORY)
+        })
 
         return context
 
@@ -509,7 +514,7 @@ class CreateExpenseView(ObjectCreateMixin):
                                     comment=comment, storage_id=storage_id,
                                     expense_type_id=type_id, expense_source_id=source_id)
             messages.success(request, 'Расход успешно создан.')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+        except exceptions.FieldNotFoundError as error:
             messages.error(request, str(error))
 
         return redirect('/lk/expenses')
@@ -522,9 +527,11 @@ class EditExpenseView(ObjectEditMixin):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['storages'] = storage_service.storages_all()
-        context['types'] = catalog_service.get_catalog_by_catalog_type_name_contains('расходы')
-        context['sources'] = catalog_service.get_catalog_by_type(settings.EXPENSE_SOURCE_CATEGORY)
+        context.update({
+            "storages": storage_service.storages_all(),
+            "types": catalog_service.get_catalog_by_catalog_type_name_contains(name='расходы'),
+            "sources": catalog_service.get_catalog_by_type(type_name=settings.EXPENSE_SOURCE_CATEGORY)
+        })
 
         return context
 
@@ -544,7 +551,7 @@ class EditExpenseView(ObjectEditMixin):
                                   comment=comment, storage_id=storage_id,
                                   expense_type_id=type_id, expense_source_id=source_id)
             messages.success(request, 'Расход успешно отредактирован.')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Expense.DoesNotExist) as error:
+        except (exceptions.FieldNotFoundError, Expense.DoesNotExist) as error:
             messages.error(request, str(error))
 
         return redirect('/lk/expenses')
@@ -566,9 +573,11 @@ class CreateSalaryView(ObjectCreateMixin):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['storages'] = storage_service.storages_all()
-        context['employees'] = employees_service.employees_all()
-        context['months'] = get_months()
+        context.update({
+            "storages": storage_service.storages_all(),
+            "employees": employees_service.employees_all(),
+            "months": get_months()
+        })
 
         return context
 
@@ -585,9 +594,9 @@ class CreateSalaryView(ObjectCreateMixin):
 
         try:
             salary_crud.create(date_at=date_at, salary_type=salary_type, employee_id=employee_id,
-                                   storage_id=storage_id, oklad=oklad, percent=percent, premium=premium,
-                                   month=month, period=period)
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+                               storage_id=storage_id, oklad=oklad, percent=percent, premium=premium,
+                               month=month, period=period)
+        except exceptions.FieldNotFoundError as error:
             messages.error(request, str(error))
 
         return redirect('/lk/salary')
@@ -600,9 +609,11 @@ class EditSalaryView(ObjectEditMixin):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['storages'] = storage_service.storages_all()
-        context['employees'] = employees_service.employees_all()
-        context['months'] = get_months()
+        context.update({
+            "storages": storage_service.storages_all(),
+            "employees": employees_service.employees_all(),
+            "months": get_months()
+        })
 
         return context
 
@@ -620,10 +631,10 @@ class EditSalaryView(ObjectEditMixin):
 
         try:
             salary_crud.edit(salary_id=salary_id, date_at=date_at, salary_type=salary_type,
-                                 employee_id=employee_id, storage_id=storage_id, oklad=oklad,
-                                 percent=percent, premium=premium, month=month, period=period)
+                             employee_id=employee_id, storage_id=storage_id, oklad=oklad,
+                             percent=percent, premium=premium, month=month, period=period)
             messages.success(request, 'Запись успешно отредактирована.')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Salary.DoesNotExist) as error:
+        except (exceptions.FieldNotFoundError, Salary.DoesNotExist) as error:
             messages.error(request, str(error))
 
         return redirect('/lk/salary')
@@ -645,9 +656,11 @@ class CreatePaysView(ObjectCreateMixin):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['storages'] = storage_service.storages_all()
-        context['pays'] = catalog_service.get_catalog_by_catalog_type_name_in_list(
-            [settings.PAYIN_CATEGORY, settings.PAYOUT_CATEGORY])
+        context.update({
+            "storages": storage_service.storages_all(),
+            "pays": catalog_service.get_catalog_by_catalog_type_name_in_list(names=[settings.PAYIN_CATEGORY,
+                                                                                    settings.PAYOUT_CATEGORY])
+        })
 
         return context
 
@@ -661,10 +674,10 @@ class CreatePaysView(ObjectCreateMixin):
 
         try:
             pays_service.create(date_at=date_at, storage_id=storage_id,
-                                 pay_type=pay_type, pay_sum=pay_sum, comment=comment,
-                                 from_to_id=from_to_id)
+                                pay_type=pay_type, pay_sum=pay_sum, comment=comment,
+                                from_to_id=from_to_id)
             messages.success(request, 'Запись успешно создана.')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+        except exceptions.FieldNotFoundError as error:
             messages.error(request, str(error))
 
         return redirect('/lk/pays')
@@ -677,9 +690,11 @@ class EditPaysView(ObjectEditMixin):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['storages'] = storage_service.storages_all()
-        context['pays'] = catalog_service.get_catalog_by_catalog_type_name_in_list(
-            [settings.PAYIN_CATEGORY, settings.PAYOUT_CATEGORY])
+        context.update({
+            "storages": storage_service.storages_all(),
+            "pays": catalog_service.get_catalog_by_catalog_type_name_in_list(names=[settings.PAYIN_CATEGORY,
+                                                                                    settings.PAYOUT_CATEGORY])
+        })
 
         return context
 
@@ -694,10 +709,10 @@ class EditPaysView(ObjectEditMixin):
 
         try:
             pays_service.edit(pay_id=pay_id, date_at=date_at, storage_id=storage_id,
-                               pay_type=pay_type, pay_sum=pay_sum, comment=comment,
-                               from_to_id=from_to_id)
+                              pay_type=pay_type, pay_sum=pay_sum, comment=comment,
+                              from_to_id=from_to_id)
             messages.success(request, 'Запись успешно отредактирована.')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Pays.DoesNotExist) as error:
+        except (exceptions.FieldNotFoundError, Pays.DoesNotExist) as error:
             messages.error(request, str(error))
 
         return redirect('/lk/pays')
@@ -719,9 +734,11 @@ class CreateFineView(ObjectCreateMixin):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['storages'] = storage_service.storages_all()
-        context['employees'] = employees_service.employees_all()
-        context['reasons'] = catalog_service.get_catalog_by_catalog_type_name_contains(settings.FINE_REASON_CATEGORY)
+        context.update({
+            "storages": storage_service.storages_all(),
+            "employees": employees_service.employees_all(),
+            "reasons": catalog_service.get_catalog_by_catalog_type_name_contains(settings.FINE_REASON_CATEGORY)
+        })
 
         return context
 
@@ -735,7 +752,7 @@ class CreateFineView(ObjectCreateMixin):
             fines_service.create(date_at=date_at, employee_id=employee_id,
                                  fine_sum=fine_sum, reason_id=reason_id)
             messages.success(request, 'Запись успешно создана.')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+        except exceptions.FieldNotFoundError as error:
             messages.error(request, str(error))
 
         return redirect('/lk/fines')
@@ -748,9 +765,11 @@ class EditFinesView(ObjectEditMixin):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['storages'] = storage_service.storages_all()
-        context['employees'] = employees_service.employees_all()
-        context['reasons'] = catalog_service.get_catalog_by_type(settings.FINE_REASON_CATEGORY)
+        context.update({
+            "storages": storage_service.storages_all(),
+            "employees": employees_service.employees_all(),
+            "reasons": catalog_service.get_catalog_by_catalog_type_name_contains(settings.FINE_REASON_CATEGORY)
+        })
 
         return context
 
@@ -765,7 +784,7 @@ class EditFinesView(ObjectEditMixin):
             fines_service.edit(fine_id=fine_id, date_at=date_at, employee_id=employee_id,
                                fine_sum=fine_sum, reason_id=reason_id)
             messages.success(request, 'Запись успешно отредактирована.')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Fine.DoesNotExist) as error:
+        except (exceptions.FieldNotFoundError, Fine.DoesNotExist) as error:
             messages.error(request, str(error))
 
         return redirect('/lk/fines')
@@ -791,8 +810,10 @@ class CreateEmployeeView(ObjectCreateMixin):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['storages'] = storage_service.storages_all()
-        context['jobs'] = positions_service.jobs_all()
+        context.update({
+            "storages": storage_service.storages_all(),
+            "jobs": positions_service.jobs_all()
+        })
 
         return context
 
@@ -815,8 +836,7 @@ class CreateEmployeeView(ObjectCreateMixin):
                                               status=status, photo=photo, description=description)
             messages.success(request, 'Сотрудник успешно создан.')
             url = '/lk/employees'
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, exceptions.UniqueFieldError,
-                exceptions.IncorrectFieldError) as error:
+        except (exceptions.FieldNotFoundError, exceptions.UniqueFieldError, exceptions.IncorrectFieldError) as error:
             messages.error(request, str(error))
             url = '/lk/employees/create'
 
@@ -829,11 +849,16 @@ class EditEmployeeView(ObjectEditMixin):
     success_url = '/lk/employees'
 
     def get_context_data(self, request, **kwargs) -> dict:
+        employee_id = request.GET.get('id')
+
         context = super().get_context_data(request, **kwargs)
-        context['storages'] = storage_service.storages_all()
-        context['jobs'] = positions_service.jobs_all()
-        context['salaries'] = salary_service.SalaryService().get_money_data_employee(request).get('entire_salary_data')
-        context['last_work_day'] = employees_service.last_work_day(employee_id=request.GET.get('id'))
+        context.update({
+            "storages": storage_service.storages_all(),
+            "jobs": positions_service.jobs_all(),
+            "salaries": salary_service.SalaryService().get_money_data_employee(request).get('entire_salary_data'),
+            "last_work_day": employees_service.last_work_day(employee_id=employee_id),
+            "employee_logs": employees_service.employee_logs(employee_id=employee_id)
+        })
 
         return context
 
@@ -858,8 +883,7 @@ class EditEmployeeView(ObjectEditMixin):
                                             description=description, status_change_comment=status_change_comment)
             messages.success(request, 'Сотрудник успешно отредактирован.')
             url = '/lk/employees'
-        except (exceptions.FieldCannotBeEmptyError, exceptions.FieldNotFoundError, exceptions.UniqueFieldError,
-                exceptions.IncorrectFieldError) as error:
+        except (exceptions.FieldNotFoundError, exceptions.UniqueFieldError, exceptions.IncorrectFieldError) as error:
             messages.error(request, str(error))
             url = f'/lk/employees/edit?id={employee_id}'
 
@@ -882,8 +906,6 @@ class ArrivalsView(BaseLkView):
     template_name = 'lk/arrivals/index.html'
 
 
-# ToDo: Refactor this
-
 class ArrivalCreateView(ObjectCreateMixin):
     template_name = 'lk/arrivals/create.html'
     model = Arrival
@@ -891,11 +913,13 @@ class ArrivalCreateView(ObjectCreateMixin):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['storages'] = storage_service.storages_all()
-        context['products'] = Product.objects.filter(
-            category__name__in=[settings.TOVAR_BEER_CATEGORY, settings.TOVAR_DRINKS_CATEGORY])
-        context['suppliers'] = Supplier.objects.all()
-        context['payment_types'] = Catalog.objects.filter(catalog_types__name=settings.EXPENSE_SOURCE_CATEGORY)
+        context.update({
+            "storages": storage_service.storages_all(),
+            "products": product_service.nomenclature_by_categories(categories=[settings.TOVAR_BEER_CATEGORY,
+                                                                               settings.TOVAR_DRINKS_CATEGORY]),
+            "suppliers": supplier_service.suppliers_all(),
+            "payment_types": catalog_service.get_catalog_by_type(type_name=settings.EXPENSE_SOURCE_CATEGORY)
+        })
 
         return context
 
@@ -910,11 +934,13 @@ class ArrivalEditView(ObjectEditMixin):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['storages'] = storage_service.storages_all()
-        context['products'] = Product.objects.filter(
-            category__name__in=[settings.TOVAR_BEER_CATEGORY, settings.TOVAR_DRINKS_CATEGORY])
-        context['suppliers'] = Supplier.objects.all()
-        context['payment_types'] = Catalog.objects.filter(catalog_types__name=settings.EXPENSE_SOURCE_CATEGORY)
+        context.update({
+            "storages": storage_service.storages_all(),
+            "products": product_service.nomenclature_by_categories(categories=[settings.TOVAR_BEER_CATEGORY,
+                                                                               settings.TOVAR_DRINKS_CATEGORY]),
+            "suppliers": supplier_service.suppliers_all(),
+            "payment_types": catalog_service.get_catalog_by_type(type_name=settings.EXPENSE_SOURCE_CATEGORY)
+        })
 
         return context
 
@@ -966,7 +992,7 @@ class ItemDeficitSendView(BaseLkView):
                 messages.success(request, 'Статус успешно обновлен.')
             else:
                 messages.error(request, 'Этот запрос уже обработан.')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, ItemDeficit.DoesNotExist) as error:
+        except (exceptions.FieldNotFoundError, ItemDeficit.DoesNotExist) as error:
             messages.error(request, str(error))
 
         url = request.META.get('HTTP_REFERER')
@@ -979,7 +1005,7 @@ class BarActionsView(BaseLkView):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context.update({
-            "settings": Setting.objects.all()
+            "settings": bar_service.bar_settings()
         })
 
         return context
@@ -997,7 +1023,7 @@ class SendMessageOnBar(BaseLkView):
             profile = context.get('profile')
             bar_service.send_message_on_bar(storages=storages, message=message, profile=profile)
             messages.success(request, 'Сообщение успешно отправлено.')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+        except exceptions.FieldNotFoundError as error:
             messages.error(request, str(error))
 
         url = request.META.get('HTTP_REFERER')
@@ -1021,12 +1047,13 @@ class MalfunctionCompleteView(BaseLkView):
         try:
             RepairerService().malfunction_repaired(malfunction_id=malfunction_id)
             messages.success(request, 'Ваш ответ был успешно отправлен.')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Malfunction.DoesNotExist) as error:
+        except (exceptions.FieldNotFoundError, Malfunction.DoesNotExist) as error:
             messages.error(request, error)
 
         return redirect('/lk/malfunctions')
 
 
+@login_required
 def link_question_to_bar_setting(request):
     question_text = request.POST.get('question_text')
     question_id = request.GET.get('question_id')
@@ -1036,7 +1063,7 @@ def link_question_to_bar_setting(request):
         bar_service.link_question_to_storage(question_text=question_text, storage_id=storage_id,
                                                           question_id=question_id)
         messages.success(request, 'Вопрос для конца дня успешно привязан к заведению.')
-    except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError, Setting.DoesNotExist) as error:
+    except (exceptions.FieldNotFoundError, Setting.DoesNotExist) as error:
         messages.error(request, str(error))
 
     return redirect('/lk/bars/settings?id=' + storage_id)
@@ -1054,6 +1081,7 @@ class ReviewsView(BaseLkView):
         return context
 
 
+@login_required
 def review_create(request):
     if request.method == "POST":
         photo = request.FILES.get('review_photo')
@@ -1070,6 +1098,7 @@ def review_create(request):
         return redirect('/lk/reviews')
     
 
+@login_required
 def review_link_to_employee(request):
     if request.method == "GET":
         review_id = request.GET.get('id')
@@ -1104,7 +1133,7 @@ class MalfunctionCreateView(ObjectCreateMixin):
             MalfunctionService().malfunction_create(storage_id=storage_id, photo=photo,
                                                     fault_object=fault_object, description=description)
             messages.success(request, 'Неисправность успешно занесена в список.')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+        except exceptions.FieldNotFoundError as error:
             messages.error(request, error)
 
         return redirect('/lk/malfunctions')
@@ -1129,7 +1158,7 @@ class NeedItemsCreateView(ObjectCreateMixin):
         try:
             item_deficit_service.create(storage_id=storage_id, item=item, amount=amount)
             messages.success(request, 'Заявка на нехватку успешно создана.')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+        except exceptions.FieldNotFoundError as error:
             messages.error(request, error)
 
         return redirect('/lk/need_items')
@@ -1172,7 +1201,7 @@ class ExpenseStatusView(BaseLkView):
         try:
             expenses_service.change_status(expense_id=expense_id, status=status, comment=comment)
             messages.success(request, 'Статус записи успешно обновлен.')
-        except (exceptions.FieldNotFoundError, exceptions.FieldCannotBeEmptyError) as error:
+        except exceptions.FieldNotFoundError as error:
             messages.error(request, str(error))
 
         return redirect('/lk/expenses')

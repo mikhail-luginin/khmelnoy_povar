@@ -1,16 +1,17 @@
-import os
-import secrets
-
 from django.contrib import messages
+from django.db import transaction
 from django.shortcuts import redirect
 
-from apps.bar.models import Timetable
-from apps.lk.models import Employee
-from core import exceptions
-from core import validators
+from core import exceptions, validators
 from core.services import positions_service
 from core.services import storage_service
 from core.utils.time import today_date
+
+from apps.bar.models import Timetable
+from apps.lk.models import Employee, EmployeeLog
+
+import os
+import secrets
 
 
 def employees_with_deleted_filter(is_deleted: bool, **kwargs) -> list[Employee]:
@@ -25,6 +26,7 @@ def employee_get(employee_id) -> Employee:
     return Employee.objects.filter(id=employee_id).first()
 
 
+@transaction.atomic()
 def employee_create(request, first_name: str | None, last_name: str | None, birth_date: str | None, address: str | None,
                     job_id: int | None, storage_id: int | None, phone: str | None, status: int | None, photo,
                     description: str | None) -> Employee:
@@ -54,16 +56,18 @@ def employee_create(request, first_name: str | None, last_name: str | None, birt
         address=address,
         job_place=positions_service.job_get(id=job_id),
         phone=phone,
-        status=status,
-        description=description
+        status=status
     )
     row.storage = storage_service.storage_get(id=storage_id) if storage_id is not None else storage_service.storage_get(
         code=request.GET.get('code'))
     row.save()
 
+    EmployeeLog.objects.create(date_at=today_date(), employee=row, type=4, comment=description)
+
     return row
 
 
+@transaction.atomic()
 def employee_edit(employee_id: int | None, first_name: str | None, last_name: str | None,
                   birth_date: str | None, address: str | None, job_place_id: int | None,
                   storage_id: int | None, phone: str | None, status: int | None, photo,
@@ -79,12 +83,17 @@ def employee_edit(employee_id: int | None, first_name: str | None, last_name: st
     if len(phone) != 10:
         raise exceptions.IncorrectFieldError('Некорректный ввод номера телефона. Попробуйте еще раз')
 
-    employee = Employee.objects.filter(id=employee_id).first()
+    last_description = EmployeeLog.objects.filter(employee_id=employee_id, type=4).last()
+    if not description:
+        description = last_description.comment
 
+    employee = Employee.objects.filter(id=employee_id).first()
     if employee:
         if int(status) != employee.status:
-            validators.validate_field(status_change_comment, 'Комментарий к изменению статуса')
-            employee.status_change_comment += ' / ' + status_change_comment
+            validators.validate_field(status_change_comment, 'комментарий к изменению статуса')
+            EmployeeLog.objects.create(date_at=today_date(), employee_id=employee_id, type=3,
+                                       comment=f'{employee.get_status_display()} -> '
+                                               f'{employee.get_status_by_id(int(status))}: {status_change_comment}')
 
         employee.fio = f'{last_name} {first_name}'
         employee.birth_date = birth_date
@@ -92,10 +101,8 @@ def employee_edit(employee_id: int | None, first_name: str | None, last_name: st
         employee.job_place_id = job_place_id
         employee.storage_id = storage_id
         employee.status = status
-        employee.description = description
 
         old_photo = employee.photo
-
         if photo:
             employee.photo = photo
             if old_photo:
@@ -110,6 +117,9 @@ def employee_edit(employee_id: int | None, first_name: str | None, last_name: st
         else:
             employee.phone = phone
             employee.save()
+
+        if last_description is None or (last_description and last_description.comment != description):
+            EmployeeLog.objects.create(date_at=today_date(), employee_id=employee_id, type=4, comment=description)
     else:
         raise Employee.DoesNotExist('Запись с указанным идентификатором не найдена.')
 
@@ -149,3 +159,7 @@ def return_to_work(request) -> redirect:
 
 def last_work_day(employee_id: int):
     return Timetable.objects.filter(employee_id=employee_id).last()
+
+
+def employee_logs(employee_id: int) -> list[EmployeeLog]:
+    return EmployeeLog.objects.filter(employee_id=employee_id)
