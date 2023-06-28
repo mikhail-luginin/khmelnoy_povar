@@ -13,6 +13,8 @@
                                             data-bs-toggle="tab">Настройка параметров</a></li>
                     <li class="nav-item"><a href="#tab-top-2" id="btn-tab-top-2" class="tab-top nav-link"
                                             data-bs-toggle="tab">Вопросы</a></li>
+                    <li class="nav-item"><a href="#tab-top-3" id="btn-tab-top-3" class="tab-top nav-link"
+                                            data-bs-toggle="tab">Посуда</a></li>
                 </ul>
             </div>
             <div class="tab-content">
@@ -85,6 +87,35 @@
                         </form>
                     </div>
                 </div>
+                <div id="tab-top-3" class="card tab-pane">
+                    <div class="card-body">
+                        <div class="card-title mb-2">Остатки посуды</div>
+                        <form action="{% url 'LK:product_remains_add' %}?id={{ row.id }}" method="post">
+                            {% csrf_token %}
+                            <div class="mb-4">
+                                <div class="columns-4 gap-4">
+                                    {% for product in products %}
+                                        <div class="row mb-1">
+                                            <div class="col-6">{{ product.name }}</div>
+                                            <div class="col-5"><input class="form-control"
+                                                                      name="{{ product.id }}"
+                                                                      placeholder="Остаток"
+                                                                      {% for remain in remains %}
+                                                                          {% if remain.product.id == product.id %}
+                                                                              value="{{ remain.amount }}"
+                                                                          {% endif %}
+                                                                      {% endfor %}
+                                                               ></div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <button type="submit" class="btn w-100">Сохранить</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -133,11 +164,16 @@
         $(document).ready(function () {
             let first_tab = $('#btn-tab-top-1')
             let second_tab = $('#btn-tab-top-2')
+            let third_tab = $('#btn-tab-top-3')
             first_tab.click(function () {
                 $('.tab-top').removeClass('active')
                 first_tab.addClass('active')
             })
             second_tab.click(function () {
+                $('.tab-top').removeClass('active')
+                second_tab.addClass('active')
+            })
+            third_tab.click(function () {
                 $('.tab-top').removeClass('active')
                 second_tab.addClass('active')
             })

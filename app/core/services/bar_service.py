@@ -1,3 +1,4 @@
+from apps.iiko.models import Storage
 from core import validators
 
 from apps.bar.models import Setting, EndDayQuestions
@@ -69,3 +70,10 @@ def get_question_on_end_day_by_storage_id(storage_id: int) -> dict:
         })
 
     return data
+
+
+def storage_by_setting_id(setting_id: int) -> Storage | None:
+    setting = Setting.objects.filter(id=setting_id).first()
+    if setting:
+        return setting.storage
+    return None

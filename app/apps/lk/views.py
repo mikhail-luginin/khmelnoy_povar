@@ -8,7 +8,9 @@ from core.logs import LogsService
 from core.utils.time import get_months
 from core.mixins import BaseLkView, ObjectEditMixin, ObjectCreateMixin, ObjectDeleteMixin
 from core import exceptions
-from core.services import salary_service, bar_service, item_deficit_service, reviews_service, catalog_service, positions_service, money_service, employees_service, expenses_service, pays_service, fines_service, timetable_service, storage_service, statement_service, salary_crud
+from core.services import salary_service, bar_service, item_deficit_service, reviews_service, catalog_service, \
+    positions_service, money_service, employees_service, expenses_service, pays_service, fines_service, \
+    timetable_service, storage_service, statement_service, salary_crud, product_remains_service, product_service
 
 from .tasks import calculate_percent_premium_for_all, update_all_money
 
@@ -142,10 +144,14 @@ class BarsSettingsView(BaseLkView):
     template_name = 'lk/bars_settings.html'
 
     def get_context_data(self, request, **kwargs) -> dict:
+        storage_id = request.GET.get('id')
+
         context = super().get_context_data(request, **kwargs)
         context.update({
             "questions": bar_service.questions_for_link(),
-            "row": bar_service.get_setting_by_storage_id(storage_id=request.GET.get('id'))
+            "row": bar_service.get_setting_by_storage_id(storage_id=storage_id),
+            "products": product_service.nomenclature_by_category(category_name=settings.TOVAR_WARE_CATEGORY),
+            "remains": product_remains_service.remains_by_storage_id(storage_id=storage_id)
         })
 
         return context
@@ -1176,5 +1182,21 @@ class PurchaserView(BaseLkView):
     template_name = 'lk/purchaser/index.html'
 
 
+@login_required
 def get_table_for_purchaser(request):
     return JsonResponse({'data': PurchaserService().get_info_for_purchaser_difference()})
+
+
+@login_required
+def product_remains_add(request):
+    storage_id = request.GET.get('id')
+
+    remains = {}
+    for key, value in request.POST.items():
+        if key != 'csrfmiddlewaretoken':
+            if value != '':
+                remains.update({key: value})
+    product_remains_service.add_remain(remains=remains, storage_id=storage_id)
+
+    messages.success(request, 'Остатки успешно занесены.')
+    return redirect(f'/lk/bars/settings?id={storage_id}')

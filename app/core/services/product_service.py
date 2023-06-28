@@ -91,3 +91,7 @@ def product_get(product_id: str = None, row_id: int = None) -> Product | None:
         data['id'] = row_id
 
     return Product.objects.filter(**data).first()
+
+
+def nomenclature_by_category(category_name: str) -> Product | None:
+    return Product.objects.filter(category__name=category_name)

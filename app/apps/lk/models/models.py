@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 from . import managers
 
-from apps.iiko.models import Storage
+from apps.iiko.models import Storage, Product
 
 
 class Navbar(models.Model):
@@ -257,3 +257,11 @@ class ExpenseStatus(models.Model):
     comments = models.JSONField(default=list)
 
     objects = managers.ExpenseStatusManager()
+
+
+class ProductRemain(models.Model):
+    storage = models.ForeignKey(to=Storage, on_delete=models.CASCADE)
+    product = models.ForeignKey(to=Product, on_delete=models.CASCADE)
+    amount = models.IntegerField()
+
+    objects = managers.ProductRemainManager()

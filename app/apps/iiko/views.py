@@ -3,13 +3,15 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import redirect
 
-from core.services import discount_service, product_service, storage_service, supplier_service, category_service, payment_type_service, stoplist_service, terminal_service
+from core.services import discount_service, product_service, storage_service, \
+                          supplier_service, category_service, payment_type_service, \
+                          stoplist_service, terminal_service
 from core.services.product_request_service import ProductRequestService
+from core.services.tables_service import OnlineTableService
 from core.exceptions import FieldNotFoundError, FieldCannotBeEmptyError
 from core.mixins import ObjectEditMixin, BaseLkView
 
 from apps.iiko.models import Product, Supplier, Category, PaymentType
-from core.services.tables_service import OnlineTableService
 
 
 @login_required
