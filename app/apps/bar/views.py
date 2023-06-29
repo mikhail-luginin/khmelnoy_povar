@@ -333,10 +333,8 @@ class NeedItemsView(BaseView):
 class NeedItemsReceiveView(BaseView):
 
     def post(self, request):
-        request_id = request.GET.get('id')
-
         try:
-            receive_status = item_deficit_service.receive(request_id=request_id,
+            receive_status = item_deficit_service.receive(request_id=request.GET.get('id'),
                                                           arrived_amount=request.POST.get('arrived_amount'),
                                                           comment=request.POST.get('comment'))
             if receive_status:
@@ -349,8 +347,16 @@ class NeedItemsReceiveView(BaseView):
         return redirect('/bar/need_items?code=' + request.GET.get('code'))
 
 
-def send_revise_message(request):
-    if request.method == "POST":
-        send_message_to_telegram(chat_id=settings.LEADERSHIP_CHAT_ID, message=request.POST.get('revise-reason'))
+class SendReviseMessageView(BaseView):
+    def post(self, request):
+        context = self.get_context_data(request)
+        bar_setting = context.get('setting')
+        chat_id = bar_setting.tg_chat_id if bar_setting else ''
+
+        revise_sum = request.POST.get('revise-sum')
+        revise_reason = request.POST.get('revise-reason')
+
+        message = f'Проверьте кассу\n\nРеальный остаток в кассе: {revise_sum}\nПричина разницы: {revise_reason}'
+        send_message_to_telegram(chat_id=chat_id, message=message)
 
         return JsonResponse(data={"success": True}, status=200)

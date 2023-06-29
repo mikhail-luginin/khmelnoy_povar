@@ -21,5 +21,9 @@ if settings.DEBUG is False:
         'update_money_every_day': {
             'task': 'apps.lk.tasks.update_money_every_day',
             'schedule': crontab(hour=1, minute=0)
+        },
+        'create_money_records': {
+            'task': 'apps.bar.tasks.create_money_records',
+            'schedule': crontab(hour=11, minute=0)
         }
     }
