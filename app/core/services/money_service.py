@@ -126,7 +126,6 @@ def money_edit(row_id: int | None, sum_cash_morning: int | None,
                sum_cash_end_day: int | None, barmen_percent: float | None) -> None:
     validators.validate_field(row_id, 'идентификатор записи')
     validators.validate_field(sum_cash_morning, 'касса утро')
-    validators.validate_field(sum_cash_end_day, 'касса вечер')
     validators.validate_field(barmen_percent, 'процент бармена')
 
     money_record = Money.objects.filter(id=row_id).first()
