@@ -12,7 +12,7 @@
             <div class="card-body">
                 <label class="form-label">Касса утро</label>
                 <input class="form-control" type="tel" inputmode="numeric"
-                       name="sum_cash_morning" value="{% if morning_cashbox is not None %}{{ morning_cashbox }}{% else %}Касса вечер предыдущего дня не была заполнена{% endif %}" disabled><br>
+                       name="sum_cash_morning" value="{% if morning_cashbox is not None %}{{ morning_cashbox }}{% else %}{{ evening_cashbox_previous_day }}{% endif %}" disabled><br>
                 <a data-bs-toggle="modal" data-bs-target="#revise" class="btn w-100">Сверка</a>
             </div>
         </div>
