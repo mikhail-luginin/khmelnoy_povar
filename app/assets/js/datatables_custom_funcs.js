@@ -84,6 +84,7 @@ function run_datatable(table_id, ajax_url, url, ajax_columns,
                                 '</div>' +
                                 '</div>' +
                                 '</div>'
+                                console.log(actions)
                         } else {
                             actions += '<a href="#" data-bs-toggle="modal" data-bs-target="#return-employee-' + row.id + '"><i class="fa fa-user"></i></a>' +
                                 '<div class="modal modal-blur fade" id="return-employee-' + row.id + '" tabindex="-1" role="dialog" aria-hidden="true">' +
