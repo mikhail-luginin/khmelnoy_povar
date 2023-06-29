@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.http import Http404
 from django.conf import settings
 
+from core.services.bar_service import get_setting_by_storage_id
 from core.utils.telegram import send_message_to_telegram
 
 from apps.bar.models import TovarRequest, Arrival
@@ -36,6 +37,8 @@ class BaseView(View):
 
         context['code'] = code
         context['bar'] = bar
+        if bar is not None:
+            context['setting'] = get_setting_by_storage_id(storage_id=bar.id)
         context['date'] = today_date()
 
         context.update(**kwargs)

@@ -12,8 +12,8 @@
             <div class="card-body">
                 <label class="form-label">Касса утро</label>
                 <input class="form-control" type="tel" inputmode="numeric"
-                       name="sum_cash_morning" value="{% if morning_cashbox is not None %}{{ morning_cashbox }}{% else %}{{ evening_cashbox_previous_day }}{% endif %}" disabled><br>
-                <a data-bs-toggle="modal" data-bs-target="#revise" class="btn w-100">Сверка</a>
+                       name="sum_cash_morning" value="{{ morning_cashbox }}" disabled><br>
+                <a data-bs-toggle="modal" data-bs-target="#revise" class="btn w-100">Не согласны с остатком?</a>
             </div>
         </div>
         <div class="modal modal-blur fade" id="revise" tabindex="-1" role="dialog" aria-hidden="true">
@@ -27,6 +27,11 @@
                         </div>
                         <div class="modal-body">
                             <div class="row mb-3 align-items-end">
+                                <div class="col">
+                                    <label class="form-label">Укажите реальный остаток</label>
+                                    <input class="form-control" name="revise-sum"
+                                           placeholder="Введите остаток"/>
+                                </div>
                                 <div class="col">
                                     <label class="form-label">Укажите причину сверки</label>
                                     <input class="form-control" name="revise-reason"

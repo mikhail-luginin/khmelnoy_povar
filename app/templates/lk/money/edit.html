@@ -15,7 +15,7 @@
                     </div>
                     <div class="mb-4">
                         <label class="form-label">Касса вечер</label>
-                        <input class="form-control" name="sum_cash_end_day" placeholder="Введите сумму кассы на вечер" value="{{ row.sum_cash_end_day }}">
+                        <input class="form-control" name="sum_cash_end_day" placeholder="Введите сумму кассы на вечер" value="{% if row.sum_cash_end_day %}{{ row.sum_cash_end_day }}{% endif %}">
                     </div>
                     <div class="mb-4">
                         <label class="form-label">Процент барменов</label>

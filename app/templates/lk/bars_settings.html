@@ -89,7 +89,7 @@
                 </div>
                 <div id="tab-top-3" class="card tab-pane">
                     <div class="card-body">
-                        <div class="card-title mb-2">Остатки посуды</div>
+                        <div class="card-title mb-2">Минимальное количество посуды</div>
                         <form action="{% url 'LK:product_remains_add' %}?id={{ row.id }}" method="post">
                             {% csrf_token %}
                             <div class="mb-4">
