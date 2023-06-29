@@ -37,7 +37,8 @@ class BaseView(View):
 
         context['code'] = code
         context['bar'] = bar
-        context['setting'] = get_setting_by_storage_id(storage_id=bar.id)
+        if bar is not None:
+            context['setting'] = get_setting_by_storage_id(storage_id=bar.id)
         context['date'] = today_date()
 
         context.update(**kwargs)
