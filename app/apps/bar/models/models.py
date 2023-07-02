@@ -1,9 +1,10 @@
+#  Copyright (c) 2023. All rights reserved. Mikhail Luginin. Contact: telegram @hex0z
+
 from django.db import models
 
-from . import managers
-
-from apps.lk.models import Employee, Position, Catalog
 from apps.iiko.models import Storage, Product, Supplier, Session
+from apps.lk.models import Employee, Position, Catalog
+from . import managers
 
 
 class Money(models.Model):
@@ -97,17 +98,25 @@ class Arrival(models.Model):
     ]
 
     date_at = models.DateField()
-    storage = models.ForeignKey(Storage, on_delete=models.SET_NULL, null=True)
+    storage = models.ForeignKey(to=Storage, on_delete=models.SET_NULL, null=True)
     num = models.CharField(max_length=64)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True)
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    supplier = models.ForeignKey(to=Supplier, on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey(to=Product, on_delete=models.SET_NULL, null=True)
     amount = models.IntegerField()
     sum = models.FloatField()
     type = models.PositiveSmallIntegerField(choices=ARRIVAL_TYPE_CHOICES, default=0)
     payment_date = models.DateField(null=True)
-    payment_type = models.ForeignKey(Catalog, on_delete=models.SET_NULL, null=True)
+    payment_type = models.ForeignKey(to=Catalog, on_delete=models.SET_NULL, null=True)
 
     objects = managers.ArrivalManager()
+
+
+class ArrivalKeg(models.Model):
+    invoice_number = models.CharField(max_length=255)
+    gave_thirty = models.PositiveIntegerField()
+    received_thirty = models.PositiveIntegerField()
+    gave_fifty = models.PositiveIntegerField()
+    received_fifty = models.PositiveIntegerField()
 
 
 class Pays(models.Model):

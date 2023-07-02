@@ -1,29 +1,26 @@
+#  Copyright (c) 2023. All rights reserved. Mikhail Luginin. Contact: telegram @hex0z
+
 import datetime
-
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
-from django.contrib import messages
-from django.http import Http404
-from django.conf import settings
-
-from core.services.bar_service import get_setting_by_storage_id
-from core.utils.telegram import send_message_to_telegram
-
-from apps.bar.models import TovarRequest, Arrival
-
-from .services.bar_info import get_bar, get_main_barmen
-
-from apps.iiko.models import Product, Category, Storage
-from core.services.api.iiko import IikoService
-from core.services import storage_service
-
-from core.utils.time import today_date, monthdelta, get_current_time, get_months
-from core.logs import create_log
-from core.utils.payment_types import get_bn_category, get_nal_category
 import xml.etree.ElementTree as ET
 
+from django.conf import settings
+from django.contrib import messages
+from django.http import Http404
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views import View
+
+from apps.bar.models import TovarRequest, Arrival
+from apps.iiko.models import Product, Category, Storage
 from apps.lk.models import Expense, Catalog
+from core.logs import create_log
 from core.services import catalog_service
+from core.services import storage_service, bar_service
+from core.services.api.iiko import IikoService
+from core.services.bar_service import get_setting_by_storage_id
+from core.utils.payment_types import get_bn_category, get_nal_category
+from core.utils.telegram import send_message_to_telegram
+from core.utils.time import today_date, monthdelta, get_current_time, get_months
+from .services.bar_info import get_bar, get_main_barmen
 
 
 class BaseView(View):
@@ -46,7 +43,15 @@ class BaseView(View):
         return context
 
     def get(self, request):
-        return render(request, self.template_name, self.get_context_data(request))
+        context = self.get_context_data(request)
+
+        main_barmen = bar_service.get_main_barmen_on_storage_by_date(date_at=today_date(),
+                                                                     storage_id=context.get('bar').id)
+        if request.path != '/bar/' and main_barmen is None:
+            messages.error(request, 'Укажите основного бармена.')
+            return redirect(f'/bar?code={context.get("code")}')
+
+        return render(request, self.template_name, context=context)
 
 
 class ObjectDeleteMixin(BaseView):
@@ -99,7 +104,7 @@ class ProductsMovementMixin(BaseView):
                 category=self.category,
                 rows=self.model.objects.filter(date_at=today_date(),
                                                storage=storage_service.storage_get(code=request.GET.get('code')),
-                                               product__category_id=category),
+                                               product__category=category),
             )
         )
 

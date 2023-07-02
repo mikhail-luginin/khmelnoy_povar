@@ -1,7 +1,8 @@
+#  Copyright (c) 2023. All rights reserved. Mikhail Luginin. Contact: telegram @hex0z
+
 from rest_framework import serializers
 
-from apps.bar.models import Pays, Arrival, TovarRequest, Timetable, Salary, Money
-
+from apps.bar.models import Pays, Arrival, TovarRequest, Timetable, Salary, Money, ArrivalKeg
 from core.utils.time import get_months
 
 
@@ -93,4 +94,10 @@ class PaysSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Pays
+        fields = '__all__'
+
+
+class ArrivalKegSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ArrivalKeg
         fields = '__all__'

@@ -44,6 +44,26 @@
                     </tr>
                     </thead>
                 </table>
+                <br>
+                <table id="arrivals-kegs-table"
+                       class="table table-sm table-hover table-striped table-bordered nowrap w-100">
+                    <thead>
+                    <tr class="column-filter dt-column-filter">
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                    </tr>
+                    <tr>
+                        <th>Накладная</th>
+                        <th>Отдали 30</th>
+                        <th>Получили 30</th>
+                        <th>Отдали 50</th>
+                        <th>Получили 50</th>
+                    </tr>
+                    </thead>
+                </table>
             </div>
         </div>
     </div>
@@ -63,5 +83,12 @@
             {data: 'payment_type_name'},
             {data: 'payment_date'}
         ])
+        run_datatable('arrivals-kegs-table', '/api/arrivals-kegs', '/lk/tovar/arrivals', [
+            {data: 'invoice_number'},
+            {data: 'gave_thirty'},
+            {data: 'received_thirty'},
+            {data: 'gave_fifty'},
+            {data: 'received_fifty'}
+        ], has_delete = false, has_update = false, has_dismiss = false, has_edit = false, has_actions = false)
     </script>
 {% endblock %}

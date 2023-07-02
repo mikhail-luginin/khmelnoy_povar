@@ -1,10 +1,12 @@
+#  Copyright (c) 2023. All rights reserved. Mikhail Luginin. Contact: telegram @hex0z
+
+from django.db.models import Q
+
+from apps.bar.models import Setting, EndDayQuestions, Timetable
 from apps.iiko.models import Storage
-from core import validators
-
-from apps.bar.models import Setting, EndDayQuestions
 from apps.lk.models import Profile
-
 from apps.lk.tasks import bar_actions_telegram_message
+from core import validators
 
 
 def send_message_on_bar(storages: list, message: str, profile: Profile) -> None:
@@ -30,7 +32,7 @@ def questions_for_link() -> list[EndDayQuestions]:
     return EndDayQuestions.objects.all()
 
 
-def link_question_to_storage(question_text: str,  storage_id: int, question_id: int) -> None:
+def link_question_to_storage(question_text: str, storage_id: int, question_id: int) -> None:
     if question_id == '':
         question = EndDayQuestions.objects.filter(text=question_text)
     else:
@@ -81,3 +83,10 @@ def storage_by_setting_id(setting_id: int) -> Storage | None:
 
 def bar_settings() -> list[Setting]:
     return Setting.objects.all()
+
+
+def get_main_barmen_on_storage_by_date(date_at: str, storage_id: int) -> Timetable | None:
+    return Timetable.objects.filter(
+        Q(date_at=date_at, storage_id=storage_id),
+        Q(position__name='Бармен основной') | Q(position__name='Бармен вызывной (основной)')
+    ).first()

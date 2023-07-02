@@ -1,31 +1,30 @@
+#  Copyright (c) 2023. All rights reserved. Mikhail Luginin. Contact: telegram @hex0z
+
+from django.conf import settings
 from django.contrib import messages
+from django.db.models import Sum
 from django.http import JsonResponse
 from django.shortcuts import redirect
-from django.conf import settings
-from django.db.models import Sum
-
-from core import exceptions
-from core.services import bar_service
-from core.utils.telegram import send_message_to_telegram
-from core.utils.time import today_date, get_months, get_current_time
-from core.services.salary_service import SalaryService
-
-from .utils import BaseView, ObjectDeleteMixin, TovarRequestMixin, ArrivalMixin, InventoryMixin, DataLogsMixin
-from .services.index import HomePageService
-from .services.expenses import ExpensesPageService
-from .services.end_day import complete_day
-from .services.malfunctions import MalfunctionService
-from .services.fines import get_fines_on_storage_by_month
-from .services.bar_info import get_full_information_of_day, get_bar_settings, get_full_information_of_day_for_data_logs
-from .exceptions import EmployeeAlreadyWorkingToday
 
 from apps.bar.models import Timetable, TovarRequest, Arrival, Pays, Salary, Money, Setting
+from apps.iiko.models import Storage
 from apps.lk.models import Expense, Fine, ItemDeficit
 from apps.repairer.models import Malfunction
-from apps.iiko.models import Storage
-
-from core.services import catalog_service, item_deficit_service, storage_service
 from apps.repairer.services import RepairerService
+from core import exceptions
+from core.services import bar_service, arrival_service
+from core.services import catalog_service, item_deficit_service, storage_service
+from core.services.salary_service import SalaryService
+from core.utils.telegram import send_message_to_telegram
+from core.utils.time import today_date, get_months, get_current_time
+from .exceptions import EmployeeAlreadyWorkingToday
+from .services.bar_info import get_full_information_of_day, get_bar_settings, get_full_information_of_day_for_data_logs
+from .services.end_day import complete_day
+from .services.expenses import ExpensesPageService
+from .services.fines import get_fines_on_storage_by_month
+from .services.index import HomePageService
+from .services.malfunctions import MalfunctionService
+from .utils import BaseView, ObjectDeleteMixin, TovarRequestMixin, ArrivalMixin, InventoryMixin, DataLogsMixin
 
 
 class IndexView(BaseView):
@@ -151,10 +150,42 @@ class TovarRequestDeleteView(ObjectDeleteMixin):
 
 class ArrivalBeerView(ArrivalMixin):
     category = settings.TOVAR_BEER_CATEGORY
+    template_name = 'bar/arrival_beer.html'
+
+    def post(self, request):
+        context = self.get_context_data(request)
+
+        post_data = request.POST.copy()
+        post_data['storage_id'] = context['bar'].id
+        post_data['kegs'] = True
+
+        try:
+            arrival_service.ArrivalService().invoice_drinks_create(data=post_data)
+            messages.success(request, 'Накладная успешно заполнена.')
+        except exceptions.FieldCannotBeEmptyError as error:
+            messages.error(request, str(error))
+
+        return redirect(f'/bar/arrivals/beer?code={request.GET.get("code")}')
 
 
 class ArrivalDrinkView(ArrivalMixin):
     category = settings.TOVAR_DRINKS_CATEGORY
+    template_name = 'bar/arrival_drinks.html'
+
+    def post(self, request):
+        context = self.get_context_data(request)
+
+        post_data = request.POST.copy()
+        post_data['storage_id'] = context['bar'].id
+        post_data['kegs'] = False
+
+        try:
+            arrival_service.ArrivalService().invoice_drinks_create(data=post_data)
+            messages.success(request, 'Накладная успешно заполнена.')
+        except exceptions.FieldCannotBeEmptyError as error:
+            messages.error(request, str(error))
+
+        return redirect(f'/bar/arrivals/drinks?code={request.GET.get("code")}')
 
 
 class ArrivalDeleteView(ObjectDeleteMixin):

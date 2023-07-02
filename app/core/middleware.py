@@ -1,9 +1,10 @@
-from django.shortcuts import redirect
-from django.contrib import messages
-
-from core.utils.telegram import send_message_to_telegram
+#  Copyright (c) 2023. All rights reserved. Mikhail Luginin. Contact: telegram @hex0z
 
 from django.conf import settings
+from django.contrib import messages
+from django.shortcuts import redirect
+
+from core.utils.telegram import send_message_to_telegram
 
 
 class Process500:
@@ -18,6 +19,7 @@ class Process500:
         import traceback
         trace = traceback.format_exc()
         send_message_to_telegram(settings.TELEGRAM_CHAT_ID_FOR_ERRORS, f'Process500 [<b>{request.path}</b>]\n\n'
-                                                                       f'{exception}\n\n Traceback: {trace}')
+                                                                       f'{exception}')
+        send_message_to_telegram(settings.TELEGRAM_CHAT_ID_FOR_ERRORS, f'{trace}')
         messages.error(request, 'Произошла неизвестная ошибка.')
         return redirect(request.META.get('HTTP_REFERER', '/'))

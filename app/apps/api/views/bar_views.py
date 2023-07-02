@@ -1,7 +1,9 @@
+#  Copyright (c) 2023. All rights reserved. Mikhail Luginin. Contact: telegram @hex0z
+
+from apps.bar.models import Pays, Arrival, TovarRequest, Timetable, Salary, Money, ArrivalKeg
 from ..serializers import MoneySerializer, SalarySerializer, TimetableSerializer, TovarRequestSerializer, \
-        ArrivalSerializer, PaysSerializer
+    ArrivalSerializer, PaysSerializer, ArrivalKegSerializer
 from ..utils import ModelViewSetMixin
-from apps.bar.models import Pays, Arrival, TovarRequest, Timetable, Salary, Money
 
 
 class MoneyViewSet(ModelViewSetMixin):
@@ -27,6 +29,11 @@ class TovarRequestViewSet(ModelViewSetMixin):
 class ArrivalViewSet(ModelViewSetMixin):
     queryset = Arrival.objects.all()
     serializer_class = ArrivalSerializer
+
+
+class ArrivalKegViewSet(ModelViewSetMixin):
+    queryset = ArrivalKeg.objects.all()
+    serializer_class = ArrivalKegSerializer
 
 
 class PaysViewSet(ModelViewSetMixin):
