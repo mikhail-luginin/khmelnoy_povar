@@ -1,16 +1,17 @@
+#  Copyright (c) 2023. All rights reserved. Mikhail Luginin. Contact: telegram @hex0z
+
+from django.conf import settings
+from django.contrib import messages
 from django.db.models import Sum
 from django.shortcuts import redirect
-from django.contrib import messages
-from django.conf import settings
 
 from apps.bar.models import Pays
 from apps.iiko.models import Storage
-from apps.lk.models import Expense, Catalog
-
-from core.services import storage_service
-from core.services import catalog_service
-from core.utils.time import today_date
+from apps.lk.models import Expense
 from core.logs import create_log
+from core.services import catalog_service
+from core.services import storage_service, expenses_service
+from core.utils.time import today_date
 
 
 class ExpensesPageService:
@@ -50,25 +51,18 @@ class ExpensesPageService:
             messages.error(request, 'Выберите тип оплаты.')
             return redirect(request.META.get('HTTP_REFERER'))
 
-        try:
-            expense_source_object = catalog_service.get_catalog_by_id(expense_source)
-        except Catalog.DoesNotExist:
+        expense_source_object = catalog_service.get_catalog_by_id(expense_source)
+        if expense_source_object is None:
             messages.error(request, 'Выбранный тип оплаты не указан.')
             return redirect(request.META.get('HTTP_REFERER'))
 
         for row in catalog_service.get_catalog_by_type(settings.EXPENSE_TYPE_CATEGORY):
             expense_sum = request.POST.get(f'sum[{row.id}]')
             if len(expense_sum) > 0:
-                expense = Expense.objects.create(
-                    writer=storage.name + ' CRM',
-                    date_at=today_date(),
-                    storage=storage,
-                    expense_type=row,
-                    expense_source=expense_source_object,
-                    payment_receiver='Не указан',
-                    sum=expense_sum,
-                    comment=request.POST.get(f'comment[{row.id}]')
-                )
+                expense = expenses_service.create(date_at=today_date(), storage_id=storage.id,
+                                                  expense_type_id=row.id, expense_source_id=expense_source_object.id,
+                                                  payment_receiver='Не указан', expense_sum=expense_sum,
+                                                  comment=request.POST.get(f'comment[{row.id}]'), writer_barmen=True)
                 create_log(owner=f'CRM {storage.name}', entity=storage.name, row=expense,
                            action='create', additional_data='Расход создан')
 
