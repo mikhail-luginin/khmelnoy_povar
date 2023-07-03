@@ -21,6 +21,7 @@ urlpatterns = [
     path('salary/retired_employees', views.SalaryForRetiredEmployeesView.as_view(), name="salary_for_retired_employees"),
     path('salary/retired_employees/accrue', views.salary_for_retired_employee_accrue_view,
          name="salary_for_retired_employee_accrue"),
+    path('salary/get_accrued_rows', views.SalaryAccruedRowsView.as_view()),
 
     path('requests/beer', views.TovarRequestBeerView.as_view(), name="tovar_request_beer"),
     path('requests/bar', views.TovarRequestBarView.as_view(), name="tovar_request_bar"),

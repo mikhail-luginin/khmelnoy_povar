@@ -32,46 +32,123 @@
         </div>
         <div class="card rounded-3 mb-2">
             <div class="card-body">
-                Сумма к выдаче: {{ data.total_sum }} руб. (выдано: {{ data.issued_sum }} / осталось: {{ data.left_sum }})
+{#                Сумма к выдаче: {{ data.total_sum }} руб. (выдано: {{ data.issued_sum }} / осталось: {{ data.left_sum }})#}
+                Сумма к выдаче: <span id="total_sum"></span> руб. (выдано <span id="issued_sum"></span> / осталось <span id="left_sum"></span>)
             </div>
         </div>
-        {% for row in data.rows %}
-            <form action="{% url 'Bar:salary' %}?code={{ code }}&employee_code={{ row.employee.code }}" method="post">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <div class="card rounded-3">
-                        <div class="card-body">
-                            <div class="mb-1">
-                                <center><b>{{ row.employee.fio }} {% if row.employee.job_place.name == 'Су-Шеф' %}({{ row.employee.job_place.name }}){% else %}({{ row.position.name }}){% endif %}</b></center>
-                            </div>
-                            <div class="mb-1">
-                                <div class="row">
-                                    <div class="col-4">
-                                        <input class="form-control" name="salary[{{ row.employee.code }}][oklad]"
-                                               placeholder="Введите оклад" value="{{ row.oklad }}"
-                                               readonly>
-                                    </div>
-                                    <div class="col-4">
-                                        <input class="form-control" name="salary[{{ row.employee.code }}][percent]"
-                                               placeholder="Введите процент" value="{{ row.percent }}"
-                                               readonly>
-                                    </div>
-                                    <div class="col-4">
-                                        <input class="form-control" name="salary[{{ row.employee.code }}][premium]"
-                                               placeholder="Введите премию" value="{{ row.premium }}"
-                                               readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            {% if row.is_accrued is True %}
-                                <button type="button" class="btn btn-danger w-100">Получено</button>
-                            {% else %}
-                                <button type="submit" class="btn btn-success w-100">Получить</button>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </form>
-        {% endfor %}
+        <div id="accrued-rows"></div>
+{#        {% for row in data.rows %}#}
+{#            <form action="{% url 'Bar:salary' %}?code={{ code }}&employee_code={{ row.employee.code }}" method="post">#}
+{#                {% csrf_token %}#}
+{#                <div class="mb-3">#}
+{#                    <div class="card rounded-3">#}
+{#                        <div class="card-body">#}
+{#                            <div class="mb-1">#}
+{#                                <center><b>{{ row.employee.fio }} {% if row.employee.job_place.name == 'Су-Шеф' %}({{ row.employee.job_place.name }}){% else %}({{ row.position.name }}){% endif %}</b></center>#}
+{#                            </div>#}
+{#                            <div class="mb-1">#}
+{#                                <div class="row">#}
+{#                                    <div class="col-4">#}
+{#                                        <input class="form-control" name="salary[{{ row.employee.code }}][oklad]"#}
+{#                                               placeholder="Введите оклад" value="{{ row.oklad }}"#}
+{#                                               readonly>#}
+{#                                    </div>#}
+{#                                    <div class="col-4">#}
+{#                                        <input class="form-control" name="salary[{{ row.employee.code }}][percent]"#}
+{#                                               placeholder="Введите процент" value="{{ row.percent }}"#}
+{#                                               readonly>#}
+{#                                    </div>#}
+{#                                    <div class="col-4">#}
+{#                                        <input class="form-control" name="salary[{{ row.employee.code }}][premium]"#}
+{#                                               placeholder="Введите премию" value="{{ row.premium }}"#}
+{#                                               readonly>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                            {% if row.is_accrued is True %}#}
+{#                                <button type="button" class="btn btn-danger w-100">Получено</button>#}
+{#                            {% else %}#}
+{#                                <button type="submit" class="btn btn-success w-100">Получить</button>#}
+{#                            {% endif %}#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </form>#}
+{#        {% endfor %}#}
     </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(document).ready(function() {
+            $('#info-alert-text').html('Зарплата загружается. Пожалуйста, подождите.')
+            $('#notification-info').modal('show')
+            $.ajax({
+                type: 'get',
+                url: '/bar/salary/get_accrued_rows?storage_id={{ bar.id }}',
+                success: function(response) {
+                    notification(true, 'Зарплата успешно загружена.')
+                    let accrued_rows = response.rows
+                    let employees = response.rows["rows"]
+                    let total_sum = accrued_rows["total_sum"]
+                    let issued_sum = accrued_rows["issued_sum"]
+                    let left_sum = accrued_rows["left_sum"]
+
+                    let accrued_rows_block = $('#accrued-rows')
+                    $('#total_sum').text(total_sum)
+                    $('#issued_sum').text(issued_sum)
+                    $('#left_sum').text(left_sum)
+
+                    employees.forEach(function(employee) {
+                        function is_accrued() {
+                            if(employee['is_accrued'] === true) {
+                                return '<button type="button" class="btn btn-danger w-100">Получено</button>'
+                            } else {
+                                return '<button type="submit" class="btn btn-success w-100">Получить</button>'
+                            }
+                        }
+
+                        function position_name() {
+                            if(employee['employee_job'] === 'Су-Шеф') {
+                                return employee['employee_job']
+                            } else {
+                                return employee['position_name']
+                            }
+                        }
+
+                        accrued_rows_block.append(
+                            '<form action="{% url 'Bar:salary' %}?code={{ code }}&employee_code=' + employee['employee_code'] + '" method="post">' +
+                                '<div class="card rounded-3 mb-3">' +
+                                    '<div class="card-body">' +
+                                        '<div class="mb-1">' +
+                                            '<center><b>' + employee['employee_fio'] + ' ' + position_name() + '</b></center>' +
+                                        '</div>' +
+                                        '<div class="mb-1">' +
+                                            '<div class="row">' +
+                                                '<div class="col-4">' +
+                                                    '<input class="form-control" name="salary[' + employee['employee_code'] + '][oklad]"' +
+                                                           'placeholder="Введите оклад" value="' + employee['oklad'] + '"' +
+                                                           'readonly>' +
+                                                '</div>' +
+                                                '<div class="col-4">' +
+                                                    '<input class="form-control" name="salary[' + employee['employee_code'] + '][percent]"' +
+                                                           'placeholder="Введите процент" value="' + employee['percent'] + '"' +
+                                                           'readonly>' +
+                                                '</div>' +
+                                                '<div class="col-4">' +
+                                                    '<input class="form-control" name="salary[' + employee['employee_code'] + '][premium]"' +
+                                                           'placeholder="Введите премию" value="' + employee['premium'] + '"' +
+                                                           'readonly>' +
+                                                '</div>' +
+                                            '</div>' +
+                                        '</div>' + is_accrued() +
+                                    '</div>' +
+                                '</div>' +
+                            '</form>'
+                        )
+                    })
+                }
+            })
+        })
+    </script>
 {% endblock %}

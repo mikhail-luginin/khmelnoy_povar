@@ -85,7 +85,6 @@ class SalaryView(BaseView):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['data'] = SalaryService().get_accrued_rows(request.GET.get('code'))
         context['salaries'] = Salary.objects.filter(storage=context['bar'], date_at=today_date(), type=1).annotate(
             total_sum=Sum('oklad') + Sum('percent') + Sum('premium')
         )
@@ -94,6 +93,15 @@ class SalaryView(BaseView):
 
     def post(self, request):
         return SalaryService().accrue_salary_prepayment(request)
+
+
+class SalaryAccruedRowsView(BaseView):
+
+    def get(self, request):
+        storage_id = request.GET.get('storage_id')
+        rows = SalaryService().salary_prepayment_rows(storage_id=storage_id)
+        if rows:
+            return JsonResponse({"rows": rows}, status=200, safe=False)
 
 
 class SalaryForRetiredEmployeesView(BaseView):
