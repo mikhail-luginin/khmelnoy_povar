@@ -1,17 +1,16 @@
-from django.db.models import Q
-
-from apps.bar.tasks import add_percent_and_premium_to_timetable
-
-from core import validators
-from core.utils.total_values import get_total_expenses_by_date_and_storage, \
-    get_total_payin_by_date_and_storage, get_total_payout_by_date_and_storage, get_total_salary_by_date_and_storage
-
-from apps.bar.models import Money
-from apps.iiko.models import PaymentType, Session
-
-from core.services.api.iiko import IikoService
+#  Copyright (c) 2023. All rights reserved. Mikhail Luginin. Contact: telegram @hex0z
 
 import json
+
+from django.db.models import Q
+
+from apps.bar.models import Money
+from apps.bar.tasks import add_percent_and_premium_to_timetable
+from apps.iiko.models import PaymentType, Session
+from core import validators
+from core.services.api.iiko import IikoService
+from core.utils.total_values import get_total_expenses_by_date_and_storage, \
+    get_total_payin_by_date_and_storage, get_total_payout_by_date_and_storage, get_total_salary_by_date_and_storage
 
 
 def update(row_id: int | None) -> None:
@@ -148,7 +147,7 @@ def rows_with_difference():
 
 
 def money_get(date_at: str, storage_id: int) -> Money | None:
-    return Money.objects.filter(date_at=date_at, storage_id=storage_id)
+    return Money.objects.filter(date_at=date_at, storage_id=storage_id).first()
 
 
 def create_money_record(date_at: str, storage_id: int, sum_cash_morning: int) -> Money:
