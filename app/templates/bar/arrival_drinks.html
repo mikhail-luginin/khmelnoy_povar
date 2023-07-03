@@ -44,7 +44,7 @@
                             <option value="bn">Картой</option>
                         </select>
                         <div class="mb-3">
-                            <h3>Номер: 1</h3>
+                            <h3>Строка: 1</h3>
                             <select class="form-select mb-2" name="product-id[1]" placeholder="Выберите продукт"
                                     required>
                                 <option value="" disabled selected>Выберите продукт</option>
@@ -58,17 +58,11 @@
                                    placeholder="Введите сумму" onkeyup="updateInvoiceTotalSum()" required>
                         </div>
                     </div>
+                    <button type="button" class="btn w-100 mb-1" id="add-invoice-num">Добавить строку</button>
                     <div class="right mb-1">
                         <h3>Итого: <span id="invoice_total_sum">0</span></h3>
                     </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <button type="button" class="btn w-100" id="add-invoice-num">Добавить запись</button>
-                        </div>
-                        <div class="col-6">
-                            <button type="submit" class="btn w-100">Сохранить</button>
-                        </div>
-                    </div>
+                    <button type="submit" class="btn w-100">Сохранить</button>
                 </form>
             </div>
         </div>
@@ -96,7 +90,7 @@
                 item += 1
                 invoice_form_body.append(
                     '<div class="mb-3">' +
-                    '<h3>Номер: ' + item + '</h3>' +
+                    '<h3>Строка: ' + item + '</h3>' +
                     '<select class="form-select mb-2" name="product-id[' + item + ']" placeholder="Выберите продукт" required>' +
                     '<option value="" disabled selected>Выберите продукт</option>' +
                     {% for product in products %}
