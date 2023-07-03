@@ -45,11 +45,12 @@ class BaseView(View):
     def get(self, request):
         context = self.get_context_data(request)
 
-        main_barmen = bar_service.get_main_barmen_on_storage_by_date(date_at=today_date(),
+        if request.path != '/bar/':
+            main_barmen = bar_service.get_main_barmen_on_storage_by_date(date_at=today_date(),
                                                                      storage_id=context.get('bar').id)
-        if request.path != '/bar/' and main_barmen is None:
-            messages.error(request, 'Укажите основного бармена.')
-            return redirect(f'/bar?code={context.get("code")}')
+            if main_barmen is None:
+                messages.error(request, 'Укажите основного бармена.')
+                return redirect(f'/bar?code={context.get("code")}')
 
         return render(request, self.template_name, context=context)
 
