@@ -25,7 +25,7 @@
                 {% csrf_token %}
                 <div class="mb-2">
                     <select class="form-select" placeholder="Выберите источник расхода" name="expense-source" required>
-                        <option></option>
+                        <option value="">Тип оплаты</option>
                         {% for source in expenses_sources %}
                         {% if source.name == 'Наличные' or source.name == 'Бизнес-карта' %}
                         <option value="{{ source.id }}">{{ source.name }}</option>
@@ -44,7 +44,7 @@
                         {% if type in bar_setting.expenses_types_with_employees_in_comment.all %}
                         <div class="col-4">
                             <select class="form-select" placeholder="Cотрудник" name="comment[{{ type.id }}]">
-                                <option></option>
+                                <option value="">Сотрудник</option>
                                 {% for row in timetable %}
                                 <option>{{ row.employee.fio }}</option>
                                 {% endfor %}

@@ -8,12 +8,15 @@ from apps.lk.models import Position, JobPlace, Employee
 from apps.iiko.models import Storage, PaymentType
 
 from core.utils import total_values
+from core.utils.telegram import send_message_to_telegram
 from core.utils.time import today_date, get_current_time
 
+from django.conf import settings
 
-def get_bar(**kwargs) -> Storage | None:
+
+def get_bar(code: str) -> Storage | None:
     try:
-        return Storage.objects.get(**kwargs)
+        return Storage.objects.get(code=code)
     except Storage.DoesNotExist:
         return None
 
@@ -51,20 +54,17 @@ def get_full_information_of_day_for_data_logs(days: str, storage: Storage):
 
 
 def get_full_information_of_day(date_at: str, storage: Storage) -> dict:
-    try:
-        money_row = Money.objects.get(date_at=date_at, storage=storage)
-    except Money.DoesNotExist:
-        return dict(error=True)
+    money_record = Money.objects.filter(date_at=date_at, storage=storage).first()
+    if money_record is None:
+        return {"error": True}
 
     today = None
-
-    sum_cash_morning = money_row.sum_cash_morning
-    sum_cash_end_day = money_row.sum_cash_end_day
-    calculated = money_row.calculated
-    difference = money_row.difference
+    sum_cash_morning = money_record.sum_cash_morning
+    sum_cash_end_day = money_record.sum_cash_end_day
+    calculated = money_record.calculated
+    difference = money_record.difference
 
     if date_at == today_date():
-
         total_day = 0
         cash = 0
         cash_point = 0
@@ -91,50 +91,46 @@ def get_full_information_of_day(date_at: str, storage: Storage) -> dict:
 
                 session_number = row["sessionNumber"]
 
-                # dict = optimize sql queries
-                payment_types = dict()
+                payment_types = {}
                 for payment_type in PaymentType.objects.all():
                     payment_types[payment_type.payment_id] = payment_type.name
 
                 for sale in sales_by_department['cashlessRecords']:
                     pm_filter = payment_types.get(sale["info"]["paymentTypeId"])
-                    if 'elivery' in pm_filter:
-                        delivery += int(sale["info"]["sum"])
-                    if 'ндекс' in pm_filter:
-                        yandex += int(sale["info"]["sum"])
-                    if pm_filter == 'Наличные':
-                        cash += int(sale["info"]["sum"])
-                    if pm_filter == 'Наличные.':
-                        cash_point += int(sale["info"]["sum"])
-                    total_cashshifts += int(sale["info"]["sum"])
+                    if pm_filter:
+                        if 'elivery' in pm_filter:
+                            delivery += int(sale["info"]["sum"])
+                        if 'ндекс' in pm_filter:
+                            yandex += int(sale["info"]["sum"])
+                        if pm_filter == 'Наличные':
+                            cash += int(sale["info"]["sum"])
+                        if pm_filter == 'Наличные.':
+                            cash_point += int(sale["info"]["sum"])
+                        total_cashshifts += int(sale["info"]["sum"])
+                    else:
+                        send_message_to_telegram(settings.TELEGRAM_CHAT_ID_FOR_ERRORS, '[Admin] Обновите типы оплат')
 
         total_market = delivery + yandex
         total_cash = total_day - total_cashshifts + cash + cash_point
         total_bn = total_day - total_cash - total_market
 
-        if not total_day:
-            total_day = 0
-        if not total_market:
-            total_market = 0
-
-        sum_cash_morning = money_row.sum_cash_morning
-        sum_cash_end_day = money_row.sum_cash_end_day
-        calculated = money_row.calculated
-        difference = money_row.difference
+        sum_cash_morning = money_record.sum_cash_morning
+        sum_cash_end_day = money_record.sum_cash_end_day
+        calculated = money_record.calculated
+        difference = money_record.difference
         today = True
-
     else:
-        session_number = money_row.session.session_number
-        open_date = money_row.session.open_date
-        close_date = money_row.session.close_date
-        total_day = money_row.total_day
-        total_market = money_row.total_market
-        total_cash = money_row.total_cash
-        total_bn = money_row.total_bn
-        cash = money_row.session.cash
-        cash_point = money_row.session.cash_point
-        yandex = money_row.session.yandex
-        delivery = money_row.session.delivery
+        session_number = money_record.session.session_number
+        open_date = money_record.session.open_date
+        close_date = money_record.session.close_date
+        total_day = money_record.total_day
+        total_market = money_record.total_market
+        total_cash = money_record.total_cash
+        total_bn = money_record.total_bn
+        cash = money_record.session.cash
+        cash_point = money_record.session.cash_point
+        yandex = money_record.session.yandex
+        delivery = money_record.session.delivery
 
     return dict(storage=storage, date_at=date_at, today=today, session_number=session_number, open_date=open_date,
                 close_date=close_date,

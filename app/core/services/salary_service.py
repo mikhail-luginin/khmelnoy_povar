@@ -2,6 +2,7 @@ from django.db.models import Sum
 from django.shortcuts import redirect
 from django.contrib import messages
 
+from config.celery import app
 from core.logs import create_log
 from core.utils.time import today_date, get_current_time, monthdelta, get_months
 from core.services import storage_service
@@ -21,9 +22,11 @@ class SalaryService:
     def calculate_prepayment_salary_by_timetable_object(self, timetable_object: Timetable) -> dict[
         Literal["oklad", "percent", "premium"], int
     ]:
-        try:
-            percent_num = Money.objects.get(storage_id=timetable_object.storage_id, date_at=timetable_object.date_at).barmen_percent
-        except Money.DoesNotExist:
+        money_row = Money.objects.filter(storage_id=timetable_object.storage_id,
+                                           date_at=timetable_object.date_at).first()
+        if money_row:
+            percent_num = money_row.barmen_percent
+        else:
             percent_num = get_bar_settings(storage_id=timetable_object.storage_id).percent
 
         percent = 0
@@ -159,68 +162,6 @@ class SalaryService:
         data['first_period'] = self.calculate_salary(employee, current_date.year, month, 1)
         data['second_period'] = self.calculate_salary(employee, current_date.year, month, 2)
         data['entire_salary_data'] = entire_salary_data
-
-        return data
-
-    def get_accrued_rows(self, code: str) -> dict:
-        data = {
-            "rows": [],
-            "total_sum": 0,
-            "issued_sum": 0,
-            "left_sum": 0
-        }
-
-        bar = storage_service.storage_get(code=code)
-
-        for timetable in Timetable.objects.filter(storage=bar, date_at=today_date()):
-            row = {
-                "oklad": 0,
-                "percent": 0,
-                "premium": 0
-            }
-
-            employee_money_information = self.calculate_prepayment_salary_by_timetable_object(
-                timetable_object=timetable)
-            percent = employee_money_information['percent']
-            premium = employee_money_information['premium']
-
-            try:
-                salary = Salary.objects.get(employee=timetable.employee, type=1, date_at=today_date())
-                is_accrued = True
-            except Salary.DoesNotExist:
-                salary = None
-                is_accrued = False
-
-            row['employee'] = timetable.employee
-            row['position'] = timetable.position
-            row['is_accrued'] = is_accrued
-
-            if is_accrued:
-                row['oklad'] = salary.oklad
-                row['percent'] = salary.percent
-                row['premium'] = salary.premium
-                data['issued_sum'] += salary.oklad + salary.percent + salary.premium
-            else:
-                if not timetable.position.args['is_trainee']:
-                    if timetable.position.args['is_called']:
-                        if timetable.position.args['is_usil']:
-                            row['oklad'] = timetable.employee.job_place.gain_shift_oklad_accrual
-                        else:
-                            row['oklad'] = timetable.employee.job_place.main_shift_oklad_accrual
-                    else:
-                        if timetable.position.args['is_usil']:
-                            row['oklad'] = timetable.employee.job_place.gain_shift_oklad_receiving
-                        else:
-                            row['oklad'] = timetable.employee.job_place.main_shift_oklad_receiving
-                    row['percent'] = percent if timetable.position.args['has_percent'] is True else 0
-                    row['premium'] = premium if timetable.position.args['is_called'] else 0
-
-            row['has_percent'] = timetable.position.args['has_percent']
-            row['has_premium'] = timetable.position.args['has_premium']
-            data['total_sum'] += row['oklad'] + row['percent'] + row['premium']
-
-            data['rows'].append(row)
-            data['left_sum'] = data['total_sum'] - data['issued_sum']
 
         return data
 
@@ -483,3 +424,24 @@ class SalaryService:
 
     def get_accrued_salary_month(self, date_at: str, storage: Storage):
         return Salary.objects.filter(date_at=date_at, storage=storage, type=2)
+
+    def salary_prepayment_rows(self, storage_id: int):
+        from celery.result import AsyncResult
+        from apps.bar.tasks import get_salary_prepayment_rows
+
+        task = get_salary_prepayment_rows.delay(storage_id=storage_id)
+        result = AsyncResult(task.id)
+        status = result.state
+
+        while status != 'SUCCESS':
+            result = AsyncResult(task.id)
+            status = result.state
+            match status:
+                case 'SUCCESS':
+                    return task.result
+                case 'FAILURE':
+                    return False
+                case _:
+                    continue
+        else:
+            return task.result

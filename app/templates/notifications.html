@@ -1,3 +1,38 @@
+<div class="modal modal-blur fade" id="notification-info" tabindex="-1" aria-hidden="true"
+     style="display: none;">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            <div class="modal-status bg-primary"></div>
+            <div class="modal-body text-center py-4">
+                <!-- Download SVG icon from http://tabler-icons.io/i/circle-check -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-primary icon-lg"
+                     width="24"
+                     height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                     fill="none"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+                    <path d="M12 8l.01 0"></path>
+                    <path d="M11 12l1 0l0 4l1 0"></path>
+                </svg>
+                <h3 id="info-alert-header">Информация</h3>
+                <div class="text-muted" id="info-alert-text"></div>
+            </div>
+            <div class="modal-footer">
+                <div class="w-100">
+                    <div class="row">
+                        <div class="col"><a href="#" class="btn btn-primary w-100"
+                                            data-bs-dismiss="modal">
+                            ОК
+                        </a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal modal-blur fade" id="notification-success" tabindex="-1" aria-hidden="true"
      style="display: none;">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
