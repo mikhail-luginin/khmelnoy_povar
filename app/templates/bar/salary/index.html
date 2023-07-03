@@ -130,6 +130,7 @@
 
                         accrued_rows_block.append(
                             '<form action="{% url 'Bar:salary' %}?code={{ code }}&employee_code=' + employee['employee_code'] + '" method="post">' +
+                            '{% csrf_token %}' +
                             '<div class="card rounded-3 mb-3">' +
                             '<div class="card-body">' +
                             '<div class="mb-1">' +
