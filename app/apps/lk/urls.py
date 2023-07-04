@@ -103,5 +103,8 @@ urlpatterns = [
     path('logs/filter', LogsWithFilterView.as_view(), name="logs_with_filter"),
 
     path('purchaser', PurchaserView.as_view(), name='purchaser'),
-    path('purchaser_get_table', get_table_for_purchaser, name='purchaser_get_table')
+    path('purchaser_get_table', get_table_for_purchaser, name='purchaser_get_table'),
+
+    path('reports', ReportsView.as_view()),
+    path('reports/money/update', ReportsMoneyUpdateView.as_view())
 ]

@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <div class="container-xl">
+{#        <div class="card rounded-3 mb-3">#}
+{#            <div class="card-body">#}
+{#                <form id="select-month">#}
+{#                    <div class="mb-2">#}
+{#                        <select class="form-select" name="month">#}
+{#                            <option value="">Выберите месяц</option>#}
+{#                            {% for month_id, month_name in months.items %}#}
+{#                                <option value="{{ month_id }}">{{ month_name }}</option>#}
+{#                            {% endfor %}#}
+{#                        </select>#}
+{#                    </div>#}
+{#                    <button class="btn w-100 mb-1" type="submit">Отфильтровать</button>#}
+{#                </form>#}
+{#            </div>#}
+{#        </div>#}
+        {% for storage in storages %}
+            <div class="row mb-2">
+{#                <div class="col-6">#}
+{#                    <div class="card rounded-3">#}
+{#                        <div class="card-body">#}
+{#                            <h3>{{ storage.name }}</h3><br>#}
+{#                            Остаток наличных в кассе: <span id="money-in-cashbox_{{ storage.id }}">0</span><br>#}
+{#                            Выручка предыдущий месяц: <span#}
+{#                                id="total-money-in-previous-month_{{ storage.id }}">0</span><br>#}
+{#                            Выручка текущий месяц: <span#}
+{#                                id="total-money-in-current-month_{{ storage.id }}">0</span><br>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+                <div class="col-12">
+                    <div class="card rounded-3">
+                        <div class="card-body">
+                            <h3 class="text-center">{{ storage.name }}</h3>
+                            <div id="incomes-and-expenses_{{ storage.id }}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="/assets/libs/apexcharts/dist/apexcharts.min.js"></script>
+    <script>
+        function generateChart(storage_id, incomes_data, expenses_data) {
+            window.ApexCharts && (new ApexCharts(document.getElementById('incomes-and-expenses_' + storage_id), {
+                chart: {
+                    type: "area",
+                    fontFamily: 'inherit',
+                    height: 240,
+                    parentHeightOffset: 0,
+                    toolbar: {
+                        show: false,
+                    },
+                    animations: {
+                        enabled: true
+                    },
+                    stacked: true,
+                },
+                dataLabels: {
+                    enabled: false,
+                },
+                fill: {
+                    opacity: .16,
+                    type: 'solid'
+                },
+                stroke: {
+                    width: 2,
+                    lineCap: "round",
+                    curve: "smooth",
+                },
+                series: [{
+                    name: "Выручка",
+                    data: incomes_data
+                }, {
+                    name: "Расходы",
+                    data: expenses_data
+                }],
+                tooltip: {
+                    theme: 'dark'
+                },
+                grid: {
+                    padding: {
+                        top: -20,
+                        right: 0,
+                        left: -4,
+                        bottom: -4
+                    },
+                    strokeDashArray: 4,
+                },
+                xaxis: {
+                    labels: {
+                        padding: 0,
+                    },
+                    tooltip: {
+                        enabled: false
+                    },
+                    axisBorder: {
+                        show: false,
+                    },
+                    categories: [{% for month_id, month_name in months.items %}"{{ month_name }}",{% endfor %}],
+                },
+                yaxis: {
+                    labels: {
+                        padding: 4
+                    },
+                },
+                colors: [tabler.getColor("primary"), tabler.getColor("pink")],
+                legend: {
+                    show: true,
+                },
+            })).render();
+        }
+
+        $(document).ready(function () {
+            $.ajax({
+                url: '/lk/reports/money/update',
+                type: 'get',
+                success: function(response) {
+                    let data = response.data
+
+                    data.forEach(function(row) {
+                        let storage_id = row['storage_id']
+
+                        {#$('#money-in-cashbox_' + storage_id).text(row['money_in_cashbox'])#}
+                        {#$('#total-money-in-current-month_' + storage_id).text(row['total_money_in_current_month'])#}
+                        {#$('#total-money-in-previous-month_' + storage_id).text(row['total_money_in_previous_month'])#}
+
+                        generateChart(storage_id, row['incomes_data'], row['expenses_data'])
+                    })
+                }
+            })
+        })
+    </script>
+{% endblock %}
