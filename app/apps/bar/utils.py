@@ -45,7 +45,7 @@ class BaseView(View):
     def get(self, request):
         context = self.get_context_data(request)
 
-        if request.path != '/bar/':
+        if request.path != '/bar/' and request.path != '/bar/employee':
             storage = context.get('bar')
             if storage:
                 storage_id = storage.id
