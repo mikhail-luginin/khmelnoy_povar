@@ -2,35 +2,35 @@
 
 {% block body %}
     <div class="container-xl">
-{#        <div class="card rounded-3 mb-3">#}
-{#            <div class="card-body">#}
-{#                <form id="select-month">#}
-{#                    <div class="mb-2">#}
-{#                        <select class="form-select" name="month">#}
-{#                            <option value="">Выберите месяц</option>#}
-{#                            {% for month_id, month_name in months.items %}#}
-{#                                <option value="{{ month_id }}">{{ month_name }}</option>#}
-{#                            {% endfor %}#}
-{#                        </select>#}
-{#                    </div>#}
-{#                    <button class="btn w-100 mb-1" type="submit">Отфильтровать</button>#}
-{#                </form>#}
-{#            </div>#}
-{#        </div>#}
+        {#        <div class="card rounded-3 mb-3">#}
+        {#            <div class="card-body">#}
+        {#                <form id="select-month">#}
+        {#                    <div class="mb-2">#}
+        {#                        <select class="form-select" name="month">#}
+        {#                            <option value="">Выберите месяц</option>#}
+        {#                            {% for month_id, month_name in months.items %}#}
+        {#                                <option value="{{ month_id }}">{{ month_name }}</option>#}
+        {#                            {% endfor %}#}
+        {#                        </select>#}
+        {#                    </div>#}
+        {#                    <button class="btn w-100 mb-1" type="submit">Отфильтровать</button>#}
+        {#                </form>#}
+        {#            </div>#}
+        {#        </div>#}
         {% for storage in storages %}
             <div class="row mb-2">
-{#                <div class="col-6">#}
-{#                    <div class="card rounded-3">#}
-{#                        <div class="card-body">#}
-{#                            <h3>{{ storage.name }}</h3><br>#}
-{#                            Остаток наличных в кассе: <span id="money-in-cashbox_{{ storage.id }}">0</span><br>#}
-{#                            Выручка предыдущий месяц: <span#}
-{#                                id="total-money-in-previous-month_{{ storage.id }}">0</span><br>#}
-{#                            Выручка текущий месяц: <span#}
-{#                                id="total-money-in-current-month_{{ storage.id }}">0</span><br>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
+                {#                <div class="col-6">#}
+                {#                    <div class="card rounded-3">#}
+                {#                        <div class="card-body">#}
+                {#                            <h3>{{ storage.name }}</h3><br>#}
+                {#                            Остаток наличных в кассе: <span id="money-in-cashbox_{{ storage.id }}">0</span><br>#}
+                {#                            Выручка предыдущий месяц: <span#}
+                {#                                id="total-money-in-previous-month_{{ storage.id }}">0</span><br>#}
+                {#                            Выручка текущий месяц: <span#}
+                {#                                id="total-money-in-current-month_{{ storage.id }}">0</span><br>#}
+                {#                        </div>#}
+                {#                    </div>#}
+                {#                </div>#}
                 <div class="col-12">
                     <div class="card rounded-3">
                         <div class="card-body">
@@ -60,7 +60,6 @@
                     animations: {
                         enabled: true
                     },
-                    stacked: true,
                 },
                 dataLabels: {
                     enabled: false,
@@ -121,10 +120,10 @@
             $.ajax({
                 url: '/lk/reports/money/update',
                 type: 'get',
-                success: function(response) {
+                success: function (response) {
                     let data = response.data
 
-                    data.forEach(function(row) {
+                    data.forEach(function (row) {
                         let storage_id = row['storage_id']
 
                         {#$('#money-in-cashbox_' + storage_id).text(row['money_in_cashbox'])#}
