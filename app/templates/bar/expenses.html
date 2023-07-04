@@ -25,7 +25,7 @@
                 {% csrf_token %}
                 <div class="mb-2">
                     <select class="form-select" placeholder="Выберите источник расхода" name="expense-source" required>
-                        <option value="">Тип оплаты</option>
+                        <option value="">Выберите тип оплаты</option>
                         {% for source in expenses_sources %}
                         {% if source.name == 'Наличные' or source.name == 'Бизнес-карта' %}
                         <option value="{{ source.id }}">{{ source.name }}</option>
