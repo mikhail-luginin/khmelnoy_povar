@@ -3,7 +3,7 @@ from django.db.models import Sum
 from apps.bar.models import Money, Salary
 from apps.lk.models import Expense
 from core.services import storage_service
-from core.utils.time import get_months
+from core.utils.time import get_months, get_current_time
 
 
 class ReportsService:
@@ -16,18 +16,21 @@ class ReportsService:
         for month in get_months().keys():
             total_money = Money.objects.filter(
                 date_at__month=month,
+                date_at__year=get_current_time().year,
                 storage_id=storage_id
             ).aggregate(total_money=Sum('total_day'))['total_money']
-            data['incomes'].append(total_money if total_money else 0)
+            data['incomes'].append(round(total_money) if total_money else 0)
             expenses = Expense.objects.filter(
                 date_at__month=month,
+                date_at__year=get_current_time().year,
                 storage_id=storage_id
             ).aggregate(total_money=Sum('sum'))['total_money']
             salaries = Salary.objects.filter(
                 date_at__month=month,
+                date_at__year=get_current_time().year,
                 storage_id=storage_id
             ).aggregate(total_sum=Sum('oklad') + Sum('percent') + Sum('premium'))['total_sum']
-            data['expenses'].append(expenses if expenses else 0 + salaries if salaries else 0)
+            data['expenses'].append(round(expenses) if expenses else 0 + round(salaries) if salaries else 0)
 
         return data
 
