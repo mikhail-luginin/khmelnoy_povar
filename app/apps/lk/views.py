@@ -5,6 +5,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 
 from core.logs import LogsService
+from core.services.reports_service import ReportsService
 from core.utils.time import get_months
 from core.mixins import BaseLkView, ObjectEditMixin, ObjectCreateMixin, ObjectDeleteMixin
 from core import exceptions
@@ -1229,3 +1230,23 @@ def product_remains_add(request):
 
     messages.success(request, 'Остатки успешно занесены.')
     return redirect(f'/lk/bars/settings?id={storage_id}')
+
+
+class ReportsView(BaseLkView):
+    template_name = 'lk/reports/index.html'
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context.update({
+            "months": get_months(),
+            "storages": storage_service.storages_all()
+        })
+
+        return context
+
+
+class ReportsMoneyUpdateView(BaseLkView):
+
+    def get(self, request):
+        data = ReportsService().update_money_reports()
+        return JsonResponse({"data": data}, status=200, safe=False)
