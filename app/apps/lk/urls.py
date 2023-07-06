@@ -106,5 +106,6 @@ urlpatterns = [
     path('purchaser_get_table', get_table_for_purchaser, name='purchaser_get_table'),
 
     path('reports', ReportsView.as_view()),
-    path('reports/money/update', ReportsMoneyUpdateView.as_view())
+    path('reports/money/update', ReportsMoneyUpdateView.as_view()),
+    path('reports/expense_types_by_storage', ReportExpenseTypesByStorageView.as_view())
 ]

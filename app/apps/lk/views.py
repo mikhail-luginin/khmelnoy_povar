@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 
 from core.logs import LogsService
 from core.services.reports_service import ReportsService
-from core.utils.time import get_months
+from core.utils.time import get_months, get_current_time
 from core.mixins import BaseLkView, ObjectEditMixin, ObjectCreateMixin, ObjectDeleteMixin
 from core import exceptions
 from core.services import salary_service, bar_service, item_deficit_service, reviews_service, catalog_service, \
@@ -1250,3 +1250,23 @@ class ReportsMoneyUpdateView(BaseLkView):
     def get(self, request):
         data = ReportsService().update_money_reports()
         return JsonResponse({"data": data}, status=200, safe=False)
+
+
+class ReportExpenseTypesByStorageView(BaseLkView):
+    template_name = 'lk/reports/expense_types_by_storage.html'
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context.update({
+            "months": get_months()
+        })
+
+        return context
+
+    def post(self, request):
+        month = request.POST.get('month')
+
+        data = ReportsService().update_expense_types_by_storages_reports(
+            year=get_current_time().year, month_id=int(month) if month else get_current_time().month
+        )
+        return JsonResponse({"data": data}, status=200)

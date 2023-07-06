@@ -5,7 +5,7 @@ from typing import List
 from core import validators
 
 
-def get_catalog_by_type(type_name: str) -> List[CatalogType]:
+def get_catalog_by_type(type_name: str) -> List[Catalog]:
     catalog_type = CatalogType.objects.filter(name=type_name).first()
     if catalog_type:
         return list(catalog_type.catalog_set.all())
