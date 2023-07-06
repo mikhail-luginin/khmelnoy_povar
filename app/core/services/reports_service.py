@@ -1,9 +1,12 @@
 from django.db.models import Sum
+from django.conf import settings
 
 from apps.bar.models import Money, Salary
 from apps.lk.models import Expense
-from core.services import storage_service
+from core.services import storage_service, catalog_service
 from core.utils.time import get_months, get_current_time
+
+from calendar import monthrange
 
 
 class ReportsService:
@@ -45,5 +48,35 @@ class ReportsService:
                 "expenses_data": incomes_expenses_data.get('expenses')
             }
             data.append(storage)
+
+        return data
+
+    def _update_expense_types_by_storages_report(self, expense_type_id: int, month: int,
+                                                 year: int, days: int) -> list[dict[str, list[int]]]:
+        data = []
+
+        for storage in storage_service.storages_all():
+            storage_dict = {"name": storage.name, "data": []}
+            for day in range(days):
+                expenses = Expense.objects.filter(
+                    date_at__year=year, date_at__month=month, date_at__day=day+1,
+                    storage_id=storage.id, expense_type_id=expense_type_id
+                ).aggregate(Sum('sum'))['sum__sum']
+                storage_dict['data'].append(round(expenses) if expenses else 0)
+            data.append(storage_dict)
+
+        return data
+
+
+    def update_expense_types_by_storages_reports(self, year: int, month_id: int):
+        days = monthrange(year=year, month=month_id)[1]
+
+        data = {"year": year, "month": month_id,
+                "days_array": [day+1 for day in range(days)], "expenses": {}}
+        for expense_type in catalog_service.get_catalog_by_type(settings.EXPENSE_TYPE_CATEGORY):
+            expense_type_data = self._update_expense_types_by_storages_report(
+                expense_type_id=expense_type.id, month=month_id, year=year, days=days
+            )
+            data["expenses"][expense_type.id] = {"name": expense_type.name, "sum": expense_type_data}
 
         return data
