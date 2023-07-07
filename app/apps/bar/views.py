@@ -99,7 +99,10 @@ class SalaryAccruedRowsView(BaseView):
 
     def get(self, request):
         storage_id = request.GET.get('storage_id')
-        rows = SalaryService().salary_prepayment_rows(storage_id=storage_id)
+        try:
+            rows = SalaryService().salary_prepayment_rows(storage_id=storage_id)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=200, safe=False)
         if rows:
             return JsonResponse({"rows": rows}, status=200, safe=False)
 
