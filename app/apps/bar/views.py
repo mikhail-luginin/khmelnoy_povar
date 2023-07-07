@@ -170,7 +170,7 @@ class ArrivalBeerView(ArrivalMixin):
         try:
             arrival_service.ArrivalService().invoice_drinks_create(data=post_data)
             messages.success(request, 'Накладная успешно заполнена.')
-        except exceptions.FieldCannotBeEmptyError as error:
+        except (exceptions.FieldCannotBeEmptyError, exceptions.FieldNotFoundError) as error:
             messages.error(request, str(error))
 
         return redirect(f'/bar/arrivals/beer?code={request.GET.get("code")}')
