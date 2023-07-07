@@ -25,7 +25,9 @@ class SalaryService:
         money_row = Money.objects.filter(storage_id=timetable_object.storage_id,
                                            date_at=timetable_object.date_at).first()
         if money_row:
-            percent_num = money_row.barmen_percent
+            percent_num = money_row.barmen_percent if money_row.barmen_percent else get_bar_settings(
+                storage_id=timetable_object.storage_id
+            ).percent
         else:
             percent_num = get_bar_settings(storage_id=timetable_object.storage_id).percent
 

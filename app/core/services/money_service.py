@@ -150,5 +150,6 @@ def money_get(date_at: str, storage_id: int) -> Money | None:
     return Money.objects.filter(date_at=date_at, storage_id=storage_id).first()
 
 
-def create_money_record(date_at: str, storage_id: int, sum_cash_morning: int) -> Money:
-    return Money.objects.create(date_at=date_at, storage_id=storage_id, sum_cash_morning=sum_cash_morning)
+def create_money_record(date_at: str, storage_id: int, sum_cash_morning: int, barmen_percent: float) -> Money:
+    return Money.objects.create(date_at=date_at, storage_id=storage_id, sum_cash_morning=sum_cash_morning,
+                                barmen_percent=barmen_percent)
