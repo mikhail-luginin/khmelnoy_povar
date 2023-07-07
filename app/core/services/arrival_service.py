@@ -5,7 +5,7 @@ from django.db import transaction
 from django.http import QueryDict
 
 from apps.bar.models import Arrival, ArrivalKeg
-from core import exceptions
+from core import exceptions, validators
 from core.services import product_service, expenses_service, catalog_service
 from core.utils.payment_types import get_nal_category, get_bn_category
 from core.utils.time import today_date
@@ -20,15 +20,20 @@ class ArrivalService:
         storage_id = data.get('storage_id')
         invoice_number = data.get('invoice-number')
         payment_type = data.get('payment-type')
+
         if data.get('kegs'):
+            gave_30 = data.get('gave-keg[30]')
+            gave_50 = data.get('gave-keg[50]')
+            received_30 = data.get('received-keg[30]')
+            received_50 = data.get('received-keg[50]')
             kegs = {
                 "gave": {
-                    "30": data.get('gave-keg[30]', 0),
-                    "50": data.get('gave-keg[50]', 0)
+                    "30": gave_30 if gave_30 else 0,
+                    "50": gave_50 if gave_50 else 0
                 },
                 "received": {
-                    "30": data.get('received-keg[30]', 0),
-                    "50": data.get('received-keg[50]', 0)
+                    "30": received_30 if received_30 else 0,
+                    "50": received_50 if received_50 else 0
                 }
             }
         else:
@@ -54,14 +59,17 @@ class ArrivalService:
             product = product_service.product_get(row_id=product_id)
             if product:
                 amount = data.get(f'amount[{invoice_row}]')
-                invoice_row_sum = data.get(f'sum[{invoice_row}]', 0)
+                invoice_row_sum = data.get(f'sum[{invoice_row}]')
+                validators.validate_field(invoice_row_sum, f'Поле "сумма" для {product.name} не может быть пустым.')
+                invoice_row_sum = float(invoice_row_sum)
                 supplier = product.supplier
+
                 arrivals.append(
                     Arrival(date_at=today_date(), storage_id=storage_id, num=invoice_number, product=product,
                             supplier=supplier, amount=amount, sum=invoice_row_sum, type=arrival_type,
                             payment_date=payment_date, payment_type=payment_type)
                 )
-                total_sum += int(invoice_row_sum)
+                total_sum += invoice_row_sum
 
         return {"arrivals": arrivals, "payment_type": payment_type, "payment_date": payment_date,
                 "invoice_number": invoice_number, "total_sum": total_sum, "storage_id": storage_id,
