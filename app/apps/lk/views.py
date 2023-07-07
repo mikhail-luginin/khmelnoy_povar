@@ -1258,7 +1258,8 @@ class ReportExpenseTypesByStorageView(BaseLkView):
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
         context.update({
-            "months": get_months()
+            "months": get_months(),
+            "storages": storage_service.storages_all()
         })
 
         return context

@@ -18,7 +18,21 @@
                 </form>
             </div>
         </div>
-        <div id="expense-types-charts"></div>
+        <div id="expense-types-charts" class="mb-2"></div>
+        <div class="card rounded-3">
+            <div class="card-table">
+                <table id="table-expense-types" class="table table-sm table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th>Тип расхода</th>
+                        {% for storage in storages %}
+                            <th>{{ storage.name }}</th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
     </div>
 {% endblock %}
 
@@ -96,6 +110,7 @@
                     url: '/lk/reports/expense_types_by_storage',
                     success: function (response) {
                         let expense_type_blocks = $('#expense-types-charts')
+                        let expense_type_table = document.getElementById('table-expense-types')
                         expense_type_blocks.html('')
 
                         let year = response.data.year
@@ -105,6 +120,7 @@
 
                         for (let key in expenses) {
                             let value = expenses[key]
+
                             expense_type_blocks.append(
                                 '<div class="card rounded-3 mb-2">' +
                                 '<div class="card-body">' +
@@ -114,6 +130,15 @@
                                 '</div>'
                             )
                             generateExpenseChart('chart_' + key, value.sum, days_array)
+
+                            let row = expense_type_table.insertRow()
+                            row.insertCell().innerHTML = value.name
+                            value.sum.forEach(function (storage) {
+                                let cell = row.insertCell()
+                                let arr = storage.data
+                                const arr_sum = (arr) => arr.reduce((acc, num) => acc + num, 0);
+                                cell.innerHTML = arr_sum(arr)
+                            })
                         }
                     }
                 })
