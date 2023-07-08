@@ -1,6 +1,7 @@
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import redirect
 from django.contrib import messages
+from django.conf import settings
 
 from apps.lk.models import Statement, Partner, Card
 from core import validators
@@ -18,7 +19,7 @@ class StatementUpdateService:
         file_name = str('statements/' + today_datetime()) + '.txt'
         saved_file = file_system.save(file_name, bank_statement)
 
-        file_text = open('/media/' + saved_file, 'r', encoding='windows-1251').read()
+        file_text = open(settings.MEDIA_ROOT + saved_file, 'r', encoding='windows-1251').read()
 
         return file_text
 
