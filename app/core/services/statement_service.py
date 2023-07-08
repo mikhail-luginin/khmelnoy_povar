@@ -19,7 +19,7 @@ class StatementUpdateService:
         file_name = str('statements/' + today_datetime()) + '.txt'
         saved_file = file_system.save(file_name, bank_statement)
 
-        file_text = open(settings.MEDIA_ROOT + saved_file, 'r', encoding='windows-1251').read()
+        file_text = open(f'{settings.MEDIA_ROOT}/{saved_file}', 'r', encoding='windows-1251').read()
 
         return file_text
 
