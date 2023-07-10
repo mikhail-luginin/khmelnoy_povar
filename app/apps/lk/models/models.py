@@ -281,3 +281,8 @@ class ProductRemain(models.Model):
     amount = models.IntegerField()
 
     objects = managers.ProductRemainManager()
+
+
+class FAQ(models.Model):
+    title = models.CharField(max_length=255)
+    body = models.TextField()

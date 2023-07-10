@@ -5,6 +5,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 
 from core.logs import LogsService
+from core.services.faq import FAQService
 from core.services.reports_service import ReportsService
 from core.utils.time import get_months, get_current_time
 from core.mixins import BaseLkView, ObjectEditMixin, ObjectCreateMixin, ObjectDeleteMixin
@@ -21,7 +22,7 @@ from apps.bar.services.malfunctions import MalfunctionService
 from apps.repairer.services import RepairerService
 from apps.purchaser.services import PurchaserService
 
-from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee, ItemDeficit, Partner
+from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee, ItemDeficit, Partner, FAQ
 from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest, Setting
 from apps.repairer.models import Malfunction
 
@@ -1271,3 +1272,51 @@ class ReportExpenseTypesByStorageView(BaseLkView):
             year=get_current_time().year, month_id=int(month) if month else get_current_time().month
         )
         return JsonResponse({"data": data}, status=200)
+
+
+class FAQView(BaseLkView):
+    template_name = 'lk/faq/index.html'
+
+
+class FAQCreateView(ObjectCreateMixin):
+    template_name = 'lk/faq/create.html'
+
+
+    def post(self, request):
+        question_title = request.POST.get('question_title')
+        question_body = request.POST.get('question_body')
+
+        try:
+            FAQService().create(question_title=question_title, question_body=question_body)
+            messages.success(request, 'Запись успешно создана.')
+            url = '/lk/faq'
+        except exceptions.FieldNotFoundError as error:
+            messages.error(request, error)
+            url = '/lk/faq/create'
+
+        return redirect(url)
+
+
+class FAQEditView(ObjectEditMixin):
+    template_name = 'lk/faq/edit.html'
+    model = FAQ
+
+    def post(self, request):
+        row_id = request.GET.get('id')
+        question_title = request.POST.get('question_title')
+        question_body = request.POST.get('question_body')
+
+        try:
+            FAQService().edit(row_id=row_id, question_title=question_title, question_body=question_body)
+            messages.success(request, 'Запись успешно отредактирована.')
+            url = '/lk/faq'
+        except (FAQ.DoesNotExist, exceptions.FieldNotFoundError) as error:
+            messages.error(request, error)
+            url = f'/lk/faq/edit?id={row_id}'
+
+        return redirect(url)
+
+
+class FAQDeleteView(ObjectDeleteMixin):
+    model = FAQ
+    success_url = '/lk/faq'

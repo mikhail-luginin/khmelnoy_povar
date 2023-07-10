@@ -107,5 +107,10 @@ urlpatterns = [
 
     path('reports', ReportsView.as_view()),
     path('reports/money/update', ReportsMoneyUpdateView.as_view()),
-    path('reports/expense_types_by_storage', ReportExpenseTypesByStorageView.as_view())
+    path('reports/expense_types_by_storage', ReportExpenseTypesByStorageView.as_view()),
+
+    path('faq', FAQView.as_view(), name='faq'),
+    path('faq/create', FAQCreateView.as_view(), name='create_faq'),
+    path('faq/edit', FAQEditView.as_view(), name='edit_faq'),
+    path('faq/delete', FAQDeleteView.as_view(), name='delete_faq')
 ]
