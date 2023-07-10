@@ -10,7 +10,7 @@
             <h3 class="card-title">Редактирование записи в FAQ</h3>
         </div>
         <div class="card-body">
-            <form action="{% url 'LK:edit_faq' %}" method="post">
+            <form action="{% url 'LK:edit_faq' %}?id={{ row.id }}" method="post">
                 {% csrf_token %}
                 <div class="mb-4">
                     <label class="form-label">Вопрос</label>
@@ -19,7 +19,7 @@
                 <div class="mb-4">
                     <label class="form-label">Текст вопроса</label>
                     <textarea name="question_body" class="form-control" id="question_body"
-                              placeholder="Введите текст вопроса"></textarea>
+                              placeholder="Введите текст вопроса">{{ row.body }}</textarea>
                 </div>
                 <div class="mb-1">
                     <button type="submit" class="btn btn-success w-100">Сохранить</button>
