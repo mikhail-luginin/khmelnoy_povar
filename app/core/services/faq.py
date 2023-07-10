@@ -3,6 +3,10 @@ from core.validators import validate_field
 
 
 class FAQService:
+
+    def faq_all(self):
+        return FAQ.objects.all()
+
     def create(self, question_title: str | None, question_body: str | None) -> None:
         validate_field(question_title, 'вопрос')
         validate_field(question_body, 'текст вопроса')

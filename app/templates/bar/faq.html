@@ -1,7 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'bar_base.html' %}
 
 {% block title %}FAQ{% endblock %}
-{% block page_title %}FAQ{% endblock %}
 
 {% block body %}
     <div class="container-xl">
@@ -9,7 +8,6 @@
             <div class="card-header card-header-light rounded-top-3">
                 <h3 class="card-title">FAQ</h3>
                 <div class="card-actions"></div>
-                <a href="{% url 'LK:create_faq' %}" class="btn btn-tabler">Создать запись</a>
             </div>
         </div>
         <div class="card-body">
@@ -17,7 +15,6 @@
         </div>
     </div>
 {% endblock %}
-
 {% block scripts %}
     <script>
         $(document).ready(function () {
@@ -37,12 +34,7 @@
                             '</button></h2>' +
                             '<div id="item_' + row['id'] + '" class="accordion-collapse collapse" ' +
                             'data-bs-parent="#faq_accordion" style="">' +
-                            '<div class="accordion-body pt-0">' + row['body'] +
-                            '<br><a href="faq/edit?id=' + row['id'] + '"<i class="fa fa-edit"></a>' +
-                            '<a href="#" onclick="delete_confirm(' + '\'' + row['id'] + '\'' + ', ' +
-                            '\'Вы действительно хотите удалить данную запись?\'' + ', ' + '\'faq/delete' +
-                            '\'' + ')"><i class="fa fa-trash"></i></a>' +
-                            '</div></div></div>'
+                            '<div class="accordion-body pt-0">' + row['body'] + '</div></div></div>'
                         )
                     })
                 }

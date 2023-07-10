@@ -53,5 +53,7 @@ urlpatterns = [
 
     path('revise', views.SendReviseMessageView.as_view(), name="revise"),
 
-    path('end_day', views.EndDayView.as_view(), name="end_day")
+    path('end_day', views.EndDayView.as_view(), name="end_day"),
+
+    path('faq', views.FAQBarView.as_view(), name='bar_faq')
 ]
