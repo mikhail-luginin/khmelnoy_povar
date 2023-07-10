@@ -43,8 +43,14 @@ def create_money_records():
     for storage in storage_service.storages_all():
         yesterday_money_evening_cashbox = HomePageService().evening_cashbox_previous_day(storage=storage)
         if money_service.money_get(date_at=today_date(), storage_id=storage.id) is None:
+            storage_setting = storage.setting_set.first()
+            if storage_setting:
+                barmen_percent = storage_setting.percent
+            else:
+                continue
             money_service.create_money_record(date_at=today_date(), storage_id=storage.id,
-                                              sum_cash_morning=yesterday_money_evening_cashbox)
+                                              sum_cash_morning=yesterday_money_evening_cashbox,
+                                              barmen_percent=barmen_percent)
 
 
 @app.task
