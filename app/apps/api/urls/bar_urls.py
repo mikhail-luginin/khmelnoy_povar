@@ -11,6 +11,7 @@ router.register('timetable', bar_views.TimetableViewSet)
 router.register('tovar-requests', bar_views.TovarRequestViewSet)
 router.register('arrivals', bar_views.ArrivalViewSet),
 router.register('arrivals-kegs', bar_views.ArrivalKegViewSet),
-router.register('pays', bar_views.PaysViewSet)
+router.register('pays', bar_views.PaysViewSet),
+router.register('arrival-invoices', bar_views.ArrivalInvoiceViewSet)
 
 urls = router.urls

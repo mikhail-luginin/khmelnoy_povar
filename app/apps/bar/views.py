@@ -165,6 +165,8 @@ class ArrivalBeerView(ArrivalMixin):
         context = self.get_context_data(request)
 
         post_data = request.POST.copy()
+        post_data['date_at'] = today_date()
+        post_data['arrival_type'] = 2
         post_data['storage_id'] = context['bar'].id
         post_data['kegs'] = True
 
@@ -185,13 +187,15 @@ class ArrivalDrinkView(ArrivalMixin):
         context = self.get_context_data(request)
 
         post_data = request.POST.copy()
+        post_data['date_at'] = today_date()
+        post_data['arrival_type'] = 2
         post_data['storage_id'] = context['bar'].id
         post_data['kegs'] = False
 
         try:
             arrival_service.ArrivalService().invoice_drinks_create(data=post_data)
             messages.success(request, 'Накладная успешно заполнена.')
-        except exceptions.FieldCannotBeEmptyError as error:
+        except (exceptions.FieldCannotBeEmptyError, exceptions.FieldNotFoundError) as error:
             messages.error(request, str(error))
 
         return redirect(f'/bar/arrivals/drinks?code={request.GET.get("code")}')

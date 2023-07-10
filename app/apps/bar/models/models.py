@@ -97,9 +97,9 @@ class Arrival(models.Model):
         (2, 'Оплачено БАР')
     ]
 
-    date_at = models.DateField()
+    date_at = models.DateField(null=True)
     storage = models.ForeignKey(to=Storage, on_delete=models.SET_NULL, null=True)
-    num = models.CharField(max_length=64)
+    num = models.CharField(max_length=64, null=True)
     supplier = models.ForeignKey(to=Supplier, on_delete=models.SET_NULL, null=True)
     product = models.ForeignKey(to=Product, on_delete=models.SET_NULL, null=True)
     amount = models.IntegerField()
@@ -109,6 +109,26 @@ class Arrival(models.Model):
     payment_type = models.ForeignKey(to=Catalog, on_delete=models.SET_NULL, null=True)
 
     objects = managers.ArrivalManager()
+
+
+class ArrivalInvoice(models.Model):
+    ARRIVAL_TYPE_CHOICES = [
+        (0, 'Неоплачено'),
+        (1, 'Оплачено'),
+        (2, 'Оплачено БАР')
+    ]
+
+    date_at = models.DateField()
+    storage = models.ForeignKey(to=Storage, on_delete=models.CASCADE)
+    number = models.CharField(max_length=255)
+    supplier = models.ForeignKey(to=Supplier, on_delete=models.SET_NULL, null=True)
+    sum = models.FloatField()
+    type = models.PositiveSmallIntegerField(choices=ARRIVAL_TYPE_CHOICES, default=0)
+    payment_date = models.DateField(null=True)
+    payment_type = models.ForeignKey(to=Catalog, on_delete=models.SET_NULL, null=True)
+    arrivals = models.ManyToManyField(to=Arrival)
+
+    objects = managers.ArrivalInvoiceManager()
 
 
 class ArrivalKeg(models.Model):

@@ -13,7 +13,7 @@ from apps.bar.models import TovarRequest, Arrival
 from apps.iiko.models import Product, Category, Storage
 from apps.lk.models import Expense, Catalog
 from core.logs import create_log
-from core.services import catalog_service
+from core.services import catalog_service, supplier_service
 from core.services import storage_service, bar_service
 from core.services.api.iiko import IikoService
 from core.services.bar_service import get_setting_by_storage_id
@@ -140,6 +140,14 @@ class TovarRequestMixin(ProductsMovementMixin):
 class ArrivalMixin(ProductsMovementMixin):
     template_name = 'bar/arrivals.html'
     model = Arrival
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context.update({
+            "suppliers": supplier_service.suppliers_all()
+        })
+
+        return context
 
     def post(self, request):
         invoice_number = request.POST.get('invoice-number')
