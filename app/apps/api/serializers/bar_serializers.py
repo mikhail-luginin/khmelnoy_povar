@@ -2,7 +2,7 @@
 
 from rest_framework import serializers
 
-from apps.bar.models import Pays, Arrival, TovarRequest, Timetable, Salary, Money, ArrivalKeg
+from apps.bar.models import Pays, Arrival, TovarRequest, Timetable, Salary, Money, ArrivalKeg, ArrivalInvoice
 from core.utils.time import get_months
 
 
@@ -100,4 +100,16 @@ class PaysSerializer(serializers.ModelSerializer):
 class ArrivalKegSerializer(serializers.ModelSerializer):
     class Meta:
         model = ArrivalKeg
+        fields = '__all__'
+
+
+class ArrivalInvoiceSerializer(serializers.ModelSerializer):
+    storage_name = serializers.CharField(source='storage.name')
+    supplier_name = serializers.CharField(source='supplier.name', allow_null=True, default='Поставщик не указан')
+    payment_type_name = serializers.CharField(source='payment_type.name', allow_null=True,
+                                              default='Тип оплаты не указан')
+    type_name = serializers.CharField(source='get_type_display')
+
+    class Meta:
+        model = ArrivalInvoice
         fields = '__all__'

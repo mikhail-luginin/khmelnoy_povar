@@ -43,6 +43,12 @@
                             <option value="nal">Из кассы</option>
                             <option value="bn">Картой</option>
                         </select>
+                        <select class="form-select mb-2" name="supplier_id" placeholder="Выберите поставщика">
+                            <option value="" disabled selected>Выберите поставщика</option>
+                            {% for supplier in suppliers %}
+                                <option value="{{ supplier.id }}">{{ supplier.name }}</option>
+                            {% endfor %}
+                        </select>
                         <div class="mb-2">
                             <label class="form-label">Отдали металлических кег (30л)</label>
                             <input class="form-control mb-2" type="tel" inputmode="numeric"
