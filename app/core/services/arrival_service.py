@@ -163,7 +163,14 @@ def get_arrivals_by_invoice_number(invoice_id: int) -> ArrivalInvoice | None:
 @app.task
 def update_arrivals_to_the_new_version():
     for arrival in Arrival.objects.all():
-        invoice = ArrivalInvoice.objects.filter(number=arrival.num).first()
+        invoice = ArrivalInvoice.objects.filter(
+            number=arrival.num,
+            storage=arrival.storage,
+            date_at=arrival.date_at,
+            payment_type=arrival.payment_type,
+            payment_date=arrival.payment_date,
+            type=arrival.type
+        ).first()
         if invoice:
             invoice.sum += arrival.sum
             invoice.arrivals.add(arrival)
