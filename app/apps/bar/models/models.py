@@ -111,6 +111,26 @@ class Arrival(models.Model):
     objects = managers.ArrivalManager()
 
 
+class ArrivalInvoice(models.Model):
+    ARRIVAL_TYPE_CHOICES = [
+        (0, 'Неоплачено'),
+        (1, 'Оплачено'),
+        (2, 'Оплачено БАР')
+    ]
+
+    date_at = models.DateField()
+    storage = models.ForeignKey(to=Storage, on_delete=models.CASCADE)
+    number = models.CharField(max_length=255)
+    supplier = models.ForeignKey(to=Supplier, on_delete=models.SET_NULL, null=True)
+    sum = models.FloatField()
+    type = models.PositiveSmallIntegerField(choices=ARRIVAL_TYPE_CHOICES, default=0)
+    payment_date = models.DateField(null=True)
+    payment_type = models.ForeignKey(to=Catalog, on_delete=models.SET_NULL, null=True)
+    arrivals = models.ManyToManyField(to=Arrival)
+
+    objects = managers.ArrivalInvoiceManager()
+
+
 class ArrivalKeg(models.Model):
     invoice_number = models.CharField(max_length=255)
     gave_thirty = models.PositiveIntegerField()

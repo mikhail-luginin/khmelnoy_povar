@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <div class="container-xl">
+        {% if invoice is None %}
+            <div class="card rounded-3">
+                <div class="card-header card-header-light rounded-top-3">
+                    <h3 class="card-title">Накладные</h3>
+                </div>
+                <div class="card-body">
+                    <table id="invoices-table" class="table table-vcenter text-nowrap datatable table-striped">
+                        <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Заведение</th>
+                            <th>Номер накладной</th>
+                            <th>Поставщик</th>
+                            <th>Сумма</th>
+                            <th>Статус оплаты</th>
+                            <th>Дата оплаты</th>
+                            <th>Тип оплаты</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="card card-lg">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-4">
+                            <p class="h3">Поставщик</p>
+                            <address>
+                                {% if invoice.supplier %}{{ invoice.supplier.name }}{% else %}Не указан{% endif %}<br>
+                            </address>
+                        </div>
+                        <div class="col-4 text-center">
+                            <p class="h3">Оплата</p>
+                            <address>
+                                {{ invoice.get_type_display }}<br>
+                                {{ invoice.payment_date }}<br>
+                                {{ invoice.payment_type.name }}<br>
+                            </address>
+                        </div>
+                        <div class="col-4 text-end">
+                            <p class="h3">Получатель</p>
+                            <address>
+                                {{ invoice.storage.name }}<br>
+                            </address>
+                        </div>
+                        <div class="col-12 my-5">
+                            <h1>Накладная {{ invoice.number }}</h1>
+                        </div>
+                    </div>
+                    <table class="table table-transparent table-responsive">
+                        <thead>
+                        <tr>
+                            <th>Продукт</th>
+                            <th class="text-center" style="width: 1%">Кол-во</th>
+                            <th class="text-end" style="width: 1%">Сумма</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% for arrival in invoice.arrivals.all %}
+                                <tr>
+                                    <td>{{ arrival.product.name }}</td>
+                                    <td>{{ arrival.amount }}</td>
+                                    <td>{{ arrival.sum }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tr>
+                            <td colspan="2" class="font-weight-bold text-uppercase text-end">Общая сумма</td>
+                            <td class="font-weight-bold text-end">{{ invoice.sum }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        let table = run_datatable('invoices-table', '/api/arrival-invoices', '', [
+            {data: 'date_at'},
+            {data: 'storage_name'},
+            {data: 'number'},
+            {data: 'supplier_name'},
+            {data: 'sum'},
+            {data: 'type_name'},
+            {data: 'payment_date'},
+            {data: 'payment_type_name'},
+            {
+                data: null,
+                render: function (data, type, row) {
+                    return '<a href="/lk/tovar/arrivals/invoices?id=' + row.id + '" class="btn w-100">Открыть</a>'
+                }
+            }
+        ], false, false, false, false, false, {}, 0)
+    </script>
+{% endblock %}

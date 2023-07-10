@@ -10,9 +10,9 @@ from core.utils.time import get_months, get_current_time
 from core.mixins import BaseLkView, ObjectEditMixin, ObjectCreateMixin, ObjectDeleteMixin
 from core import exceptions
 from core.services import salary_service, bar_service, item_deficit_service, reviews_service, catalog_service, \
-                          positions_service, money_service, employees_service, expenses_service, pays_service, \
-                          timetable_service, storage_service, statement_service, salary_crud, product_remains_service, \
-                          supplier_service, fines_service, product_service
+    positions_service, money_service, employees_service, expenses_service, pays_service, \
+    timetable_service, storage_service, statement_service, salary_crud, product_remains_service, \
+    supplier_service, fines_service, product_service, arrival_service
 
 from .tasks import calculate_percent_premium_for_all, update_all_money
 from .services import index_page
@@ -1271,3 +1271,29 @@ class ReportExpenseTypesByStorageView(BaseLkView):
             year=get_current_time().year, month_id=int(month) if month else get_current_time().month
         )
         return JsonResponse({"data": data}, status=200)
+
+
+class ArrivalInvoicesView(BaseLkView):
+    template_name = 'lk/arrivals/invoices.html'
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        invoice_id = request.GET.get('id')
+
+        context = super().get_context_data(request, **kwargs)
+        context.update({
+            "invoice": arrival_service.get_arrivals_by_invoice_number(invoice_id=invoice_id)
+        })
+
+        return context
+
+
+class ArrivalInvoicesAllView(BaseLkView):
+
+    def get(self, request):
+        return JsonResponse(arrival_service.get_invoices(), status=200, safe=False)
+
+
+
+def update_arrivals_temp_view(request):
+    result = arrival_service.update_arrivals_to_the_new_version()
+    return HttpResponse(str(result))
