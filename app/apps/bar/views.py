@@ -14,6 +14,7 @@ from apps.repairer.services import RepairerService
 from core import exceptions
 from core.services import bar_service, arrival_service
 from core.services import catalog_service, item_deficit_service, storage_service
+from core.services.faq import FAQService
 from core.services.salary_service import SalaryService
 from core.utils.telegram import send_message_to_telegram
 from core.utils.time import today_date, get_months, get_current_time
@@ -403,3 +404,13 @@ class SendReviseMessageView(BaseView):
         send_message_to_telegram(chat_id=chat_id, message=message)
 
         return JsonResponse(data={"success": True}, status=200)
+
+
+class FAQBarView(BaseView):
+    template_name = 'bar/faq.html'
+
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context['row'] = FAQService().faq_all()
+
+        return context

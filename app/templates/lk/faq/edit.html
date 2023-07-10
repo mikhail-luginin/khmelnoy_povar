@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование записи{% endblock %}
+{% block page_title %}Редактирование записи в FAQ{% endblock %}
+
+{% block body %}
+<div class="container-xl">
+    <div class="card rounded-3">
+        <div class="card-header card-header-light rounded-top-3">
+            <h3 class="card-title">Редактирование записи в FAQ</h3>
+        </div>
+        <div class="card-body">
+            <form action="{% url 'LK:edit_faq' %}" method="post">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="form-label">Вопрос</label>
+                    <input name="question_title" class="form-control" id="question_title" placeholder="Введите вопрос" value="{{ row.title }}">
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Текст вопроса</label>
+                    <textarea name="question_body" class="form-control" id="question_body"
+                              placeholder="Введите текст вопроса"></textarea>
+                </div>
+                <div class="mb-1">
+                    <button type="submit" class="btn btn-success w-100">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

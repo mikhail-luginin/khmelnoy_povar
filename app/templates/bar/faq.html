@@ -1,0 +1,44 @@
+{% extends 'bar_base.html' %}
+
+{% block title %}FAQ{% endblock %}
+
+{% block body %}
+    <div class="container-xl">
+        <div class="card rounded-3">
+            <div class="card-header card-header-light rounded-top-3">
+                <h3 class="card-title">FAQ</h3>
+                <div class="card-actions"></div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div id="faq_accordion" class="accordion"></div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                data: $(this).serialize(),
+                url: '/api/faq',
+                type: 'get',
+                success: function (response) {
+                    let faq = $('#faq_accordion')
+                    faq.html('')
+                    response.forEach(function (row) {
+                        faq.append(
+                            '<div class="accordion-item">' +
+                            '<h2 class="accordion-header">' +
+                            '<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"' +
+                            'data-bs-target="#item_' + row['id'] + '" aria-expanded="false">' + row['title'] +
+                            '</button></h2>' +
+                            '<div id="item_' + row['id'] + '" class="accordion-collapse collapse" ' +
+                            'data-bs-parent="#faq_accordion" style="">' +
+                            '<div class="accordion-body pt-0">' + row['body'] + '</div></div></div>'
+                        )
+                    })
+                }
+            })
+        })
+    </script>
+{% endblock %}
