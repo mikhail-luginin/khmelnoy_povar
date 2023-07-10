@@ -162,7 +162,7 @@ def get_arrivals_by_invoice_number(invoice_id: int) -> ArrivalInvoice | None:
 
 @app.task
 def update_arrivals_to_the_new_version():
-    u = ''
+    u = 'Что найдено: '
     for arrival in Arrival.objects.all():
         invoice = ArrivalInvoice.objects.filter(
             number=arrival.num,
@@ -172,7 +172,7 @@ def update_arrivals_to_the_new_version():
             payment_date=arrival.payment_date,
             type=arrival.type
         )
-        if invoice.count > 1:
+        if invoice.count() > 1:
             send_message_to_telegram(settings.TELEGRAM_CHAT_ID_FOR_ERRORS, 'Найден повтор')
             for i in invoice:
                 u += f'{i.number} - {i.storage.name} - {i.date_at}\n'
