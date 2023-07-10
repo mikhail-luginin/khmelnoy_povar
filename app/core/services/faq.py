@@ -9,7 +9,7 @@ class FAQService:
 
         FAQ.objects.create(title=question_title, body=question_body)
 
-    def edit(self, row_id: int | None, question_title: str | None, question_body: str | None) -> None:
+    def edit(self, row_id: str | None, question_title: str | None, question_body: str | None) -> None:
         validate_field(row_id, 'идентификатор')
         validate_field(question_title, 'вопрос')
         validate_field(question_body, 'текст вопроса')
