@@ -5,9 +5,11 @@ from django.db import transaction
 from django.http import QueryDict
 
 from apps.bar.models import Arrival, ArrivalKeg, ArrivalInvoice
+from config.celery import app
 from core import exceptions, validators
 from core.services import product_service, expenses_service, catalog_service
 from core.utils.payment_types import get_nal_category, get_bn_category
+from core.utils.telegram import send_message_to_telegram
 from core.utils.time import today_date
 
 
@@ -158,6 +160,7 @@ def get_arrivals_by_invoice_number(invoice_id: int) -> ArrivalInvoice | None:
     return ArrivalInvoice.objects.filter(id=invoice_id).first()
 
 
+@app.task
 def update_arrivals_to_the_new_version():
     for arrival in Arrival.objects.all():
         invoice = ArrivalInvoice.objects.filter(number=arrival.num).first()
@@ -180,4 +183,5 @@ def update_arrivals_to_the_new_version():
             invoice.arrivals.add(arrival)
             invoice.save()
 
+    send_message_to_telegram(settings.TELEGRAM_CHAT_ID_FOR_ERRORS, '1')
     return True
