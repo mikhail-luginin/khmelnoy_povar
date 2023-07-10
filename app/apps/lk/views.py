@@ -1291,9 +1291,3 @@ class ArrivalInvoicesAllView(BaseLkView):
 
     def get(self, request):
         return JsonResponse(arrival_service.get_invoices(), status=200, safe=False)
-
-
-
-def update_arrivals_temp_view(request):
-    result = arrival_service.update_arrivals_to_the_new_version.delay()
-    return HttpResponse(str(result))

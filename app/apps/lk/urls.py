@@ -80,7 +80,6 @@ urlpatterns = [
     path('tovar/arrivals/delete', ArrivalDeleteView.as_view(), name="tovar_arrival_delete"),
     path('tovar/arrivals/invoices', ArrivalInvoicesView.as_view(), name="total_arrival_invoices"),
     path('tovar/arrivals/invoices/all', ArrivalInvoicesAllView.as_view()),
-    path('tovar/arrivals/invoices/update', update_arrivals_temp_view),
     path('tovar/requests', TovarRequestsView.as_view(), name="tovar_requests"),
     path('tovar/requests/edit', TovarRequestEditView.as_view(), name="tovar_request_edit"),
     path('tovar/requests/delete', TovarRequestDeleteView.as_view(), name="tovar_request_delete"),

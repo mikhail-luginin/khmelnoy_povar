@@ -147,6 +147,8 @@ class ArrivalMixin(ProductsMovementMixin):
             "suppliers": supplier_service.suppliers_all()
         })
 
+        return context
+
     def post(self, request):
         invoice_number = request.POST.get('invoice-number')
         product_id = request.POST.get('product-id')

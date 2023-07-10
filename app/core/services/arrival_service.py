@@ -69,7 +69,9 @@ class ArrivalService:
                 invoice_row_sum = float(invoice_row_sum)
 
                 arrivals.append(
-                    Arrival(product=product, amount=amount, sum=invoice_row_sum)
+                    Arrival(date_at=today_date(), storage_id=storage_id, num=invoice_number, product=product,
+                            supplier_id=supplier_id, amount=amount, sum=invoice_row_sum, type=arrival_type,
+                            payment_date=payment_date, payment_type=payment_type)
                 )
                 total_sum += invoice_row_sum
 
@@ -82,7 +84,7 @@ class ArrivalService:
             "storage_id": storage_id,
             "supplier_id": supplier_id,
             "kegs": kegs,
-            "type": arrival_type,
+            "arrival_type": arrival_type,
             "date_at": date_at
         }
 
@@ -158,24 +160,3 @@ def get_invoices() -> list[dict]:
 
 def get_arrivals_by_invoice_number(invoice_id: int) -> ArrivalInvoice | None:
     return ArrivalInvoice.objects.filter(id=invoice_id).first()
-
-
-@app.task
-def update_arrivals_to_the_new_version():
-    u = 'Что найдено: '
-    for arrival in Arrival.objects.all():
-        invoice = ArrivalInvoice.objects.filter(
-            number=arrival.num,
-            storage=arrival.storage,
-            date_at=arrival.date_at,
-            payment_type=arrival.payment_type,
-            payment_date=arrival.payment_date,
-            type=arrival.type
-        )
-        if invoice.count() > 1:
-            send_message_to_telegram(settings.TELEGRAM_CHAT_ID_FOR_ERRORS, 'Найден повтор')
-            for i in invoice:
-                u += f'{i.number} - {i.storage.name} - {i.date_at}\n'
-
-    send_message_to_telegram(settings.TELEGRAM_CHAT_ID_FOR_ERRORS, u)
-    return True
