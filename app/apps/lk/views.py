@@ -1295,5 +1295,5 @@ class ArrivalInvoicesAllView(BaseLkView):
 
 
 def update_arrivals_temp_view(request):
-    result = arrival_service.update_arrivals_to_the_new_version()
+    result = arrival_service.update_arrivals_to_the_new_version.delay()
     return HttpResponse(str(result))
