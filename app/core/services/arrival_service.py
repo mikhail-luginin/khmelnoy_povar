@@ -162,6 +162,7 @@ def get_arrivals_by_invoice_number(invoice_id: int) -> ArrivalInvoice | None:
 
 @app.task
 def update_arrivals_to_the_new_version():
+    u = ''
     for arrival in Arrival.objects.all():
         invoice = ArrivalInvoice.objects.filter(
             number=arrival.num,
@@ -170,25 +171,11 @@ def update_arrivals_to_the_new_version():
             payment_type=arrival.payment_type,
             payment_date=arrival.payment_date,
             type=arrival.type
-        ).first()
-        if invoice:
-            invoice.sum += arrival.sum
-            invoice.arrivals.add(arrival)
-            invoice.save()
-        else:
-            invoice = ArrivalInvoice.objects.create(
-                date_at=arrival.date_at,
-                storage_id=arrival.storage_id,
-                number=arrival.num,
-                supplier=arrival.supplier,
-                sum=0,
-                type=arrival.type,
-                payment_date=arrival.payment_date,
-                payment_type=arrival.payment_type
-            )
-            invoice.sum += arrival.sum
-            invoice.arrivals.add(arrival)
-            invoice.save()
+        )
+        if invoice.count > 1:
+            send_message_to_telegram(settings.TELEGRAM_CHAT_ID_FOR_ERRORS, 'Найден повтор')
+            for i in invoice:
+                u += f'{i.number} - {i.storage.name} - {i.date_at}\n'
 
-    send_message_to_telegram(settings.TELEGRAM_CHAT_ID_FOR_ERRORS, '1')
+    send_message_to_telegram(settings.TELEGRAM_CHAT_ID_FOR_ERRORS, u)
     return True
