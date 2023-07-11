@@ -69,9 +69,17 @@ class ArrivalService:
                 invoice_row_sum = float(invoice_row_sum)
 
                 arrivals.append(
-                    Arrival(date_at=today_date(), storage_id=storage_id, num=invoice_number, product=product,
-                            supplier_id=supplier_id, amount=amount, sum=invoice_row_sum, type=arrival_type,
-                            payment_date=payment_date, payment_type=payment_type)
+                    Arrival.objects.create(
+                        date_at=today_date(),
+                        storage_id=storage_id,
+                        num=invoice_number,
+                        product=product,
+                        supplier_id=supplier_id,
+                        amount=amount,
+                        sum=invoice_row_sum,
+                        type=arrival_type,
+                        payment_date=payment_date,
+                        payment_type=payment_type)
                 )
                 total_sum += invoice_row_sum
 
@@ -99,7 +107,7 @@ class ArrivalService:
         storage_id = invoice_data.get('storage_id')
         supplier_id = invoice_data.get('supplier_id')
         total_sum = invoice_data.get('total_sum')
-        arrivals = invoice_data.get('arrivals')
+        arrivals_objects = invoice_data.get('arrivals')
         arrival_type = invoice_data.get('arrival_type')
 
         invoice = ArrivalInvoice.objects.create(
@@ -112,9 +120,8 @@ class ArrivalService:
             payment_type=payment_type,
             type=arrival_type
         )
-        if arrivals:
-            created_arrivals = Arrival.objects.bulk_create(arrivals)
-            for arrival in created_arrivals:
+        if arrivals_objects:
+            for arrival in arrivals_objects:
                 invoice.arrivals.add(arrival)
             invoice.save()
         if payment_type:
