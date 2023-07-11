@@ -21,5 +21,5 @@ class Process500:
         send_message_to_telegram(settings.TELEGRAM_CHAT_ID_FOR_ERRORS, f'Process500 [<b>{request.path}</b>]\n\n'
                                                                        f'{exception}')
         send_message_to_telegram(settings.TELEGRAM_CHAT_ID_FOR_ERRORS, f'{trace}')
-        messages.error(request, f'Произошла неизвестная ошибка. {exception} / {trace}')
+        messages.error(request, f'Произошла неизвестная ошибка.')
         return redirect(request.META.get('HTTP_REFERER', '/'))
