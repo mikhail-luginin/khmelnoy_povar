@@ -18,8 +18,9 @@
                            id="malfunctions-table">
                         <thead>
                         <tr class="column-filter dt-column-filter">
+                            <th></th>
                             <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
-                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th></th>
                             <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                             <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                             <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
@@ -29,6 +30,7 @@
                         <tr>
                             <th></th>
                             <th>Дата</th>
+                            <th>Таймер</th>
                             <th>Заведение</th>
                             <th>Объект неисправности</th>
                             <th>Описание</th>
@@ -49,7 +51,7 @@
         run_datatable('malfunctions-table', '/api/malfunctions', '/lk/malfunctions', [
             {
                 data: 'photo_link',
-                render: function(data, type, row) {
+                render: function (data, type, row) {
                     let photo = "<a href='" + row.photo_link + "' class='image-popup'><i class='fa fa-camera'></i></a>"
                     $('.image-popup').magnificPopup({
                         type: 'image'
@@ -58,17 +60,31 @@
                 }
             },
             {data: 'date_at'},
+            {
+                data: 'date_at',
+                render: function (data, type, row) {
+                    let currentDate = new Date();
+                    let dateAt = new Date(data);
+
+                    let secondsDiff = Math.floor((currentDate - dateAt) / 1000);
+                    let minutesDiff = Math.floor(secondsDiff / 60);
+                    let hoursDiff = Math.floor(minutesDiff / 60);
+                    let daysDiff = Math.floor(hoursDiff / 24);
+
+                    return '<div class="update-timer-date" data-date="' + data + '">' + daysDiff + ' дн. ' + (hoursDiff % 24) + ' ч. ' + (minutesDiff % 60) + ' мин. ' + (secondsDiff % 60) + ' сек.' + '</div>'
+                }
+            },
             {data: 'storage_name'},
             {data: 'fault_object'},
             {data: 'description'},
             {data: 'comment'},
             {
                 data: null,
-                render: function(data, type, row) {
+                render: function (data, type, row) {
                     return '<a href="/lk/malfunctions/complete?id=' + row.id + '"><i class="fa fa-check-double"></i></a>'
                 }
             }
-        ], has_delete=true, has_update=false, has_dismiss=false, has_edit=false, has_actions=true, custom_dict = {
+        ], has_delete = true, has_update = false, has_dismiss = false, has_edit = false, has_actions = true, custom_dict = {
             createdRow: function (row, data, dataIndex) {
                 if (data.status === 0) {
                     $(row).addClass('table-danger');
@@ -78,6 +94,24 @@
                     $(row).addClass('table-warning')
                 }
             },
-        }, order_id=1)
+        }, order_id = 1)
+
+        $(document).ready(function () {
+            setInterval(function () {
+                document.querySelectorAll('.update-timer-date').forEach((el) => {
+                    let date_param = el.getAttribute('data-date')
+
+                    let currentDate = new Date();
+                    let dateAt = new Date(date_param);
+
+                    let secondsDiff = Math.floor((currentDate - dateAt) / 1000);
+                    let minutesDiff = Math.floor(secondsDiff / 60);
+                    let hoursDiff = Math.floor(minutesDiff / 60);
+                    let daysDiff = Math.floor(hoursDiff / 24);
+
+                    el.innerHTML = daysDiff + ' дн. ' + (hoursDiff % 24) + ' ч. ' + (minutesDiff % 60) + ' мин. ' + (secondsDiff % 60) + ' сек.'
+                })
+            }, 1000)
+        })
     </script>
 {% endblock %}
