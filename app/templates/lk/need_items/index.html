@@ -19,6 +19,7 @@
                     <thead>
                     <tr class="column-filter dt-column-filter">
                         <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th></th>
                         <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                         <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
                         <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
@@ -28,6 +29,7 @@
                     </tr>
                     <tr>
                         <th>Дата</th>
+                        <th>Таймер</th>
                         <th>Заведение</th>
                         <th>Владелец</th>
                         <th>Предмет</th>
@@ -69,8 +71,67 @@
 
 {% block scripts %}
     <script>
+        run_datatable('need-items-with-success-table', '/api/item_deficit?without_success=0', '/lk/need_items', [
+            {data: 'created_at'},
+            {data: 'storage_name'},
+            {data: 'owner_fio'},
+            {data: 'item'},
+            {
+                data: 'amount',
+                render: function (data, type, row) {
+                    let sended_amount = 0;
+                    if(row.sended_amount != null) {
+                        sended_amount = row.sended_amount
+                    }
+                    let arrived_amount = 0;
+                    if(row.arrived_amount != null) {
+                        arrived_amount = row.arrived_amount
+                    }
+                    return row.amount + ' | ' + sended_amount + ' | ' + arrived_amount
+                }
+            },
+            {data: 'receive_date'},
+            {data: 'comment'},
+            {
+                data: null,
+                render: function (data, type, row) {
+                    if (row.status === 1) {
+                        url = '"/lk/need_items/send?id=' + row.id + '"'
+                        return "<button onclick='window.location.href = " + url + "' class='btn w-100'>Отправить</button>"
+                    } else if (row.status === 2) {
+                        return '<i class="fa fa-long-arrow-down"></i>'
+                    } else if (row.status === 3) {
+                        return '<i class="fa fa-check-circle"></i>'
+                    }
+                }
+            }
+        ], has_delete = false, has_update = false, has_dismiss = false, has_edit = false, has_actions = false, custom_dict = {
+            createdRow: function (row, data, dataIndex) {
+                if (data.status === 1) {
+                    $(row).addClass('table-danger');
+                } else if (data.status === 2) {
+                    $(row).addClass('table-warning');
+                } else if (data.status === 3) {
+                    $(row).addClass('table-success');
+                }
+            }
+        })
         run_datatable('need-items-without-success-table', '/api/item_deficit?without_success=1', '/lk/need_items', [
             {data: 'created_at'},
+            {
+                data: 'created_at',
+                render: function (data, type, row) {
+                    let currentDate = new Date();
+                    let dateAt = new Date(data);
+
+                    let secondsDiff = Math.floor((currentDate - dateAt) / 1000);
+                    let minutesDiff = Math.floor(secondsDiff / 60);
+                    let hoursDiff = Math.floor(minutesDiff / 60);
+                    let daysDiff = Math.floor(hoursDiff / 24);
+
+                    return '<div class="update-timer-date" data-date="' + data + '">' + daysDiff + ' дн. ' + (hoursDiff % 24) + ' ч. ' + (minutesDiff % 60) + ' мин. ' + (secondsDiff % 60) + ' сек.' + '</div>'
+                }
+            },
             {data: 'storage_name'},
             {data: 'owner_fio'},
             {data: 'item'},
@@ -149,56 +210,22 @@
                 }
             }
         })
-    </script>
-    <script>
-        run_datatable('need-items-with-success-table', '/api/item_deficit?without_success=0', '/lk/need_items', [
-            {data: 'created_at'},
-            {data: 'storage_name'},
-            {data: 'owner_fio'},
-            {data: 'item'},
-            {
-                data: 'amount',
-                render: function (data, type, row) {
-                    let sended_amount = 0;
-                    if(row.sended_amount != null) {
-                        sended_amount = row.sended_amount
-                    }
-                    let arrived_amount = 0;
-                    if(row.arrived_amount != null) {
-                        arrived_amount = row.arrived_amount
-                    }
-                    return row.amount + ' | ' + sended_amount + ' | ' + arrived_amount
-                }
-            },
-            {data: 'receive_date'},
-            {data: 'comment'},
-            {
-                data: null,
-                render: function (data, type, row) {
-                    if (row.status === 1) {
-                        url = '"/lk/need_items/send?id=' + row.id + '"'
-                        return "<button onclick='window.location.href = " + url + "' class='btn w-100'>Отправить</button>"
-                    } else if (row.status === 2) {
-                        return '<i class="fa fa-long-arrow-down"></i>'
-                    } else if (row.status === 3) {
-                        return '<i class="fa fa-check-circle"></i>'
-                    }
-                }
-            }
-        ], has_delete = false, has_update = false, has_dismiss = false, has_edit = false, has_actions = false, custom_dict = {
-            createdRow: function (row, data, dataIndex) {
-                if (data.status === 1) {
-                    $(row).addClass('table-danger');
-                } else if (data.status === 2) {
-                    $(row).addClass('table-warning');
-                } else if (data.status === 3) {
-                    $(row).addClass('table-success');
-                }
-            }
-        })
-    </script>
-    <script>
         $(document).ready(function () {
+            setInterval(function () {
+                document.querySelectorAll('.update-timer-date').forEach((el) => {
+                    let date_param = el.getAttribute('data-date')
+
+                    let currentDate = new Date();
+                    let dateAt = new Date(date_param);
+
+                    let secondsDiff = Math.floor((currentDate - dateAt) / 1000);
+                    let minutesDiff = Math.floor(secondsDiff / 60);
+                    let hoursDiff = Math.floor(minutesDiff / 60);
+                    let daysDiff = Math.floor(hoursDiff / 24);
+
+                    el.innerHTML = daysDiff + ' дн. ' + (hoursDiff % 24) + ' ч. ' + (minutesDiff % 60) + ' мин. ' + (secondsDiff % 60) + ' сек.'
+                })
+            }, 1000)
             let first_tab = $('#btn-tab-top-1')
             let second_tab = $('#btn-tab-top-2')
             first_tab.click(function () {
