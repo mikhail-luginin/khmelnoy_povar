@@ -1,4 +1,4 @@
-#  Copyright (c) 2023. All rights reserved. Mikhail Luginin. Contact: telegram @hex0z
+
 
 import datetime
 import xml.etree.ElementTree as ET
