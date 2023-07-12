@@ -114,5 +114,8 @@ urlpatterns = [
     path('faq', FAQView.as_view(), name='faq'),
     path('faq/create', FAQCreateView.as_view(), name='create_faq'),
     path('faq/edit', FAQEditView.as_view(), name='edit_faq'),
-    path('faq/delete', FAQDeleteView.as_view(), name='delete_faq')
+    path('faq/delete', FAQDeleteView.as_view(), name='delete_faq'),
+    path('faq/tags/create', FAQTagCreateView.as_view(), name='create_faq_tag'),
+    path('faq/tags/edit', FAQTagEditView.as_view(), name='edit_faq_tag'),
+    path('faq/tags/delete', FAQTagDeleteView.as_view(), name='delete_faq_tag')
 ]

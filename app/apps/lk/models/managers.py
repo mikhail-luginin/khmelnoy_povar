@@ -101,3 +101,9 @@ class EmployeeLogManager(models.Manager):
 
     def get_queryset(self):
         return super().get_queryset().select_related('employee')
+
+
+class FAQManager(models.Manager):
+
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related('tags')

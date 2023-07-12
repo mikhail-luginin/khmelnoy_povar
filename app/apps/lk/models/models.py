@@ -283,6 +283,16 @@ class ProductRemain(models.Model):
     objects = managers.ProductRemainManager()
 
 
+class FAQTag(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
 class FAQ(models.Model):
     title = models.CharField(max_length=255)
     body = models.TextField()
+    tags = models.ManyToManyField(to=FAQTag)
+
+    objects = managers.FAQManager()

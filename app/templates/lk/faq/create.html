@@ -21,6 +21,15 @@
                     <textarea name="question_body" class="form-control" id="question_body"
                               placeholder="Введите текст вопроса"></textarea>
                 </div>
+                <div class="mb-4">
+                    <label class="form-label">Теги</label>
+                    <select class="form-select" name="question_tags" placeholder="Укажите теги" multiple>
+                        <option></option>
+                        {% for tag in tags %}
+                            <option value="{{ tag.id }}">{{ tag.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
                 <div class="mb-1">
                     <button type="submit" class="btn btn-success w-100">Создать</button>
                 </div>
