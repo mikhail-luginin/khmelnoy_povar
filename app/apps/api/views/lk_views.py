@@ -1,15 +1,16 @@
 from rest_framework.viewsets import ModelViewSet
 
-from ..serializers import NavbarSerializer, RoleSerializer, ProfileSerializer, JobPlaceSerializer, PositionSerializer, \
+from apps.api.serializers import NavbarSerializer, RoleSerializer, ProfileSerializer, JobPlaceSerializer, \
+    PositionSerializer, \
     EmployeeSerializer, CatalogTypeSerializer, CatalogSerializer, TestQuestionSerializer, TestSerializer, \
     TestResultSerializer, TelegramChatSerializer, CardSerializer, PartnerSerializer, StatementSerializer, \
     FineSerializer, ExpenseSerializer, LogsSerializer, ItemDeficitSerializer, MalfunctionSerializer, ReviewSerializer, \
     FAQSerializer, FAQTagSerializer
-from ..utils import ModelViewSetMixin
+from apps.api.mixins import ModelViewSetMixin
 
 from apps.lk.models import Navbar, Role, Profile, JobPlace, Position, Employee, Catalog, CatalogType, Log, Expense, \
     Fine, Statement, Card, Partner, TelegramChat, TestResult, Test, TestQuestion, ItemDeficit, Review, FAQ, FAQTag
-from ...repairer.models import Malfunction
+from apps.repairer.models import Malfunction
 
 
 class NavbarViewSet(ModelViewSetMixin):

@@ -1,9 +1,7 @@
-
-
 from apps.bar.models import Pays, Arrival, TovarRequest, Timetable, Salary, Money, ArrivalKeg, ArrivalInvoice
 from ..serializers import MoneySerializer, SalarySerializer, TimetableSerializer, TovarRequestSerializer, \
     ArrivalSerializer, PaysSerializer, ArrivalKegSerializer, ArrivalInvoiceSerializer
-from ..utils import ModelViewSetMixin
+from ..mixins import ModelViewSetMixin
 
 
 class MoneyViewSet(ModelViewSetMixin):

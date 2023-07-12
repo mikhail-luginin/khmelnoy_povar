@@ -1,6 +1,6 @@
-from ..serializers import CategorySerializer, StorageSerializer, SupplierSerializer, ProductSerializer, \
+from apps.api.serializers import CategorySerializer, StorageSerializer, SupplierSerializer, ProductSerializer, \
     PaymentTypeSerializer, DiscountSerializer
-from ..utils import ModelViewSetMixin
+from apps.api.mixins import ModelViewSetMixin
 from apps.iiko.models import Category, Storage, Supplier, Product, PaymentType, Discount
 
 
