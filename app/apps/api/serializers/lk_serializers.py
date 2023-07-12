@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from apps.lk.models import Navbar, Role, Profile, JobPlace, Position, Employee, Catalog, CatalogType, Log, Expense, \
     Fine, Statement, Card, Partner, TelegramChat, TestResult, Test, TestQuestion, ItemDeficit, Review, ExpenseStatus, \
-    FAQ
+    FAQ, FAQTag
 from apps.repairer.models import Malfunction
 
 
@@ -212,7 +212,14 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class FAQSerializer(serializers.ModelSerializer):
+    tags = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = FAQ
+        fields = '__all__'
+
+
+class FAQTagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FAQTag
         fields = '__all__'

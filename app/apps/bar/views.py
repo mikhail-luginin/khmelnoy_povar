@@ -12,9 +12,8 @@ from apps.lk.models import Expense, Fine, ItemDeficit
 from apps.repairer.models import Malfunction
 from apps.repairer.services import RepairerService
 from core import exceptions
-from core.services import bar_service, arrival_service
-from core.services import catalog_service, item_deficit_service, storage_service
-from core.services.faq import FAQService
+from core.services import bar_service, arrival_service, catalog_service, \
+    item_deficit_service, storage_service, faq_service
 from core.services.salary_service import SalaryService
 from core.utils.telegram import send_message_to_telegram
 from core.utils.time import today_date, get_months, get_current_time
@@ -411,6 +410,6 @@ class FAQBarView(BaseView):
 
     def get_context_data(self, request, **kwargs) -> dict:
         context = super().get_context_data(request, **kwargs)
-        context['row'] = FAQService().faq_all()
+        context['row'] = faq_service.faq_all()
 
         return context

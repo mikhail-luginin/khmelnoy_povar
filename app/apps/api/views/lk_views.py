@@ -1,12 +1,14 @@
+from rest_framework.viewsets import ModelViewSet
+
 from ..serializers import NavbarSerializer, RoleSerializer, ProfileSerializer, JobPlaceSerializer, PositionSerializer, \
     EmployeeSerializer, CatalogTypeSerializer, CatalogSerializer, TestQuestionSerializer, TestSerializer, \
     TestResultSerializer, TelegramChatSerializer, CardSerializer, PartnerSerializer, StatementSerializer, \
     FineSerializer, ExpenseSerializer, LogsSerializer, ItemDeficitSerializer, MalfunctionSerializer, ReviewSerializer, \
-    FAQSerializer
+    FAQSerializer, FAQTagSerializer
 from ..utils import ModelViewSetMixin
 
 from apps.lk.models import Navbar, Role, Profile, JobPlace, Position, Employee, Catalog, CatalogType, Log, Expense, \
-    Fine, Statement, Card, Partner, TelegramChat, TestResult, Test, TestQuestion, ItemDeficit, Review, FAQ
+    Fine, Statement, Card, Partner, TelegramChat, TestResult, Test, TestQuestion, ItemDeficit, Review, FAQ, FAQTag
 from ...repairer.models import Malfunction
 
 
@@ -131,6 +133,11 @@ class ReviewViewSet(ModelViewSetMixin):
     serializer_class = ReviewSerializer
 
 
-class FAQViewSet(ModelViewSetMixin):
+class FAQViewSet(ModelViewSet):
     queryset = FAQ.objects.all()
     serializer_class = FAQSerializer
+
+
+class FAQTagViewSet(ModelViewSet):
+    queryset = FAQTag.objects.all()
+    serializer_class = FAQTagSerializer

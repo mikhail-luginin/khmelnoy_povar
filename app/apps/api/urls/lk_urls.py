@@ -27,5 +27,6 @@ router.register('item_deficit', lk_views.ItemDeficitViewSet)
 router.register('malfunctions', lk_views.MalfunctionViewSet)
 router.register('reviews', lk_views.ReviewViewSet)
 router.register('faq', lk_views.FAQViewSet)
+router.register('faq-tags', lk_views.FAQTagViewSet)
 
 urls = router.urls

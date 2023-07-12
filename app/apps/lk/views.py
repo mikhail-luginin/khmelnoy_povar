@@ -5,7 +5,6 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 
 from core.logs import LogsService
-from core.services.faq import FAQService
 from core.services.reports_service import ReportsService
 from core.utils.time import get_months, get_current_time
 from core.mixins import BaseLkView, ObjectEditMixin, ObjectCreateMixin, ObjectDeleteMixin
@@ -13,7 +12,7 @@ from core import exceptions
 from core.services import salary_service, bar_service, item_deficit_service, reviews_service, catalog_service, \
     positions_service, money_service, employees_service, expenses_service, pays_service, \
     timetable_service, storage_service, statement_service, salary_crud, product_remains_service, \
-    supplier_service, fines_service, product_service, arrival_service
+    supplier_service, fines_service, product_service, arrival_service, faq_service
 
 from .tasks import calculate_percent_premium_for_all, update_all_money
 from .services import index_page
@@ -22,7 +21,7 @@ from apps.bar.services.malfunctions import MalfunctionService
 from apps.repairer.services import RepairerService
 from apps.purchaser.services import PurchaserService
 
-from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee, ItemDeficit, Partner, FAQ
+from apps.lk.models import Catalog, CatalogType, Card, Expense, Fine, Employee, ItemDeficit, Partner, FAQ, FAQTag
 from apps.bar.models import Position, Timetable, Money, Salary, Pays, Arrival, TovarRequest, Setting
 from apps.repairer.models import Malfunction
 
@@ -1278,16 +1277,63 @@ class FAQView(BaseLkView):
     template_name = 'lk/faq/index.html'
 
 
+class FAQTagCreateView(ObjectCreateMixin):
+    template_name = 'lk/faq/tag_create.html'
+
+    def post(self, request):
+        name = request.POST.get('name')
+
+        try:
+            faq_service.tag_create(name=name)
+        except exceptions.FieldCannotBeEmptyError as error:
+            messages.error(request, str(error))
+
+        return redirect('/lk/faq')
+
+
+class FAQTagEditView(ObjectEditMixin):
+    template_name = 'lk/faq/tag_edit.html'
+    model = FAQTag
+
+    def post(self, request):
+        tag_id = request.GET.get('id')
+        name = request.POST.get('name')
+
+        try:
+            faq_service.tag_edit(tag_id=tag_id, name=name)
+        except (exceptions.FieldCannotBeEmptyError, FAQTag.DoesNotExist) as error:
+            messages.error(request, str(error))
+
+        return redirect('/lk/faq')
+
+
+class FAQTagDeleteView(ObjectDeleteMixin):
+    success_url = '/lk/faq'
+    model = FAQTag
+
+
 class FAQCreateView(ObjectCreateMixin):
     template_name = 'lk/faq/create.html'
 
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context.update({
+            "tags": faq_service.faq_tags_all()
+        })
+
+        return context
 
     def post(self, request):
         question_title = request.POST.get('question_title')
         question_body = request.POST.get('question_body')
+        question_tags = request.POST.getlist('question_tags')
 
         try:
-            FAQService().create(question_title=question_title, question_body=question_body)
+            faq_service.faq_create(
+                question_title=question_title,
+                question_body=question_body,
+                question_tags=question_tags
+            )
             messages.success(request, 'Запись успешно создана.')
             url = '/lk/faq'
         except exceptions.FieldNotFoundError as error:
@@ -1301,13 +1347,27 @@ class FAQEditView(ObjectEditMixin):
     template_name = 'lk/faq/edit.html'
     model = FAQ
 
+    def get_context_data(self, request, **kwargs) -> dict:
+        context = super().get_context_data(request, **kwargs)
+        context.update({
+            "tags": faq_service.faq_tags_all()
+        })
+
+        return context
+
     def post(self, request):
         row_id = request.GET.get('id')
         question_title = request.POST.get('question_title')
         question_body = request.POST.get('question_body')
+        question_tags = request.POST.getlist('question_tags')
 
         try:
-            FAQService().edit(row_id=row_id, question_title=question_title, question_body=question_body)
+            faq_service.faq_edit(
+                row_id=row_id,
+                question_title=question_title,
+                question_body=question_body,
+                question_tags=question_tags
+            )
             messages.success(request, 'Запись успешно отредактирована.')
             url = '/lk/faq'
         except (FAQ.DoesNotExist, exceptions.FieldNotFoundError) as error:
