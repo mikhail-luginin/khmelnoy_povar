@@ -13,7 +13,7 @@ from apps.repairer.models import Malfunction
 from apps.repairer.services import RepairerService
 from core import exceptions
 from core.services import bar_service, arrival_service, catalog_service, \
-    item_deficit_service, storage_service, faq_service
+    item_deficit_service, storage_service
 from core.services.salary_service import SalaryService
 from core.utils.telegram import send_message_to_telegram
 from core.utils.time import today_date, get_months, get_current_time
@@ -407,9 +407,3 @@ class SendReviseMessageView(BaseView):
 
 class FAQBarView(BaseView):
     template_name = 'bar/faq.html'
-
-    def get_context_data(self, request, **kwargs) -> dict:
-        context = super().get_context_data(request, **kwargs)
-        context['row'] = faq_service.faq_all()
-
-        return context
