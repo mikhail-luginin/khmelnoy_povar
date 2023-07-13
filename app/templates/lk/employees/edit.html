@@ -89,7 +89,17 @@
                                        style="display: none;" placeholder="Введите комментарий к смене статуса">
                             </div>
                             <div class="mb-1">
-                                <button type="submit" class="btn btn-success w-100">Сохранить</button>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <button type="submit" class="btn w-100">Сохранить</button>
+                                    </div>
+                                    <div class="col-6">
+                                        {% if row.is_deleted == 0 %}<a href="/lk/employees/dismiss?id={{ row.id }}"
+                                                                       class="btn btn-danger w-100">Уволить</a>{% else %}
+                                            <a href="/lk/employees/return?id={{ row.id }}"
+                                               class="btn btn-primary w-100">Вернуть</a>{% endif %}
+                                    </div>
+                                </div>
                             </div>
                         </form>
                     </div>
