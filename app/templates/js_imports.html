@@ -46,20 +46,20 @@
                 {
                     "data": null,
                     render: function (data, type, row) {
-                        let actions = '<span class="dropdown"><button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport" data-bs-toggle="dropdown">Действия</button><div class="dropdown-menu dropdown-menu-end">'
+                        let actions = ''
                         if (has_edit === true) {
-                            actions += '<a href="' + url + '/edit?id=' + row.id + '" class="dropdown-item">Редактировать</a>'
+                            actions += '<a href="' + url + '/edit?id=' + row.id + '"><i class="fa fa-edit"></i></a>'
                         }
                         if (has_delete === true) {
-                            actions += '<a class="dropdown-item" href="#" onclick="delete_confirm(' + '\'' + row.id + '\'' + ', ' + '\'Вы действительно хотите удалить данную запись?\'' + ', ' + '\'' + url + '/delete' + '\'' + ')">Удалить</a>'
+                            actions += '<a href="#" onclick="delete_confirm(' + '\'' + row.id + '\'' + ', ' + '\'Вы действительно хотите удалить данную запись?\'' + ', ' + '\'' + url + '/delete' + '\'' + ')"><i class="fa fa-trash"></i></a>'
                         }
                         if (has_update === true) {
-                            actions += '<a class="dropdown-item" href="' + url + '/update?id=' + row.id + '">Обновить</a>'
+                            actions += '<a href="' + url + '/update?id=' + row.id + '"><i class="fa fa-cloud-upload"></i></a>'
                         }
                         if (has_dismiss === true) {
                             if (row.active_status === 'Активный') {
-                                actions += '<a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#dismiss-employee-' + row.id + '">Уволить</a>'
-                                end += '<div class="modal modal-blur fade" id="dismiss-employee-' + row.id + '" tabindex="-1" role="dialog" aria-hidden="true">' +
+                                actions += '<a href="#" data-bs-toggle="modal" data-bs-target="#dismiss-employee-' + row.id + '"><i class="fa fa-user-minus"></i></a>' +
+                                    '<div class="modal modal-blur fade" id="dismiss-employee-' + row.id + '" tabindex="-1" role="dialog" aria-hidden="true">' +
                                     '<div class="modal-dialog modal-dialog-centered" role="document">' +
                                     '<div class="modal-content">' +
                                     '<form action="/lk/employees/dismiss">' +
@@ -93,8 +93,8 @@
                                     '</div>' +
                                     '</div>'
                             } else {
-                                actions += '<a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#return-employee-' + row.id + '">Вернуть на работу</a>'
-                                end += '<div class="modal modal-blur fade" id="return-employee-' + row.id + '" tabindex="-1" role="dialog" aria-hidden="true">' +
+                                actions += '<a href="#" data-bs-toggle="modal" data-bs-target="#return-employee-' + row.id + '"><i class="fa fa-user"></i></a>' +
+                                    '<div class="modal modal-blur fade" id="return-employee-' + row.id + '" tabindex="-1" role="dialog" aria-hidden="true">' +
                                     '<div class="modal-dialog modal-dialog-centered" role="document">' +
                                     '<div class="modal-content">' +
                                     '<form action="/lk/employees/return">' +
@@ -129,7 +129,7 @@
                                     '</div>'
                             }
                         }
-                        return actions + '</div></span>' + end
+                        return actions
                     }
                 }
             ])
