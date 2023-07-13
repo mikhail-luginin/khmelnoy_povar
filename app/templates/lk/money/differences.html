@@ -4,36 +4,142 @@
     <div class="container-xl">
         <div class="card rounded-3">
             <div class="card-table table-responsive rounded">
-                <table class="table table-sm table-striped nowrap w-100">
+                <table id="difference-table" class="table table-sm table-striped nowrap w-100">
                     <thead>
-                        <tr>
-                            <th>Дата</th>
-                            <th>Заведение</th>
-                            <th>Касса утро</th>
-                            <th>Касса вечер</th>
-                            <th>Расчетный</th>
-                            <th>Разница</th>
-                            <th></th>
-                        </tr>
+                    <tr class="column-filter dt-column-filter">
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Заведение</th>
+                        <th>Касса утро</th>
+                        <th>Касса вечер</th>
+                        <th>Расчетный</th>
+                        <th>Разница</th>
+                        <th></th>
+                    </tr>
                     </thead>
                     <tbody>
-                        {% for row in rows %}
-                            <tr>
-                                <td>{{ row.date_at }}</td>
-                                <td>{{ row.storage.name }}</td>
-                                <td>{{ row.sum_cash_morning }}</td>
-                                <td>{{ row.sum_cash_end_day }}</td>
-                                <td>{{ row.calculated }}</td>
-                                <td>{{ row.difference }}</td>
-                                <td>
-                                    <a href="/lk/money/edit?id={{ row.id }}"><i class="fa fa-edit"></i></a>
-                                    <a href="/lk/money/update?id={{ row.id }}"><i class="fa fa-cloud-upload"></i></a>
-                                </td>
-                            </tr>
-                        {% endfor %}
+                    {% for row in rows %}
+                        <tr>
+                            <td>{{ row.date_at }}</td>
+                            <td>{{ row.storage.name }}</td>
+                            <td>{{ row.sum_cash_morning }}</td>
+                            <td>{{ row.sum_cash_end_day }}</td>
+                            <td>{{ row.calculated }}</td>
+                            <td>{{ row.difference }}</td>
+                            <td>
+                                <a href="/lk/money/edit?id={{ row.id }}"><i class="fa fa-edit"></i></a>
+                                <a href="/lk/money/update?id={{ row.id }}"><i class="fa fa-cloud-upload"></i></a>
+                            </td>
+                        </tr>
+                    {% endfor %}
                     </tbody>
+                    <tfoot>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(() => {
+            // Run datatable
+            var table = $('#difference-table').DataTable({
+                language: {
+                    "url": "//cdn.datatables.net/plug-ins/1.11.1/i18n/ru.json"
+                },
+                lengthMenu: [10, 25, 50, 100, 200, 500],
+                pageLength: 25,
+                responsive: true,
+
+                drawCallback: function () {
+                    $('.dataTables_paginate > .pagination').addClass('pagination-sm') // make pagination small
+                },
+                "order": [[0, "desc"]],
+                footerCallback: function (row, data, start, end, display) {
+                    var api = this.api();
+                    // Remove the formatting to get integer data for summation
+                    var intVal = function (i) {
+                        return typeof i === 'string' ?
+                            i.replace(/[\$,]/g, '') * 1 :
+                            typeof i === 'number' ?
+                                i : 0;
+                    };
+                    pageTotal = api.column(2, {page: 'current'}).data().reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                    // Update footer
+                    $(api.column(2).footer()).html(
+                        '' + pageTotal  //+ ' (' + total4 + ' total)'
+                    );
+                    pageTotal = api.column(3, {page: 'current'}).data().reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                    // Update footer
+                    $(api.column(3).footer()).html(
+                        '' + pageTotal  //+ ' (' + total4 + ' total)'
+                    );
+                    pageTotal = api.column(4, {page: 'current'}).data().reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                    // Update footer
+                    $(api.column(4).footer()).html(
+                        '' + pageTotal  //+ ' (' + total4 + ' total)'
+                    );
+                    pageTotal = api.column(5, {page: 'current'}).data().reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                    // Update footer
+                    $(api.column(5).footer()).html(
+                        '' + pageTotal  //+ ' (' + total4 + ' total)'
+                    );
+                }
+
+            })
+            // Apply column filter
+            $('#table_id .dt-column-filter th').each(function (i) {
+                $('input', this).on('keyup change', function () {
+                    if (table.column(i).search() !== this.value) {
+                        table
+                            .column(i)
+                            .search(this.value)
+                            .draw()
+                    }
+                })
+            })
+            // Toggle Column filter function
+            var responsiveFilter = function (table, index, val) {
+                var th = $(table).find('.dt-column-filter th').eq(index)
+                val === true ? th.removeClass('d-none') : th.addClass('d-none')
+            }
+            // Run Toggle Column filter at first
+            $.each(table.columns().responsiveHidden(), function (index, val) {
+                responsiveFilter('#table_id', index, val)
+            })
+            // Run Toggle Column filter on responsive-resize event
+            table.on('responsive-resize', function (e, datatable, columns) {
+                $.each(columns, function (index, val) {
+                    responsiveFilter('#table_id', index, val)
+                })
+            })
+        })
+    </script>
 {% endblock %}
