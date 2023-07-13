@@ -28,7 +28,7 @@
                     <tbody>
                     {% for row in rows %}
                         <tr>
-                            <td>{{ row.date_at }}</td>
+                            <td>{{ row.date_at|date:'Y-m-d' }}</td>
                             <td>{{ row.storage.name }}</td>
                             <td>{{ row.sum_cash_morning }}</td>
                             <td>{{ row.sum_cash_end_day }}</td>
@@ -70,9 +70,6 @@
                 pageLength: 25,
                 responsive: true,
 
-                drawCallback: function () {
-                    $('.dataTables_paginate > .pagination').addClass('pagination-sm') // make pagination small
-                },
                 "order": [[0, "desc"]],
                 footerCallback: function (row, data, start, end, display) {
                     var api = this.api();
